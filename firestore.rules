@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function: Kullanıcı giriş yapmış mı?
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function: Kullanıcı kendi verisine mi erişmeye çalışıyor?
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users koleksiyonu - kullanıcılar sadece kendi belgelerine erişebilir
+    match /users/{userId} {
+      // Kullanıcı belgesi - sadece kendi belgesini okuyabilir/yazabilir
+      allow read, write: if isOwner(userId);
+      
+      // Work records alt koleksiyonu - kullanıcılar sadece kendi kayıtlarına erişebilir
+      match /work_records/{recordId} {
+        // Okuma: sadece kendi kayıtlarını okuyabilir
+        allow read: if isOwner(userId);
+        
+        // Silme: sadece kendi kayıtlarını silebilir
+        allow delete: if isOwner(userId);
+        
+        // Oluşturma: date alanı doğru formatta olmalı
+        allow create: if isOwner(userId) 
+          && request.resource.data.date is string
+          && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+          && request.resource.data.keys().hasAll(['date', 'updatedAt']);
+        
+        // Güncelleme: date alanı değiştirilemez, diğer alanlar güncellenebilir
+        allow update: if isOwner(userId)
+          && resource.data.date == request.resource.data.date
+          && request.resource.data.date is string
+          && request.resource.data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+      }
+    }
+    
+    // Diğer tüm koleksiyonlara erişim yasak
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

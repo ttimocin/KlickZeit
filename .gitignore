@@ -7,10 +7,8 @@ node_modules/
 .expo/
 dist/
 web-build/
-expo-env.d.ts
 
 # Native
-.kotlin/
 *.orig.*
 *.jks
 *.p8
@@ -32,12 +30,31 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
 
 # typescript
 *.tsbuildinfo
 
-app-example
+# Firebase
+google-services.json
+firebase-debug.log
+firestore-debug.log
 
-# generated native folders
-/ios
-/android
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build
+android/app/build/
+android/build/
+ios/build/
+*.apk
+*.aab
+*.ipa
+
+# Logs
+logs
+*.log
