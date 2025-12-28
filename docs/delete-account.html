@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hesap Silme - ZeitLog</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .warning strong {
+            color: #856404;
+        }
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .button {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        .button:hover {
+            background: #45a049;
+        }
+        .lang-selector {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        .lang-selector a {
+            color: #666;
+            text-decoration: none;
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+        .lang-selector a:hover {
+            background: #f0f0f0;
+        }
+        .lang-selector a.active {
+            background: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-selector">
+            <a href="delete-account.html" class="active">TR</a>
+            <a href="delete-account-en.html">EN</a>
+            <a href="delete-account-de.html">DE</a>
+        </div>
+
+        <h1>🗑️ Hesap Silme</h1>
+
+        <div class="warning">
+            <strong>⚠️ Uyarı:</strong> Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+        </div>
+
+        <h2>Hesabınızı Nasıl Silebilirsiniz?</h2>
+        <p>ZeitLog uygulaması içinden hesabınızı silebilirsiniz:</p>
+        <ol>
+            <li>Uygulamayı açın</li>
+            <li>Ayarlar (Settings) sayfasına gidin</li>
+            <li>"Hesabı Sil" (Delete Account) butonuna tıklayın</li>
+            <li>Onaylamak için "DELETE" yazın</li>
+            <li>İşlemi onaylayın</li>
+        </ol>
+
+        <h2>Silinecek Veriler</h2>
+        <div class="info-box">
+            <p>Hesabınız silindiğinde aşağıdaki veriler kalıcı olarak silinir:</p>
+            <ul>
+                <li>Tüm iş kayıtları (giriş/çıkış saatleri)</li>
+                <li>Bulut yedekleme verileri (Firebase)</li>
+                <li>Yerel depolama verileri (cihazınızdaki veriler)</li>
+                <li>Kullanıcı hesabı bilgileri</li>
+            </ul>
+        </div>
+
+        <h2>Önemli Notlar</h2>
+        <ul>
+            <li>Bu işlem <strong>geri alınamaz</strong></li>
+            <li>Tüm verileriniz kalıcı olarak silinir</li>
+            <li>Verilerinizi yedeklemek istiyorsanız, önce CSV olarak dışa aktarın</li>
+            <li>Hesap silme işlemi için uygulamada giriş yapmış olmanız gerekir</li>
+        </ul>
+
+        <h2>Yardım</h2>
+        <p>Hesap silme ile ilgili sorularınız için: <a href="mailto:support@taytek.dev">support@taytek.dev</a></p>
+
+        <a href="index.html" class="button">Ana Sayfaya Dön</a>
+    </div>
+</body>
+</html>
+

@@ -233,6 +233,14 @@ export default function SettingsScreen() {
                 <Ionicons name="log-out-outline" size={20} color="#FF5252" />
                 <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
               </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.deleteAccountButton} 
+                onPress={() => router.push('/delete-account')}
+              >
+                <Ionicons name="trash-outline" size={20} color="#FF5252" />
+                <Text style={styles.deleteAccountText}>{i18n.t('deleteAccount')}</Text>
+              </TouchableOpacity>
             </>
           ) : (
             <>
@@ -407,6 +415,23 @@ const createStyles = (isDark: boolean) =>
       fontSize: 16,
       color: '#FF5252',
       fontWeight: '500',
+    },
+    deleteAccountButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 12,
+      backgroundColor: isDark ? '#3a2020' : '#ffebee',
+      borderRadius: 12,
+      marginTop: 8,
+      borderWidth: 1,
+      borderColor: '#FF5252',
+    },
+    deleteAccountText: {
+      fontSize: 16,
+      color: '#FF5252',
+      fontWeight: '500',
+      marginLeft: 8,
     },
     loginHint: {
       fontSize: 14,
