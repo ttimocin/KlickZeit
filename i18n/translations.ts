@@ -72,6 +72,8 @@ export const translations = {
     weekly: 'Haftalık',
     thisWeek: 'Bu Hafta',
     total: 'Toplam',
+    day: 'Gün',
+    duration: 'Süre',
     
     // Zaman
     hours: 'saat',
@@ -127,10 +129,33 @@ export const translations = {
     removeHolidayConfirm: 'Bu günün tatil kaydını kaldırmak ister misiniz?',
     remove: 'Kaldır',
     
+    // Mola
+    editDay: 'Günü Düzenle',
+    breakCounted: 'Mola sayılıyor',
+    breakCountedDesc: 'Bu seçenek açıksa, mola süresi (30 dk) çalışma süresinden düşülmez.',
+    save: 'Kaydet',
+    
     // Legal
     privacyPolicy: 'Gizlilik Politikası',
     termsOfService: 'Kullanım Koşulları',
     lastUpdated: 'Son Güncelleme',
+    
+    // Account Deletion
+    deleteAccount: 'Hesabı Sil',
+    deleteAccountWarning: 'Hesabınızı Silmek İstediğinizden Emin misiniz?',
+    deleteAccountWarningText: 'Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir.',
+    deleteAccountConfirmationError: 'Onaylamak için "DELETE" yazmanız gerekiyor.',
+    deleteAccountFinalWarning: 'Bu işlem geri alınamaz. Tüm verileriniz kalıcı olarak silinecektir. Devam etmek istediğinizden emin misiniz?',
+    deleteAccountError: 'Hesap silinirken bir hata oluştu.',
+    accountDeleted: 'Hesap Silindi',
+    accountDeletedMessage: 'Hesabınız ve tüm verileriniz başarıyla silindi.',
+    whatWillBeDeleted: 'Silinecek Veriler:',
+    allWorkRecords: 'Tüm iş kayıtları',
+    cloudBackupData: 'Bulut yedekleme verileri',
+    localStorageData: 'Yerel depolama verileri',
+    userAccount: 'Kullanıcı hesabı',
+    typeToConfirm: 'Onaylamak için yazın',
+    loginRequired: 'Hesap silmek için giriş yapmanız gerekiyor.',
   },
   
   en: {
@@ -206,6 +231,8 @@ export const translations = {
     weekly: 'Weekly',
     thisWeek: 'This Week',
     total: 'Total',
+    day: 'Day',
+    duration: 'Duration',
     
     // Time
     hours: 'hours',
@@ -261,10 +288,33 @@ export const translations = {
     removeHolidayConfirm: 'Do you want to remove the holiday record for this day?',
     remove: 'Remove',
     
+    // Break
+    editDay: 'Edit Day',
+    breakCounted: 'Break counted',
+    breakCountedDesc: 'If this option is enabled, break time (30 min) will not be deducted from work duration.',
+    save: 'Save',
+    
     // Legal
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     lastUpdated: 'Last Updated',
+    
+    // Account Deletion
+    deleteAccount: 'Delete Account',
+    deleteAccountWarning: 'Are You Sure You Want to Delete Your Account?',
+    deleteAccountWarningText: 'This action cannot be undone. All your data will be permanently deleted.',
+    deleteAccountConfirmationError: 'You must type "DELETE" to confirm.',
+    deleteAccountFinalWarning: 'This action cannot be undone. All your data will be permanently deleted. Are you sure you want to continue?',
+    deleteAccountError: 'An error occurred while deleting your account.',
+    accountDeleted: 'Account Deleted',
+    accountDeletedMessage: 'Your account and all data have been successfully deleted.',
+    whatWillBeDeleted: 'What Will Be Deleted:',
+    allWorkRecords: 'All work records',
+    cloudBackupData: 'Cloud backup data',
+    localStorageData: 'Local storage data',
+    userAccount: 'User account',
+    typeToConfirm: 'Type to confirm',
+    loginRequired: 'You must be logged in to delete your account.',
   },
   
   de: {
@@ -340,6 +390,8 @@ export const translations = {
     weekly: 'Wöchentlich',
     thisWeek: 'Diese Woche',
     total: 'Gesamt',
+    day: 'Tag',
+    duration: 'Dauer',
     
     // Zeit
     hours: 'Stunden',
@@ -395,10 +447,33 @@ export const translations = {
     removeHolidayConfirm: 'Möchten Sie den Urlaubseintrag für diesen Tag entfernen?',
     remove: 'Entfernen',
     
+    // Pause
+    editDay: 'Tag bearbeiten',
+    breakCounted: 'Pause zählt',
+    breakCountedDesc: 'Wenn diese Option aktiviert ist, wird die Pausenzeit (30 Min) nicht von der Arbeitszeit abgezogen.',
+    save: 'Speichern',
+    
     // Legal
     privacyPolicy: 'Datenschutzerklärung',
     termsOfService: 'Nutzungsbedingungen',
     lastUpdated: 'Zuletzt aktualisiert',
+    
+    // Account Deletion
+    deleteAccount: 'Konto löschen',
+    deleteAccountWarning: 'Sind Sie sicher, dass Sie Ihr Konto löschen möchten?',
+    deleteAccountWarningText: 'Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten werden dauerhaft gelöscht.',
+    deleteAccountConfirmationError: 'Sie müssen "DELETE" eingeben, um zu bestätigen.',
+    deleteAccountFinalWarning: 'Diese Aktion kann nicht rückgängig gemacht werden. Alle Ihre Daten werden dauerhaft gelöscht. Möchten Sie wirklich fortfahren?',
+    deleteAccountError: 'Beim Löschen Ihres Kontos ist ein Fehler aufgetreten.',
+    accountDeleted: 'Konto gelöscht',
+    accountDeletedMessage: 'Ihr Konto und alle Daten wurden erfolgreich gelöscht.',
+    whatWillBeDeleted: 'Was gelöscht wird:',
+    allWorkRecords: 'Alle Arbeitsaufzeichnungen',
+    cloudBackupData: 'Cloud-Backup-Daten',
+    localStorageData: 'Lokale Speicherdaten',
+    userAccount: 'Benutzerkonto',
+    typeToConfirm: 'Zum Bestätigen eingeben',
+    loginRequired: 'Sie müssen angemeldet sein, um Ihr Konto zu löschen.',
   },
 };
 
