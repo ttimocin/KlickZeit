@@ -1,12 +1,12 @@
 # Katkıda Bulunma Rehberi
 
-ZeitLog projesine katkıda bulunmak istediğiniz için teşekkürler! 🎉
+KlickZeit projesine katkıda bulunmak istediğiniz için teşekkürler! 🎉
 
 ## Nasıl Katkıda Bulunabilirim?
 
 ### 🐛 Hata Bildirimi
 
-1. [Issues](https://github.com/ttimocin/ZeitLog/issues) sayfasına gidin
+1. [Issues](https://github.com/ttimocin/KlickZeit/issues) sayfasına gidin
 2. Yeni bir issue oluşturun
 3. Şu bilgileri ekleyin:
    - Uygulama versiyonu
@@ -17,7 +17,7 @@ ZeitLog projesine katkıda bulunmak istediğiniz için teşekkürler! 🎉
 
 ### ✨ Yeni Özellik Önerisi
 
-1. [Issues](https://github.com/ttimocin/ZeitLog/issues) sayfasında yeni bir issue açın
+1. [Issues](https://github.com/ttimocin/KlickZeit/issues) sayfasında yeni bir issue açın
 2. "Feature Request" etiketi ekleyin
 3. Özelliği detaylıca açıklayın:
    - Neden bu özellik gerekli?
@@ -28,8 +28,8 @@ ZeitLog projesine katkıda bulunmak istediğiniz için teşekkürler! 🎉
 
 1. **Repository'yi fork edin**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Yeni bir branch oluşturun**

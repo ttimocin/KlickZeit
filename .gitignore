@@ -51,6 +51,7 @@ firestore-debug.log
 android/app/build/
 android/build/
 ios/build/
+modules/wearable-data-layer/build/
 *.apk
 *.aab
 *.ipa

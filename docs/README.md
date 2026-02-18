@@ -4,7 +4,7 @@ Bu klasör GitHub Pages için web tabanlı yasal belgeleri içerir.
 
 ## GitHub Pages Kurulumu
 
-1. GitHub repository'nize gidin: https://github.com/ttimocin/ZeitLog
+1. GitHub repository'nize gidin: https://github.com/ttimocin/KlickZeit
 2. **Settings** > **Pages** bölümüne gidin
 3. **Source** kısmından **Deploy from a branch** seçin
 4. **Branch** olarak `main` seçin

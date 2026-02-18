@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - Work Time Tracking App
+# ⏱️ KlickZeit - Work Time Tracking App
 
 <div align="center">
 
@@ -21,9 +21,9 @@ Track your work hours with a single tap, backup to Firebase, and export as CSV.
 
 ## 📖 About
 
-ZeitLog is a **completely free and ad-free** mobile application that makes it easy to track your work hours. With its modern and user-friendly interface, tracking your work hours has never been easier.
+KlickZeit is a **completely free and ad-free** mobile application that makes it easy to track your work hours. With its modern and user-friendly interface, tracking your work hours has never been easier.
 
-### 🎯 Why ZeitLog?
+### 🎯 Why KlickZeit?
 
 - ✅ **Completely Free** - No fees, subscriptions, or hidden costs
 - ✅ **Ad-Free** - No ads or unsolicited notifications
@@ -86,8 +86,8 @@ ZeitLog is a **completely free and ad-free** mobile application that makes it ea
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Install dependencies**
@@ -186,7 +186,7 @@ ZeitLog is a **completely free and ad-free** mobile application that makes it ea
 ## 📁 Project Structure
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Expo Router pages
 │   ├── (tabs)/              # Tab navigation
 │   │   ├── index.tsx        # Main recording screen
@@ -283,7 +283,7 @@ We welcome your contributions! Please follow these steps:
 
 ## 🐛 Bug Reports
 
-If you find a bug, please report it on the [Issues](https://github.com/ttimocin/ZeitLog/issues) page. Provide as much detail as possible:
+If you find a bug, please report it on the [Issues](https://github.com/ttimocin/KlickZeit/issues) page. Provide as much detail as possible:
 
 - App version
 - Device and operating system
@@ -324,7 +324,7 @@ If you like this project, don't forget to give it a star! ⭐
 
 <div align="center">
 
-**Track your work hours easily with ZeitLog!** ⏱️
+**Track your work hours easily with KlickZeit!** ⏱️
 
 Made with ❤️ by TayTek
 

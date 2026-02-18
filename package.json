@@ -1,11 +1,11 @@
 {
-  "name": "zeitlog",
+  "name": "klickzeit",
   "version": "1.0.0",
   "description": "Ücretsiz ve reklamsız iş takip uygulaması - Tek tuşla giriş/çıkış kaydı",
   "main": "expo-router/entry",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ttimocin/ZeitLog.git"
+    "url": "https://github.com/ttimocin/KlickZeit.git"
   },
   "keywords": [
     "react-native",
