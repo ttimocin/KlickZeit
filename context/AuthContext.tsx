@@ -1,22 +1,23 @@
 import { auth } from '@/config/firebase';
+import { Logger } from '@/utils/logger';
 import {
-    GoogleSignin,
-    statusCodes,
+  GoogleSignin,
+  statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {
-    createUserWithEmailAndPassword,
-    GoogleAuthProvider,
-    onAuthStateChanged,
-    signInWithCredential,
-    signInWithEmailAndPassword,
-    signOut,
-    User,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithCredential,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
 } from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // Google Sign-In yapılandırması
 GoogleSignin.configure({
-    webClientId: '1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com',
+  webClientId: '1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com',
 });
 
 interface AuthContextType {
@@ -67,29 +68,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       // Google Play Services kontrolü
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-      
+
       // Google ile giriş yap
       const signInResult = await GoogleSignin.signIn();
-      
+
       // ID token al
       const idToken = signInResult?.data?.idToken;
-      
+
       if (!idToken) {
+        Logger.error('❌ ID Token alınamadı');
         return { error: 'Google token alınamadı' };
       }
-      
+
       // Firebase credential oluştur
       const credential = GoogleAuthProvider.credential(idToken);
-      
+
       // Firebase'e giriş yap
       await signInWithCredential(auth, credential);
-      
+
       return {};
     } catch (error: unknown) {
-      console.log('Google Sign-In Error:', error);
-      
+      Logger.error('❌ Google Sign-In Error:', error);
+      Logger.error('Error details:', JSON.stringify(error, null, 2));
+
       const googleError = error as { code?: string; message?: string };
-      
+
       if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
         return { error: 'Giriş iptal edildi' };
       } else if (googleError.code === statusCodes.IN_PROGRESS) {
@@ -97,8 +100,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         return { error: 'Google Play Servisleri kullanılamıyor' };
       }
-      
-      return { error: 'Google ile giriş başarısız' };
+
+      return { error: `Google ile giriş başarısız: ${googleError.message || googleError.code || 'Bilinmeyen hata'}` };
     }
   };
 
@@ -106,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await signOut(auth);
     } catch (error: unknown) {
-      console.error('Çıkış yapılırken hata:', error);
+      Logger.error('Çıkış yapılırken hata:', error);
       // Hata olsa bile kullanıcıyı çıkış yapmış say
       // Çünkü yerel state zaten temizlenecek
     }

@@ -52,7 +52,7 @@ export const upsertRecordByDateType = async (date: string, type: 'giris' | 'ciki
   try {
     const records = await getRecords();
     const existingIndex = records.findIndex(r => r.date === date && r.type === type);
-    
+
     if (existingIndex !== -1) {
       // Mevcut kayıt var - saati kontrol et
       if (records[existingIndex].time === time) {
@@ -119,12 +119,13 @@ export const setRecords = async (records: WorkRecord[]): Promise<boolean> => {
   }
 };
 
-// Son kaydı getir (bugünün son kaydı)
+// Son kaydı getir (bugünün son kaydı - sadece giris/cikis)
 export const getLastRecord = async (): Promise<WorkRecord | null> => {
   try {
     const records = await getRecords();
     const today = new Date().toISOString().split('T')[0];
-    const todayRecords = records.filter(r => r.date === today);
+    // Sadece giris ve cikis kayıtlarını filtrele (mola kayıtlarını hariç tut)
+    const todayRecords = records.filter(r => r.date === today && (r.type === 'giris' || r.type === 'cikis'));
     return todayRecords.length > 0 ? todayRecords[0] : null;
   } catch (error) {
     console.error('Son kayıt alınırken hata:', error);
@@ -136,10 +137,10 @@ export const getLastRecord = async (): Promise<WorkRecord | null> => {
 export const addHolidayRecord = async (date: string): Promise<boolean> => {
   try {
     const records = await getRecords();
-    
+
     // Bu tarih için mevcut kayıtları sil
     const filtered = records.filter(r => r.date !== date);
-    
+
     // Giriş kaydı (08:00)
     const girisRecord: WorkRecord = {
       id: `holiday_${date}_giris_${Date.now()}`,
@@ -150,7 +151,7 @@ export const addHolidayRecord = async (date: string): Promise<boolean> => {
       synced: false,
       isHoliday: true,
     };
-    
+
     // Çıkış kaydı (15:00 - 7 saat sonra)
     const cikisRecord: WorkRecord = {
       id: `holiday_${date}_cikis_${Date.now()}`,
@@ -161,11 +162,11 @@ export const addHolidayRecord = async (date: string): Promise<boolean> => {
       synced: false,
       isHoliday: true,
     };
-    
+
     // Kayıtları ekle
     filtered.unshift(cikisRecord);
     filtered.unshift(girisRecord);
-    
+
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
     return true;
   } catch (error) {
@@ -196,6 +197,147 @@ export const isHolidayDate = async (date: string): Promise<boolean> => {
     return false;
   }
 };
+
+// Mola sayılıyor mu kaydet
+const BREAK_COUNTED_KEY = 'break_counted_dates';
+
+export const setBreakCounted = async (date: string, counted: boolean): Promise<boolean> => {
+  try {
+    const data = await AsyncStorage.getItem(BREAK_COUNTED_KEY);
+    const dates: Record<string, boolean> = data ? JSON.parse(data) : {};
+
+    if (counted) {
+      dates[date] = true;
+    } else {
+      delete dates[date];
+    }
+
+    await AsyncStorage.setItem(BREAK_COUNTED_KEY, JSON.stringify(dates));
+    return true;
+  } catch (error) {
+    console.error('Mola sayılıyor kaydedilirken hata:', error);
+    return false;
+  }
+};
+
+export const getBreakCounted = async (date: string): Promise<boolean> => {
+  try {
+    const data = await AsyncStorage.getItem(BREAK_COUNTED_KEY);
+    if (!data) return false;
+    const dates: Record<string, boolean> = JSON.parse(data);
+    return dates[date] === true;
+  } catch (error) {
+    console.error('Mola sayılıyor okunurken hata:', error);
+    return false;
+  }
+};
+
+// Mola süresini kaydet (dakika cinsinden)
+const BREAK_DURATION_KEY = 'break_duration_dates';
+
+export const setBreakDuration = async (date: string, duration: number): Promise<boolean> => {
+  try {
+    const data = await AsyncStorage.getItem(BREAK_DURATION_KEY);
+    const dates: Record<string, number> = data ? JSON.parse(data) : {};
+
+    if (duration > 0) {
+      dates[date] = duration;
+    } else {
+      delete dates[date];
+    }
+
+    await AsyncStorage.setItem(BREAK_DURATION_KEY, JSON.stringify(dates));
+    return true;
+  } catch (error) {
+    console.error('Mola süresi kaydedilirken hata:', error);
+    return false;
+  }
+};
+
+export const getBreakDuration = async (date: string): Promise<number | null> => {
+  try {
+    const data = await AsyncStorage.getItem(BREAK_DURATION_KEY);
+    if (!data) return null;
+    const dates: Record<string, number> = JSON.parse(data);
+    return dates[date] ?? null;
+  } catch (error) {
+    console.error('Mola süresi okunurken hata:', error);
+    return null;
+  }
+};
+
+// Bugünün mola kayıtlarını getir
+export const getTodayBreakRecords = async (): Promise<WorkRecord[]> => {
+  try {
+    const records = await getRecords();
+    const today = new Date().toISOString().split('T')[0];
+    return records.filter(r => r.date === today && (r.type === 'molagiris' || r.type === 'molacikis'));
+  } catch (error) {
+    console.error('Bugünün mola kayıtları alınırken hata:', error);
+    return [];
+  }
+};
+
+// Son mola kaydını getir (bugünün)
+export const getLastBreakRecord = async (): Promise<WorkRecord | null> => {
+  try {
+    const breakRecords = await getTodayBreakRecords();
+    if (breakRecords.length === 0) return null;
+    // En son kaydı getir (timestamp'e göre sırala)
+    const sorted = breakRecords.sort((a, b) => b.timestamp - a.timestamp);
+    return sorted[0];
+  } catch (error) {
+    console.error('Son mola kaydı alınırken hata:', error);
+    return null;
+  }
+};
+
+
+// Uygulama standartları
+const APP_STANDARDS_KEY = 'app_standards';
+
+export interface AppStandards {
+  dailyWorkMinutes: number;    // Günlük çalışma süresi (dk), varsayılan 420 (7 saat)
+  defaultBreakMinutes: number; // Varsayılan mola süresi (dk), varsayılan 30
+  eveningThresholdMinutes: number; // Akşam mesai başlangıcı (gece yarısından dk), varsayılan 1200 (20:00)
+  workingDays: number[]; // Çalışma günleri (JS getDay: 0=Pazar..6=Cumartesi), varsayılan [1,2,3,4,5]
+}
+
+export const DEFAULT_STANDARDS: AppStandards = {
+  dailyWorkMinutes: 420,
+  defaultBreakMinutes: 30,
+  eveningThresholdMinutes: 1200,
+  workingDays: [1, 2, 3, 4, 5], // Pazartesi-Cuma
+};
+
+export const getAppStandards = async (): Promise<AppStandards> => {
+  try {
+    const data = await AsyncStorage.getItem(APP_STANDARDS_KEY);
+    if (data) {
+      return { ...DEFAULT_STANDARDS, ...JSON.parse(data) };
+    }
+    return { ...DEFAULT_STANDARDS };
+  } catch (error) {
+    console.error('Standartlar okunurken hata:', error);
+    return { ...DEFAULT_STANDARDS };
+  }
+};
+
+export const setAppStandards = async (standards: Partial<AppStandards>): Promise<boolean> => {
+  try {
+    const current = await getAppStandards();
+    const updated = { ...current, ...standards };
+    await AsyncStorage.setItem(APP_STANDARDS_KEY, JSON.stringify(updated));
+    return true;
+  } catch (error) {
+    console.error('Standartlar kaydedilirken hata:', error);
+    return false;
+  }
+};
+
+
+
+
 
 
 

@@ -7,6 +7,12 @@ const getLocale = (): string => {
     tr: 'tr-TR',
     en: 'en-US',
     de: 'de-DE',
+    fr: 'fr-FR',
+    pt: 'pt-PT',
+    ar: 'ar-SA',
+    zh: 'zh-CN',
+    ru: 'ru-RU',
+    uk: 'uk-UA',
   };
   return localeMap[lang] || 'en-US';
 };
@@ -50,6 +56,15 @@ export const getDayName = (dateStr: string): string => {
   const date = new Date(dateStr);
   return date.toLocaleDateString(getLocale(), { weekday: 'long' });
 };
+
+
+
+
+
+
+
+
+
 
 
 

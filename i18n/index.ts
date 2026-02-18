@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLocales } from 'expo-localization';
 import { TranslationKey, translations } from './translations';
 
-type Language = 'tr' | 'en' | 'de';
+type Language = 'tr' | 'en' | 'de' | 'fr' | 'pt' | 'ar' | 'zh' | 'ru' | 'uk';
 
 const LANGUAGE_KEY = '@zeitlog_language';
 
@@ -10,11 +10,11 @@ const LANGUAGE_KEY = '@zeitlog_language';
 const deviceLanguage = getLocales()[0]?.languageCode || 'en';
 
 // Desteklenen diller
-const supportedLanguages: Language[] = ['tr', 'en', 'de'];
+const supportedLanguages: Language[] = ['tr', 'en', 'de', 'fr', 'pt', 'ar', 'zh', 'ru', 'uk'];
 
 // Mevcut dil (varsayılan)
-let currentLocale: Language = supportedLanguages.includes(deviceLanguage as Language) 
-  ? (deviceLanguage as Language) 
+let currentLocale: Language = supportedLanguages.includes(deviceLanguage as Language)
+  ? (deviceLanguage as Language)
   : 'en';
 
 // Kaydedilmiş dili yükle
@@ -70,6 +70,15 @@ export const getLanguage = () => currentLocale;
 
 // Kısa çeviri fonksiyonu
 export const t = (key: TranslationKey) => i18n.t(key);
+
+
+
+
+
+
+
+
+
 
 
 

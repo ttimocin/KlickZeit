@@ -1,7 +1,8 @@
 import { auth, db } from '@/config/firebase';
 import { WorkRecord } from '@/types';
+import { Logger } from '@/utils/logger';
 import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
-import { getRecords, setRecords, updateRecord } from './storage';
+import { getRecords, setBreakCounted, setRecords, updateRecord } from './storage';
 
 // Kullanıcı giriş yapmış mı kontrol et
 const isUserLoggedIn = () => auth.currentUser !== null;
@@ -21,7 +22,7 @@ const dateToDocId = (date: string): string => {
     }
     return `${day}_${month}_${year}`;
   } catch (error) {
-    console.error('dateToDocId hatası:', error, 'date:', date);
+    Logger.error('dateToDocId hatası:', error, 'date:', date);
     // Fallback: geçersiz tarih için hash kullan
     return date.replace(/-/g, '_');
   }
@@ -41,7 +42,7 @@ const docIdToDate = (docId: string): string => {
     }
     return `${year}-${month}-${day}`;
   } catch (error) {
-    console.error('docIdToDate hatası:', error, 'docId:', docId);
+    Logger.error('docIdToDate hatası:', error, 'docId:', docId);
     // Fallback: geçersiz format için orijinal değeri döndür
     return docId.replace(/_/g, '-');
   }
@@ -67,53 +68,72 @@ export const syncToFirebase = async (record: WorkRecord): Promise<boolean> => {
   try {
     // Tarih formatını doğrula
     if (!record.date || !record.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      console.error('Geçersiz tarih formatı:', record.date);
+      Logger.error('Geçersiz tarih formatı:', record.date);
       return false;
     }
-    
+
     // Gün bazlı belge referansı: users/{userId}/work_records/{DD_MM_YYYY}
     const dateDocId = dateToDocId(record.date);
     if (!dateDocId) {
-      console.error('Belge ID oluşturulamadı:', record.date);
+      Logger.error('Belge ID oluşturulamadı:', record.date);
       return false;
     }
-    
+
     const dayDocRef = doc(db, 'users', userId, 'work_records', dateDocId);
-    
+
     // Mevcut belgeyi oku
     const existingDoc = await getDoc(dayDocRef);
     const existingData = existingDoc.exists() ? existingDoc.data() : {};
-    
+
     // Yeni veriyi hazırla
     const updateData: Record<string, unknown> = {
       date: record.date,
       updatedAt: serverTimestamp(),
     };
-    
+
+    // Kayıt tipine göre veriyi hazırla
     if (record.type === 'giris') {
       updateData.giris = record.time;
       updateData.girisTimestamp = record.timestamp;
+      // Tatil bilgisini kaydet
+      if (record.isHoliday) {
+        updateData.isHoliday = true;
+      }
     } else if (record.type === 'cikis') {
       updateData.cikis = record.time;
       updateData.cikisTimestamp = record.timestamp;
+      // Tatil bilgisini kaydet
+      if (record.isHoliday) {
+        updateData.isHoliday = true;
+      }
+    } else if (record.type === 'molagiris') {
+      // Sadece ilk mola girişini kaydet (eğer yoksa)
+      if (!existingData.molaGiris) {
+        updateData.molaGiris = record.time;
+        updateData.molaGirisTimestamp = record.timestamp;
+      }
+    } else if (record.type === 'molacikis') {
+      // Son mola çıkışını her zaman güncelle
+      updateData.molaCikis = record.time;
+      updateData.molaCikisTimestamp = record.timestamp;
     } else {
-      console.error('Geçersiz kayıt tipi:', record.type);
+      Logger.error('Geçersiz kayıt tipi:', record.type);
       return false;
     }
-    
+
     // Belgeyi güncelle veya oluştur
     await setDoc(dayDocRef, { ...existingData, ...updateData }, { merge: true });
-    
+
     // Yerel kaydı güncelle
     await updateRecord(record.id, { synced: true });
     return true;
   } catch (error: any) {
-    console.error('Firebase sync hatası:', error);
+    Logger.error('Firebase sync hatası:', error);
     // Firebase hata kodlarını kontrol et
     if (error?.code === 'permission-denied') {
-      console.error('Firestore izin hatası - kuralları kontrol edin');
+      Logger.error('Firestore izin hatası - kuralları kontrol edin');
     } else if (error?.code === 'unavailable') {
-      console.error('Firebase servisi kullanılamıyor');
+      Logger.error('Firebase servisi kullanılamıyor');
     }
     return false;
   }
@@ -129,10 +149,10 @@ export const syncAllPendingRecords = async (): Promise<{ success: number; failed
   try {
     const records = await getRecords();
     const pending = records.filter(r => !r.synced);
-    
+
     let success = 0;
     let failed = 0;
-    
+
     for (const record of pending) {
       const result = await syncToFirebase(record);
       if (result) {
@@ -141,11 +161,39 @@ export const syncAllPendingRecords = async (): Promise<{ success: number; failed
         failed++;
       }
     }
-    
+
     return { success, failed };
   } catch (error) {
-    console.error('Toplu sync hatası:', error);
+    Logger.error('Toplu sync hatası:', error);
     return { success: 0, failed: 0 };
+  }
+};
+
+// Mola ayarlarını Firebase'e sync et
+export const syncBreakSettings = async (date: string, breakCounted: boolean): Promise<boolean> => {
+  if (!isUserLoggedIn()) {
+    return false;
+  }
+
+  const userId = getUserId();
+  if (!userId) return false;
+
+  try {
+    const dateDocId = dateToDocId(date);
+    if (!dateDocId) return false;
+
+    const dayDocRef = doc(db, 'users', userId, 'work_records', dateDocId);
+
+    await setDoc(dayDocRef, {
+      date,
+      breakCounted,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    return true;
+  } catch (error) {
+    Logger.error('Mola ayarları sync hatası:', error);
+    return false;
   }
 };
 
@@ -160,21 +208,24 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
 
   try {
     const snapshot = await getDocs(userCollection);
-    
+
     // Gün bazlı belgelerden kayıtları çıkar
     const firebaseRecords: WorkRecord[] = [];
-    
+
     for (const docSnap of snapshot.docs) {
       try {
         const data = docSnap.data();
         const date = data.date || docIdToDate(docSnap.id);
-        
+
         // Tarih formatını doğrula
         if (!date || !date.match(/^\d{4}-\d{2}-\d{2}$/)) {
           console.warn('Geçersiz tarih formatı atlandı:', date, 'docId:', docSnap.id);
           continue;
         }
-        
+
+        // Tatil bilgisini al
+        const isHoliday = data.isHoliday === true;
+
         // Giriş kaydı
         if (data.giris && data.girisTimestamp) {
           firebaseRecords.push({
@@ -184,9 +235,10 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
             date,
             time: String(data.giris),
             synced: true,
+            isHoliday,
           });
         }
-        
+
         // Çıkış kaydı
         if (data.cikis && data.cikisTimestamp) {
           firebaseRecords.push({
@@ -196,10 +248,40 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
             date,
             time: String(data.cikis),
             synced: true,
+            isHoliday,
           });
         }
+
+        // Mola giriş kaydı
+        if (data.molaGiris && data.molaGirisTimestamp) {
+          firebaseRecords.push({
+            id: `firebase_${docSnap.id}_molagiris`,
+            type: 'molagiris',
+            timestamp: typeof data.molaGirisTimestamp === 'number' ? data.molaGirisTimestamp : Date.now(),
+            date,
+            time: String(data.molaGiris),
+            synced: true,
+          });
+        }
+
+        // Mola çıkış kaydı
+        if (data.molaCikis && data.molaCikisTimestamp) {
+          firebaseRecords.push({
+            id: `firebase_${docSnap.id}_molacikis`,
+            type: 'molacikis',
+            timestamp: typeof data.molaCikisTimestamp === 'number' ? data.molaCikisTimestamp : Date.now(),
+            date,
+            time: String(data.molaCikis),
+            synced: true,
+          });
+        }
+
+        // Mola ayarlarını geri yükle
+        if (typeof data.breakCounted === 'boolean') {
+          await setBreakCounted(date, data.breakCounted);
+        }
       } catch (error) {
-        console.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
+        Logger.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
         // Hatalı belgeyi atla ve devam et
         continue;
       }
@@ -207,11 +289,11 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
 
     // Mevcut yerel kayıtları al
     const localRecords = await getRecords();
-    
+
     // Firebase kayıtlarını yerel kayıtlarla birleştir (tekrarları önle)
     const localKeys = new Set(localRecords.map(r => `${r.date}_${r.type}`));
     const newRecords = firebaseRecords.filter(r => !localKeys.has(`${r.date}_${r.type}`));
-    
+
     if (newRecords.length > 0) {
       const mergedRecords = [...localRecords, ...newRecords].sort((a, b) => b.timestamp - a.timestamp);
       await setRecords(mergedRecords);
@@ -219,7 +301,7 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
 
     return { loaded: newRecords.length };
   } catch (error) {
-    console.error('Firebase kayıtları alınırken hata:', error);
+    Logger.error('Firebase kayıtları alınırken hata:', error);
     return { loaded: 0 };
   }
 };
@@ -236,18 +318,21 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
   try {
     const snapshot = await getDocs(userCollection);
     const records: WorkRecord[] = [];
-    
+
     for (const docSnap of snapshot.docs) {
       try {
         const data = docSnap.data();
         const date = data.date || docIdToDate(docSnap.id);
-        
+
         // Tarih formatını doğrula
         if (!date || !date.match(/^\d{4}-\d{2}-\d{2}$/)) {
           console.warn('Geçersiz tarih formatı atlandı:', date, 'docId:', docSnap.id);
           continue;
         }
-        
+
+        // Tatil bilgisi
+        const isHoliday = data.isHoliday === true;
+
         if (data.giris && data.girisTimestamp) {
           records.push({
             id: `firebase_${docSnap.id}_giris`,
@@ -256,9 +341,10 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
             date,
             time: String(data.giris),
             synced: true,
+            isHoliday,
           });
         }
-        
+
         if (data.cikis && data.cikisTimestamp) {
           records.push({
             id: `firebase_${docSnap.id}_cikis`,
@@ -267,22 +353,41 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
             date,
             time: String(data.cikis),
             synced: true,
+            isHoliday,
+          });
+        }
+
+        if (data.molaGiris && data.molaGirisTimestamp) {
+          records.push({
+            id: `firebase_${docSnap.id}_molagiris`,
+            type: 'molagiris',
+            timestamp: typeof data.molaGirisTimestamp === 'number' ? data.molaGirisTimestamp : Date.now(),
+            date,
+            time: String(data.molaGiris),
+            synced: true,
+          });
+        }
+
+        if (data.molaCikis && data.molaCikisTimestamp) {
+          records.push({
+            id: `firebase_${docSnap.id}_molacikis`,
+            type: 'molacikis',
+            timestamp: typeof data.molaCikisTimestamp === 'number' ? data.molaCikisTimestamp : Date.now(),
+            date,
+            time: String(data.molaCikis),
+            synced: true,
           });
         }
       } catch (error) {
-        console.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
+        Logger.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
         // Hatalı belgeyi atla ve devam et
         continue;
       }
     }
-    
+
     return records.sort((a, b) => b.timestamp - a.timestamp);
   } catch (error) {
-    console.error('Firebase kayıtları alınırken hata:', error);
+    Logger.error('Firebase kayıtları alınırken hata:', error);
     return [];
   }
 };
-
-
-
-
