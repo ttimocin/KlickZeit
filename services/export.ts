@@ -143,7 +143,7 @@ export const exportToCSV = async (): Promise<boolean> => {
     const standards = await getAppStandards();
     const csv = toCSV(summaries, standards.dailyWorkMinutes, standards.defaultBreakMinutes);
 
-    const fileName = `ZeitLog_${new Date().toISOString().split('T')[0]}.csv`;
+    const fileName = `KlickZeit_${new Date().toISOString().split('T')[0]}.csv`;
     const filePath = `${FileSystem.documentDirectory}${fileName}`;
 
     await FileSystem.writeAsStringAsync(filePath, csv);

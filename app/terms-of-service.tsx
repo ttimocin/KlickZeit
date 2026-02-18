@@ -22,11 +22,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Kabul',
-          content: 'ZeitLog uygulamasını kullanarak, bu Kullanım Koşullarını kabul etmiş sayılırsınız. Uygulamayı kullanmaya devam ederseniz, bu koşullara bağlı kalmayı kabul edersiniz.',
+          content: 'KlickZeit uygulamasını kullanarak, bu Kullanım Koşullarını kabul etmiş sayılırsınız. Uygulamayı kullanmaya devam ederseniz, bu koşullara bağlı kalmayı kabul edersiniz.',
         },
         {
           title: '2. Hizmet Açıklaması',
-          content: 'ZeitLog, işe giriş-çıkış saatlerinizi kaydetmenizi sağlayan ücretsiz bir mobil uygulamadır. Uygulama:\n\n• Giriş/çıkış saatlerinizi kaydetmenize olanak tanır\n• Verilerinizi Firebase üzerinden yedeklemenize izin verir\n• CSV formatında veri dışa aktarma özelliği sunar\n• Tamamen ücretsiz ve reklamsızdır',
+          content: 'KlickZeit, işe giriş-çıkış saatlerinizi kaydetmenizi sağlayan ücretsiz bir mobil uygulamadır. Uygulama:\n\n• Giriş/çıkış saatlerinizi kaydetmenize olanak tanır\n• Verilerinizi Firebase üzerinden yedeklemenize izin verir\n• CSV formatında veri dışa aktarma özelliği sunar\n• Tamamen ücretsiz ve reklamsızdır',
         },
         {
           title: '3. Kullanıcı Sorumlulukları',
@@ -34,15 +34,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Hizmet Kullanılabilirliği',
-          content: 'ZeitLog, hizmeti kesintisiz sağlamaya çalışır ancak:\n\n• Zaman zaman bakım veya güncellemeler nedeniyle hizmet kesintileri olabilir\n• İnternet bağlantısı gerektiren özellikler (Firebase senkronizasyonu) bağlantı durumuna bağlıdır\n• Uygulama çevrimdışı modda da çalışabilir',
+          content: 'KlickZeit, hizmeti kesintisiz sağlamaya çalışır ancak:\n\n• Zaman zaman bakım veya güncellemeler nedeniyle hizmet kesintileri olabilir\n• İnternet bağlantısı gerektiren özellikler (Firebase senkronizasyonu) bağlantı durumuna bağlıdır\n• Uygulama çevrimdışı modda da çalışabilir',
         },
         {
           title: '5. Fikri Mülkiyet',
-          content: 'ZeitLog ve tüm içeriği, telif hakkı ve diğer fikri mülkiyet yasalarıyla korunmaktadır. Uygulama MIT Lisansı altında açık kaynaklıdır.',
+          content: 'KlickZeit ve tüm içeriği, telif hakkı ve diğer fikri mülkiyet yasalarıyla korunmaktadır. Uygulama MIT Lisansı altında açık kaynaklıdır.',
         },
         {
           title: '6. Sorumluluk Reddi',
-          content: 'ZeitLog:\n\n• Verilerinizin kaybolmasından sorumlu tutulamaz\n• Uygulama kullanımından kaynaklanan herhangi bir zarardan sorumlu değildir\n• "OLDUĞU GİBİ" sağlanır, garanti verilmez',
+          content: 'KlickZeit:\n\n• Verilerinizin kaybolmasından sorumlu tutulamaz\n• Uygulama kullanımından kaynaklanan herhangi bir zarardan sorumlu değildir\n• "OLDUĞU GİBİ" sağlanır, garanti verilmez',
         },
         {
           title: '7. Değişiklikler',
@@ -50,7 +50,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. İletişim',
-          content: 'Sorularınız veya önerileriniz için:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Issues sayfasından bize ulaşabilirsiniz',
+          content: 'Sorularınız veya önerileriniz için:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Issues sayfasından bize ulaşabilirsiniz',
         },
       ],
     },
@@ -60,11 +60,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Acceptance',
-          content: 'By using the ZeitLog application, you agree to these Terms of Service. If you continue to use the app, you agree to be bound by these terms.',
+          content: 'By using the KlickZeit application, you agree to these Terms of Service. If you continue to use the app, you agree to be bound by these terms.',
         },
         {
           title: '2. Service Description',
-          content: 'ZeitLog is a free mobile application that allows you to record your work check-in/out times. The app:\n\n• Allows you to record your check-in/out times\n• Allows you to backup your data via Firebase\n• Provides CSV data export functionality\n• Is completely free and ad-free',
+          content: 'KlickZeit is a free mobile application that allows you to record your work check-in/out times. The app:\n\n• Allows you to record your check-in/out times\n• Allows you to backup your data via Firebase\n• Provides CSV data export functionality\n• Is completely free and ad-free',
         },
         {
           title: '3. User Responsibilities',
@@ -72,15 +72,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Service Availability',
-          content: 'ZeitLog strives to provide uninterrupted service, but:\n\n• Service interruptions may occur due to maintenance or updates\n• Features requiring internet connection (Firebase sync) depend on connection status\n• The app can also work in offline mode',
+          content: 'KlickZeit strives to provide uninterrupted service, but:\n\n• Service interruptions may occur due to maintenance or updates\n• Features requiring internet connection (Firebase sync) depend on connection status\n• The app can also work in offline mode',
         },
         {
           title: '5. Intellectual Property',
-          content: 'ZeitLog and all its content are protected by copyright and other intellectual property laws. The app is open source under the MIT License.',
+          content: 'KlickZeit and all its content are protected by copyright and other intellectual property laws. The app is open source under the MIT License.',
         },
         {
           title: '6. Disclaimer',
-          content: 'ZeitLog:\n\n• Cannot be held responsible for loss of your data\n• Is not liable for any damages arising from app usage\n• Is provided "AS IS" without warranty',
+          content: 'KlickZeit:\n\n• Cannot be held responsible for loss of your data\n• Is not liable for any damages arising from app usage\n• Is provided "AS IS" without warranty',
         },
         {
           title: '7. Changes',
@@ -88,7 +88,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Contact',
-          content: 'For questions or suggestions:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• You can reach us via the Issues page',
+          content: 'For questions or suggestions:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• You can reach us via the Issues page',
         },
       ],
     },
@@ -98,11 +98,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Annahme',
-          content: 'Durch die Nutzung der ZeitLog-Anwendung stimmen Sie diesen Nutzungsbedingungen zu. Wenn Sie die App weiterhin nutzen, stimmen Sie zu, an diese Bedingungen gebunden zu sein.',
+          content: 'Durch die Nutzung der KlickZeit-Anwendung stimmen Sie diesen Nutzungsbedingungen zu. Wenn Sie die App weiterhin nutzen, stimmen Sie zu, an diese Bedingungen gebunden zu sein.',
         },
         {
           title: '2. Dienstbeschreibung',
-          content: 'ZeitLog ist eine kostenlose mobile Anwendung, mit der Sie Ihre Arbeitszeiten erfassen können. Die App:\n\n• Ermöglicht die Erfassung Ihrer Ein-/Ausstempelzeiten\n• Ermöglicht die Sicherung Ihrer Daten über Firebase\n• Bietet CSV-Datenexport-Funktionalität\n• Ist vollständig kostenlos und werbefrei',
+          content: 'KlickZeit ist eine kostenlose mobile Anwendung, mit der Sie Ihre Arbeitszeiten erfassen können. Die App:\n\n• Ermöglicht die Erfassung Ihrer Ein-/Ausstempelzeiten\n• Ermöglicht die Sicherung Ihrer Daten über Firebase\n• Bietet CSV-Datenexport-Funktionalität\n• Ist vollständig kostenlos und werbefrei',
         },
         {
           title: '3. Benutzerverantwortlichkeiten',
@@ -110,15 +110,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Dienstverfügbarkeit',
-          content: 'ZeitLog bemüht sich, einen unterbrechungsfreien Service zu bieten, aber:\n\n• Dienstunterbrechungen können aufgrund von Wartung oder Updates auftreten\n• Funktionen, die eine Internetverbindung erfordern (Firebase-Sync), hängen vom Verbindungsstatus ab\n• Die App kann auch im Offline-Modus arbeiten',
+          content: 'KlickZeit bemüht sich, einen unterbrechungsfreien Service zu bieten, aber:\n\n• Dienstunterbrechungen können aufgrund von Wartung oder Updates auftreten\n• Funktionen, die eine Internetverbindung erfordern (Firebase-Sync), hängen vom Verbindungsstatus ab\n• Die App kann auch im Offline-Modus arbeiten',
         },
         {
           title: '5. Geistiges Eigentum',
-          content: 'ZeitLog und alle seine Inhalte sind durch Urheberrechte und andere Gesetze zum geistigen Eigentum geschützt. Die App ist unter der MIT-Lizenz Open Source.',
+          content: 'KlickZeit und alle seine Inhalte sind durch Urheberrechte und andere Gesetze zum geistigen Eigentum geschützt. Die App ist unter der MIT-Lizenz Open Source.',
         },
         {
           title: '6. Haftungsausschluss',
-          content: 'ZeitLog:\n\n• Kann nicht für den Verlust Ihrer Daten verantwortlich gemacht werden\n• Ist nicht haftbar für Schäden, die aus der App-Nutzung entstehen\n• Wird "WIE BESEHEN" ohne Gewährleistung bereitgestellt',
+          content: 'KlickZeit:\n\n• Kann nicht für den Verlust Ihrer Daten verantwortlich gemacht werden\n• Ist nicht haftbar für Schäden, die aus der App-Nutzung entstehen\n• Wird "WIE BESEHEN" ohne Gewährleistung bereitgestellt',
         },
         {
           title: '7. Änderungen',
@@ -126,7 +126,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Kontakt',
-          content: 'Bei Fragen oder Vorschlägen:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Sie können uns über die Issues-Seite erreichen',
+          content: 'Bei Fragen oder Vorschlägen:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Sie können uns über die Issues-Seite erreichen',
         },
       ],
     },
@@ -136,11 +136,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Acceptation',
-          content: 'En utilisant l\'application ZeitLog, vous acceptez ces Conditions d\'utilisation. Si vous continuez à utiliser l\'application, vous acceptez d\'être lié par ces conditions.',
+          content: 'En utilisant l\'application KlickZeit, vous acceptez ces Conditions d\'utilisation. Si vous continuez à utiliser l\'application, vous acceptez d\'être lié par ces conditions.',
         },
         {
           title: '2. Description du service',
-          content: 'ZeitLog est une application mobile gratuite qui vous permet d\'enregistrer vos heures d\'entrée/sortie de travail. L\'application :\n\n• Vous permet d\'enregistrer vos heures d\'entrée/sortie\n• Vous permet de sauvegarder vos données via Firebase\n• Fournit une fonctionnalité d\'exportation de données CSV\n• Est entièrement gratuite et sans publicité',
+          content: 'KlickZeit est une application mobile gratuite qui vous permet d\'enregistrer vos heures d\'entrée/sortie de travail. L\'application :\n\n• Vous permet d\'enregistrer vos heures d\'entrée/sortie\n• Vous permet de sauvegarder vos données via Firebase\n• Fournit une fonctionnalité d\'exportation de données CSV\n• Est entièrement gratuite et sans publicité',
         },
         {
           title: '3. Responsabilités de l\'utilisateur',
@@ -148,15 +148,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Disponibilité du service',
-          content: 'ZeitLog s\'efforce de fournir un service ininterrompu, mais :\n\n• Des interruptions de service peuvent survenir en raison de maintenance ou de mises à jour\n• Les fonctionnalités nécessitant une connexion Internet (synchronisation Firebase) dépendent de l\'état de la connexion\n• L\'application peut également fonctionner en mode hors ligne',
+          content: 'KlickZeit s\'efforce de fournir un service ininterrompu, mais :\n\n• Des interruptions de service peuvent survenir en raison de maintenance ou de mises à jour\n• Les fonctionnalités nécessitant une connexion Internet (synchronisation Firebase) dépendent de l\'état de la connexion\n• L\'application peut également fonctionner en mode hors ligne',
         },
         {
           title: '5. Propriété intellectuelle',
-          content: 'ZeitLog et tout son contenu sont protégés par le droit d\'auteur et d\'autres lois sur la propriété intellectuelle. L\'application est open source sous licence MIT.',
+          content: 'KlickZeit et tout son contenu sont protégés par le droit d\'auteur et d\'autres lois sur la propriété intellectuelle. L\'application est open source sous licence MIT.',
         },
         {
           title: '6. Avis de non-responsabilité',
-          content: 'ZeitLog :\n\n• Ne peut être tenu responsable de la perte de vos données\n• N\'est pas responsable des dommages résultant de l\'utilisation de l\'application\n• Est fourni "TEL QUEL" sans garantie',
+          content: 'KlickZeit :\n\n• Ne peut être tenu responsable de la perte de vos données\n• N\'est pas responsable des dommages résultant de l\'utilisation de l\'application\n• Est fourni "TEL QUEL" sans garantie',
         },
         {
           title: '7. Modifications',
@@ -164,7 +164,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Contact',
-          content: 'Pour des questions ou des suggestions :\n\n• GitHub : https://github.com/ttimocin/ZeitLog\n• Vous pouvez nous contacter via la page Issues',
+          content: 'Pour des questions ou des suggestions :\n\n• GitHub : https://github.com/ttimocin/KlickZeit\n• Vous pouvez nous contacter via la page Issues',
         },
       ],
     },
@@ -174,11 +174,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Aceitação',
-          content: 'Ao usar o aplicativo ZeitLog, você concorda com estes Termos de Serviço. Se você continuar a usar o aplicativo, você concorda em ficar vinculado a estes termos.',
+          content: 'Ao usar o aplicativo KlickZeit, você concorda com estes Termos de Serviço. Se você continuar a usar o aplicativo, você concorda em ficar vinculado a estes termos.',
         },
         {
           title: '2. Descrição do Serviço',
-          content: 'ZeitLog é um aplicativo móvel gratuito que permite registrar seus horários de entrada/saída do trabalho. O aplicativo:\n\n• Permite registrar seus horários de entrada/saída\n• Permite fazer backup de seus dados via Firebase\n• Fornece funcionalidade de exportação de dados CSV\n• É totalmente gratuito e sem anúncios',
+          content: 'KlickZeit é um aplicativo móvel gratuito que permite registrar seus horários de entrada/saída do trabalho. O aplicativo:\n\n• Permite registrar seus horários de entrada/saída\n• Permite fazer backup de seus dados via Firebase\n• Fornece funcionalidade de exportação de dados CSV\n• É totalmente gratuito e sem anúncios',
         },
         {
           title: '3. Responsabilidades do Usuário',
@@ -186,15 +186,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Disponibilidade do Serviço',
-          content: 'ZeitLog se esforça para fornecer um serviço ininterrupto, mas:\n\n• Interrupções de serviço podem ocorrer devido a manutenção ou atualizações\n• Recursos que requerem conexão com a internet (sincronização Firebase) dependem do status da conexão\n• O aplicativo também pode funcionar no modo offline',
+          content: 'KlickZeit se esforça para fornecer um serviço ininterrupto, mas:\n\n• Interrupções de serviço podem ocorrer devido a manutenção ou atualizações\n• Recursos que requerem conexão com a internet (sincronização Firebase) dependem do status da conexão\n• O aplicativo também pode funcionar no modo offline',
         },
         {
           title: '5. Propriedade Intelectual',
-          content: 'ZeitLog e todo o seu conteúdo são protegidos por direitos autorais e outras leis de propriedade intelectual. O aplicativo é de código aberto sob a Licença MIT.',
+          content: 'KlickZeit e todo o seu conteúdo são protegidos por direitos autorais e outras leis de propriedade intelectual. O aplicativo é de código aberto sob a Licença MIT.',
         },
         {
           title: '6. Isenção de Responsabilidade',
-          content: 'ZeitLog:\n\n• Não pode ser responsabilizado pela perda de seus dados\n• Não é responsável por quaisquer danos decorrentes do uso do aplicativo\n• É fornecido "COMO ESTÁ" sem garantia',
+          content: 'KlickZeit:\n\n• Não pode ser responsabilizado pela perda de seus dados\n• Não é responsável por quaisquer danos decorrentes do uso do aplicativo\n• É fornecido "COMO ESTÁ" sem garantia',
         },
         {
           title: '7. Alterações',
@@ -202,7 +202,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Contato',
-          content: 'Para perguntas ou sugestões:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Você pode nos contatar através da página Issues',
+          content: 'Para perguntas ou sugestões:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Você pode nos contatar através da página Issues',
         },
       ],
     },
@@ -212,11 +212,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. القبول',
-          content: 'باستخدام تطبيق ZeitLog، فإنك توافق على شروط الخدمة هذه. إذا واصلت استخدام التطبيق، فإنك توافق على الالتزام بهذه الشروط.',
+          content: 'باستخدام تطبيق KlickZeit، فإنك توافق على شروط الخدمة هذه. إذا واصلت استخدام التطبيق، فإنك توافق على الالتزام بهذه الشروط.',
         },
         {
           title: '2. وصف الخدمة',
-          content: 'تطبيق ZeitLog هو تطبيق محمول مجاني يسمح لك بتسجيل أوقات الدخول/الخروج في العمل. يوفر التطبيق:\n\n• إمكانية تسجيل أوقات الدخول/الخروج\n• إمكانية نسخ بياناتك احتياطيًا عبر Firebase\n• خاصية تصدير البيانات بتنسيق CSV\n• مجاني تمامًا وخالي من الإعلانات',
+          content: 'تطبيق KlickZeit هو تطبيق محمول مجاني يسمح لك بتسجيل أوقات الدخول/الخروج في العمل. يوفر التطبيق:\n\n• إمكانية تسجيل أوقات الدخول/الخروج\n• إمكانية نسخ بياناتك احتياطيًا عبر Firebase\n• خاصية تصدير البيانات بتنسيق CSV\n• مجاني تمامًا وخالي من الإعلانات',
         },
         {
           title: '3. مسؤوليات المستخدم',
@@ -224,15 +224,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. توفر الخدمة',
-          content: 'يسعى ZeitLog لتقديم خدمة دون انقطاع، ولكن:\n\n• قد تحدث انقطاعات في الخدمة بسبب الصيانة أو التحديثات\n• الميزات التي تتطلب اتصالاً بالإنترنت (مزامنة Firebase) تعتمد على حالة الاتصال\n• يمكن للتطبيق العمل أيضًا في وضع عدم الاتصال',
+          content: 'يسعى KlickZeit لتقديم خدمة دون انقطاع، ولكن:\n\n• قد تحدث انقطاعات في الخدمة بسبب الصيانة أو التحديثات\n• الميزات التي تتطلب اتصالاً بالإنترنت (مزامنة Firebase) تعتمد على حالة الاتصال\n• يمكن للتطبيق العمل أيضًا في وضع عدم الاتصال',
         },
         {
           title: '5. الملكية الفكرية',
-          content: 'ZeitLog وجميع محتوياته محمية بموجب قوانين حقوق الطبع والنشر وقوانين الملكية الفكرية الأخرى. التطبيق مفتوح المصدر بموجب ترخيص MIT.',
+          content: 'KlickZeit وجميع محتوياته محمية بموجب قوانين حقوق الطبع والنشر وقوانين الملكية الفكرية الأخرى. التطبيق مفتوح المصدر بموجب ترخيص MIT.',
         },
         {
           title: '6. إخلاء المسؤولية',
-          content: 'ZeitLog:\n\n• لا يمكن أن يكون مسؤولاً عن فقدان بياناتك\n• غير مسؤول عن أي أضرار ناجمة عن استخدام التطبيق\n• يتم تقديمه "كما هو" دون ضمان',
+          content: 'KlickZeit:\n\n• لا يمكن أن يكون مسؤولاً عن فقدان بياناتك\n• غير مسؤول عن أي أضرار ناجمة عن استخدام التطبيق\n• يتم تقديمه "كما هو" دون ضمان',
         },
         {
           title: '7. التغييرات',
@@ -240,7 +240,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. الاتصال',
-          content: 'للأسئلة أو الاقتراحات:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• يمكنك الوصول إلينا عبر صفحة المشكلات (Issues)',
+          content: 'للأسئلة أو الاقتراحات:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• يمكنك الوصول إلينا عبر صفحة المشكلات (Issues)',
         },
       ],
     },
@@ -250,11 +250,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. 接受',
-          content: '使用 ZeitLog 应用程序即表示您同意这些服务条款。如果您继续使用该应用程序，即表示您同意受这些条款的约束。',
+          content: '使用 KlickZeit 应用程序即表示您同意这些服务条款。如果您继续使用该应用程序，即表示您同意受这些条款的约束。',
         },
         {
           title: '2. 服务说明',
-          content: 'ZeitLog 是一款免费的移动应用程序，允许您记录工作签入/签出时间。该应用程序：\n\n• 允许您记录签入/签出时间\n• 允许您通过 Firebase 备份数据\n• 提供 CSV 数据导出功能\n• 完全免费且无广告',
+          content: 'KlickZeit 是一款免费的移动应用程序，允许您记录工作签入/签出时间。该应用程序：\n\n• 允许您记录签入/签出时间\n• 允许您通过 Firebase 备份数据\n• 提供 CSV 数据导出功能\n• 完全免费且无广告',
         },
         {
           title: '3. 用户责任',
@@ -262,15 +262,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. 服务可用性',
-          content: 'ZeitLog 致力于提供不间断的服务，但是：\n\n• 由于维护或更新，可能会出现服务中断\n• 需要互联网连接的功能（Firebase 同步）取决于连接状态\n• 该应用程序也可以在离线模式下工作',
+          content: 'KlickZeit 致力于提供不间断的服务，但是：\n\n• 由于维护或更新，可能会出现服务中断\n• 需要互联网连接的功能（Firebase 同步）取决于连接状态\n• 该应用程序也可以在离线模式下工作',
         },
         {
           title: '5. 知识产权',
-          content: 'ZeitLog 及其所有内容受版权和其他知识产权法律保护。该应用程序是在 MIT 许可下开源的。',
+          content: 'KlickZeit 及其所有内容受版权和其他知识产权法律保护。该应用程序是在 MIT 许可下开源的。',
         },
         {
           title: '6. 免责声明',
-          content: 'ZeitLog：\n\n• 不对您的数据丢失负责\n• 不对因使用应用程序而造成的任何损害负责\n• “按原样”提供，不提供担保',
+          content: 'KlickZeit：\n\n• 不对您的数据丢失负责\n• 不对因使用应用程序而造成的任何损害负责\n• “按原样”提供，不提供担保',
         },
         {
           title: '7. 变更',
@@ -278,7 +278,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. 联系方式',
-          content: '如有疑问或建议：\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• 您可以通过 Issues 页面联系我们',
+          content: '如有疑问或建议：\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• 您可以通过 Issues 页面联系我们',
         },
       ],
     },
@@ -288,11 +288,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Принятие',
-          content: 'Используя приложение ZeitLog, вы соглашаетесь с этими Условиями использования. Если вы продолжаете использовать приложение, вы соглашаетесь соблюдать эти условия.',
+          content: 'Используя приложение KlickZeit, вы соглашаетесь с этими Условиями использования. Если вы продолжаете использовать приложение, вы соглашаетесь соблюдать эти условия.',
         },
         {
           title: '2. Описание услуги',
-          content: 'ZeitLog — это бесплатное мобильное приложение, которое позволяет записывать время прихода/ухода с работы. Приложение:\n\n• Позволяет записывать время прихода/ухода\n• Позволяет создавать резервные копии данных через Firebase\n• Предоставляет функцию экспорта данных в CSV\n• Полностью бесплатно и без рекламы',
+          content: 'KlickZeit — это бесплатное мобильное приложение, которое позволяет записывать время прихода/ухода с работы. Приложение:\n\n• Позволяет записывать время прихода/ухода\n• Позволяет создавать резервные копии данных через Firebase\n• Предоставляет функцию экспорта данных в CSV\n• Полностью бесплатно и без рекламы',
         },
         {
           title: '3. Обязанности пользователя',
@@ -300,15 +300,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Доступность услуги',
-          content: 'ZeitLog стремится предоставлять бесперебойное обслуживание, но:\n\n• Перерывы в обслуживании могут возникать из-за технического обслуживания или обновлений\n• Функции, требующие подключения к Интернету (синхронизация Firebase), зависят от состояния подключения\n• Приложение также может работать в автономном режиме',
+          content: 'KlickZeit стремится предоставлять бесперебойное обслуживание, но:\n\n• Перерывы в обслуживании могут возникать из-за технического обслуживания или обновлений\n• Функции, требующие подключения к Интернету (синхронизация Firebase), зависят от состояния подключения\n• Приложение также может работать в автономном режиме',
         },
         {
           title: '5. Интеллектуальная собственность',
-          content: 'ZeitLog и весь его контент защищены авторским правом и другими законами об интеллектуальной собственности. Приложение с открытым исходным кодом под лицензией MIT.',
+          content: 'KlickZeit и весь его контент защищены авторским правом и другими законами об интеллектуальной собственности. Приложение с открытым исходным кодом под лицензией MIT.',
         },
         {
           title: '6. Отказ от ответственности',
-          content: 'ZeitLog:\n\n• Не несет ответственности за потерю ваших данных\n• Не несет ответственности за любой ущерб, возникший в результате использования приложения\n• Предоставляется «КАК ЕСТЬ» без гарантии',
+          content: 'KlickZeit:\n\n• Не несет ответственности за потерю ваших данных\n• Не несет ответственности за любой ущерб, возникший в результате использования приложения\n• Предоставляется «КАК ЕСТЬ» без гарантии',
         },
         {
           title: '7. Изменения',
@@ -316,7 +316,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Контакт',
-          content: 'По вопросам или предложениям:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Вы можете связаться с нами через страницу Issues',
+          content: 'По вопросам или предложениям:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Вы можете связаться с нами через страницу Issues',
         },
       ],
     },
@@ -326,11 +326,11 @@ export default function TermsOfServiceScreen() {
       sections: [
         {
           title: '1. Прийняття',
-          content: 'Використовуючи додаток ZeitLog, ви погоджуєтесь з цими Умовами використання. Якщо ви продовжуєте використовувати додаток, ви погоджуєтесь дотримуватися цих умов.',
+          content: 'Використовуючи додаток KlickZeit, ви погоджуєтесь з цими Умовами використання. Якщо ви продовжуєте використовувати додаток, ви погоджуєтесь дотримуватися цих умов.',
         },
         {
           title: '2. Опис послуги',
-          content: 'ZeitLog — це безкоштовний мобільний додаток, який дозволяє записувати час вашого приходу/виходу з роботи. Додаток:\n\n• Дозволяє записувати час приходу/виходу\n• Дозволяє створювати резервні копії ваших даних через Firebase\n• Надає функцію експорту даних у CSV\n• Повністю безкоштовний і без реклами',
+          content: 'KlickZeit — це безкоштовний мобільний додаток, який дозволяє записувати час вашого приходу/виходу з роботи. Додаток:\n\n• Дозволяє записувати час приходу/виходу\n• Дозволяє створювати резервні копії ваших даних через Firebase\n• Надає функцію експорту даних у CSV\n• Повністю безкоштовний і без реклами',
         },
         {
           title: '3. Обов\'язки користувача',
@@ -338,15 +338,15 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '4. Доступність послуги',
-          content: 'ZeitLog прагне надавати безперебійне обслуговування, але:\n\n• Перерви в обслуговуванні можуть виникати через технічне обслуговування або оновлення\n• Функції, що вимагають підключення до Інтернету (синхронізація Firebase), залежать від стану підключення\n• Додаток також може працювати в автономному режимі',
+          content: 'KlickZeit прагне надавати безперебійне обслуговування, але:\n\n• Перерви в обслуговуванні можуть виникати через технічне обслуговування або оновлення\n• Функції, що вимагають підключення до Інтернету (синхронізація Firebase), залежать від стану підключення\n• Додаток також може працювати в автономному режимі',
         },
         {
           title: '5. Інтелектуальна власність',
-          content: 'ZeitLog і весь його контент захищені авторським правом та іншими законами про інтелектуальну власність. Додаток є відкритим кодом під ліцензією MIT.',
+          content: 'KlickZeit і весь його контент захищені авторським правом та іншими законами про інтелектуальну власність. Додаток є відкритим кодом під ліцензією MIT.',
         },
         {
           title: '6. Відмова від відповідальності',
-          content: 'ZeitLog:\n\n• Не несе відповідальності за втрату ваших даних\n• Не несе відповідальності за будь-які збитки, що виникли внаслідок використання додатку\n• Надається «ЯК Є» без гарантії',
+          content: 'KlickZeit:\n\n• Не несе відповідальності за втрату ваших даних\n• Не несе відповідальності за будь-які збитки, що виникли внаслідок використання додатку\n• Надається «ЯК Є» без гарантії',
         },
         {
           title: '7. Зміни',
@@ -354,7 +354,7 @@ export default function TermsOfServiceScreen() {
         },
         {
           title: '8. Контакт',
-          content: 'З питань або пропозицій:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Ви можете зв\'язатися з нами через сторінку Issues',
+          content: 'З питань або пропозицій:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Ви можете зв\'язатися з нами через сторінку Issues',
         },
       ],
     },

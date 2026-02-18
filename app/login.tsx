@@ -61,7 +61,7 @@ export default function LoginScreen() {
 
     setIsLoading(true);
     try {
-      const result = isLogin 
+      const result = isLogin
         ? await signIn(email, password)
         : await signUp(email, password);
 
@@ -92,11 +92,11 @@ export default function LoginScreen() {
   const styles = createStyles(isDark);
 
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -104,7 +104,7 @@ export default function LoginScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Text style={styles.logo}>⏱️</Text>
-          <Text style={styles.appName}>ZeitLog</Text>
+          <Text style={styles.appName}>KlickZeit</Text>
           <Text style={styles.tagline}>{i18n.t('appDescription')}</Text>
         </View>
 
@@ -141,16 +141,16 @@ export default function LoginScreen() {
               secureTextEntry={!showPassword}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons 
-                name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
-                size={20} 
-                color={isDark ? '#888' : '#666'} 
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={20}
+                color={isDark ? '#888' : '#666'}
               />
             </TouchableOpacity>
           </View>
 
           {/* Submit Button */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.submitButton}
             onPress={handleSubmit}
             disabled={isLoading}
@@ -172,7 +172,7 @@ export default function LoginScreen() {
           </View>
 
           {/* Google Sign In */}
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.googleButton}
             onPress={handleGoogleSignIn}
             disabled={isLoading}
@@ -194,7 +194,7 @@ export default function LoginScreen() {
           </View>
         </View>
       </ScrollView>
-      
+
       {/* Custom Modal */}
       <ModalComponent />
     </KeyboardAvoidingView>

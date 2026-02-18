@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "ZeitLog",
-    "slug": "IsTakipApp",
+    "name": "KlickZeit",
+    "slug": "klickzeit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "istakipapp",
+    "scheme": "klickzeit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.taytek.zeitlog"
+      "bundleIdentifier": "com.taytek.klickzeit"
     },
     "android": {
-      "package": "com.taytek.zeitlog",
+      "package": "com.taytek.klickzeit",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#4CAF50",

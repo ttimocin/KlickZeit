@@ -7,20 +7,41 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1014925050088:android:96df4b3ea9b68bd706895d",
+        "mobilesdk_app_id": "1:1014925050088:android:99090f4d5b50376506895d",
         "android_client_info": {
-          "package_name": "com.taytek.zeitlog"
+          "package_name": "com.taytek.klickzeit"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1014925050088-kc5emr03o46njt5uvmlasrd78nk8f9e1.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.taytek.zeitlog",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
+          "client_id": "1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCfqdLcrtddDq4CzwiL8LklMQ7VXr59SuU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1014925050088:android:dd7b88f84559b4f606895d",
+        "android_client_info": {
+          "package_name": "com.taytek.zeitlog.wear"
+        }
+      },
+      "oauth_client": [
         {
           "client_id": "1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com",
           "client_type": 3

@@ -366,7 +366,7 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{i18n.t('about')}</Text>
           <View style={styles.aboutCard}>
-            <Text style={styles.appName}>ZeitLog</Text>
+            <Text style={styles.appName}>KlickZeit</Text>
             <Text style={styles.appVersion}>v1.0.0</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
@@ -375,7 +375,7 @@ export default function SettingsScreen() {
             style={styles.linkButton}
             onPress={async () => {
               try {
-                await Linking.openURL('https://github.com/ttimocin/ZeitLog');
+                await Linking.openURL('https://github.com/ttimocin/KlickZeit');
               } catch (error) {
                 console.error('GitHub linki açılırken hata:', error);
               }

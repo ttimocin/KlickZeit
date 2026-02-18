@@ -2,8 +2,8 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 // Bildirim kanalı ID'si - yeni kanal
-const CHANNEL_ID = 'zeitlog-alerts';
-const NOTIFICATION_ID = 'zeitlog-work';
+const CHANNEL_ID = 'klickzeit-alerts';
+const NOTIFICATION_ID = 'klickzeit-work';
 
 // Bildirim ayarları
 Notifications.setNotificationHandler({
@@ -20,7 +20,7 @@ export const setupNotificationChannel = async (): Promise<void> => {
   try {
     if (Platform.OS === 'android') {
       await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-        name: 'ZeitLog Bildirimler',
+        name: 'KlickZeit Bildirimler',
         importance: Notifications.AndroidImportance.HIGH,
         sound: 'default',
         enableVibrate: true,
@@ -38,7 +38,7 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
     await Notifications.scheduleNotificationAsync({
       identifier: NOTIFICATION_ID,
       content: {
-        title: 'ZeitLog',
+        title: 'KlickZeit',
         body: `Giris: ${time}`,
         data: { type: 'check-in', time },
         sound: true,
@@ -50,7 +50,7 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
     await Notifications.scheduleNotificationAsync({
       identifier: 'reminder-6h30',
       content: {
-        title: 'ZeitLog',
+        title: 'KlickZeit',
         body: `Giris: ${time} - Yarim saat kaldi!`,
         data: { type: 'reminder', time },
         sound: true,
@@ -65,7 +65,7 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
     await Notifications.scheduleNotificationAsync({
       identifier: 'reminder-7h',
       content: {
-        title: 'ZeitLog',
+        title: 'KlickZeit',
         body: `Giris: ${time} - Cikis zamani!`,
         data: { type: 'reminder', time },
         sound: true,
@@ -86,12 +86,12 @@ export const showCheckOutNotification = async (checkOutTime: string): Promise<vo
     // Önce mevcut bildirimi ve hatırlatmaları kaldır
     await dismissOngoingNotification();
     await cancelWorkReminders();
-    
+
     // Özet bildirimi göster
     await Notifications.scheduleNotificationAsync({
       identifier: 'checkout-summary',
       content: {
-        title: 'ZeitLog',
+        title: 'KlickZeit',
         body: `Cikis: ${checkOutTime}`,
         data: { type: 'check-out' },
         sound: true,
@@ -122,14 +122,14 @@ export const dismissAllNotifications = async () => {
 // Bildirim izinlerini kontrol et ve iste
 export const requestNotificationPermissions = async (): Promise<boolean> => {
   const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  
+
   let finalStatus = existingStatus;
-  
+
   if (existingStatus !== 'granted') {
     const { status } = await Notifications.requestPermissionsAsync();
     finalStatus = status;
   }
-  
+
   return finalStatus === 'granted';
 };
 
