@@ -5,12 +5,12 @@ import { getFirestore } from 'firebase/firestore';
 
 // Firebase konfigürasyonu
 const firebaseConfig = {
-  apiKey: "AIzaSyCfqdLcrtddDq4CzwiL8LklMQ7VXr59SuU",
-  authDomain: "zeitlog-8aad7.firebaseapp.com",
-  projectId: "zeitlog-8aad7",
-  storageBucket: "zeitlog-8aad7.firebasestorage.app",
-  messagingSenderId: "1014925050088",
-  appId: "1:1014925050088:android:96df4b3ea9b68bd706895d"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
 // Firebase'i başlat
