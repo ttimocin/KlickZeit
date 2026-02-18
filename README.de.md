@@ -11,7 +11,7 @@
 
 Erfassen Sie Ihre Arbeitszeiten mit einem Tipp, sichern Sie sie in Firebase und exportieren Sie sie als CSV.
 
-**🌐 Languages / Sprachen:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md)
+**🌐 Languages / Sprachen:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md) • [🇫🇷 Français](README.fr.md) • [🇵🇹 Português](README.pt.md) • [🇸🇦 العربية](README.ar.md) • [🇨🇳 中文](README.zh.md) • [🇷🇺 Русский](README.ru.md)
 
 [Funktionen](#-funktionen) • [Installation](#-installation) • [Verwendung](#-verwendung) • [Mitwirken](#-mitwirken) • [Lizenz](#-lizenz)
 
@@ -42,7 +42,8 @@ ZeitLog ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es 
 - **Live-Uhr-Anzeige**: Echtzeit-Uhr und Datumsinformationen
 - **Arbeitsdauer-Tracking**: Live-Anzeige der Arbeitsdauer nach Einstempeln
 - **Dunkler Modus**: Systemthemen-kompatibles, augenfreundliches Design
-- **Mehrsprachige Unterstützung**: Türkisch, Englisch, Deutsch
+- **Mehrsprachige Unterstützung**: Türkisch, Englisch, Deutsch, Französisch, Portugiesisch, Arabisch, Chinesisch, Russisch
+- **Pausenspiel**: Integriertes Minispiel (Sudoku, 2048 usw.) zum Stressabbau in Pausen
 
 ### 💾 Datenverwaltung
 - **Automatisches Backup**: Ihre Aufzeichnungen werden automatisch in Firebase gesichert
@@ -54,16 +55,19 @@ ZeitLog ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es 
 ### 📊 Berichterstattung
 - **Wochenansicht**: Wöchentliche Arbeitsstunden und Überstunden-Tracking
 - **Tagesdetails**: Detaillierte Ein-/Ausstempel-Informationen für jeden Tag
+- **Flexible Arbeitstage**: Passen Sie Ihre Arbeitstage an (Mo-So)
 - **Feiertagsmarkierung**: Feiertage markieren und automatisch 7 Stunden erfassen
 - **Überstunden/Fehlzeit-Berechnung**: Tägliche und wöchentliche Überstunden/Fehlzeit-Berechnung
 
-### 🔔 Benachrichtigungen
+### 🔔 Benachrichtigungen und Updates
 - **Einstempel-Benachrichtigung**: Sofortige Benachrichtigung beim Einstempeln
 - **Erinnerungen**: Automatische Erinnerungsbenachrichtigungen nach 6,5 und 7 Stunden
 - **Ausstempel-Benachrichtigung**: Zusammenfassungsbenachrichtigung beim Ausstempeln
+- **Automatische Update-Prüfung**: Prüfung auf neue Versionen beim App-Start
 
 ### 🔐 Sicherheit
 - **Firebase-Authentifizierung**: E-Mail/Passwort und Google Sign-In Unterstützung
+- **Kontolöschung**: Option zum dauerhaften Löschen Ihres Kontos und aller Daten
 - **Sichere Firestore-Regeln**: Benutzer können nur auf ihre eigenen Daten zugreifen
 - **Datenvalidierung**: Alle Daten durchlaufen eine Formatprüfung
 

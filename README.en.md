@@ -11,7 +11,7 @@
 
 Track your work hours with a single tap, backup to Firebase, and export as CSV.
 
-**🌐 Languages / Sprachen:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md)
+**🌐 Languages / Sprachen:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md) • [🇫🇷 Français](README.fr.md) • [🇵🇹 Português](README.pt.md) • [🇸🇦 العربية](README.ar.md) • [🇨🇳 中文](README.zh.md) • [🇷🇺 Русский](README.ru.md)
 
 [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Contributing](#-contributing) • [License](#-license)
 
@@ -42,7 +42,8 @@ ZeitLog is a **completely free and ad-free** mobile application that makes it ea
 - **Live Clock Display**: Real-time clock and date information
 - **Work Duration Tracking**: Live work duration display after check-in
 - **Dark Mode**: System theme compatible, eye-friendly design
-- **Multi-Language Support**: Turkish, English, German
+- **Multi-Language Support**: Turkish, English, German, French, Portuguese, Arabic, Chinese, Russian
+- **Break Game**: Integrated mini-game (Sudoku, 2048 etc.) to relieve stress during breaks
 
 ### 💾 Data Management
 - **Automatic Backup**: Your records are automatically backed up to Firebase
@@ -54,16 +55,19 @@ ZeitLog is a **completely free and ad-free** mobile application that makes it ea
 ### 📊 Reporting
 - **Weekly View**: Weekly work hours and overtime tracking
 - **Daily Details**: Detailed entry/exit information for each day
+- **Flexible Working Days**: Customize your working days (Mon-Sun)
 - **Holiday Marking**: Mark holidays and automatically record 7 hours
 - **Overtime/Shortage Calculation**: Daily and weekly overtime/shortage calculation
 
-### 🔔 Notifications
+### 🔔 Notifications and Updates
 - **Check-In Notification**: Instant notification when you check in
 - **Reminders**: Automatic reminder notifications after 6.5 and 7 hours
 - **Check-Out Notification**: Summary notification when you check out
+- **Auto Update Check**: Check for new versions on app startup
 
 ### 🔐 Security
 - **Firebase Authentication**: Email/Password and Google Sign-In support
+- **Account Deletion**: Option to permanently delete your account and all data
 - **Secure Firestore Rules**: Users can only access their own data
 - **Data Validation**: All data passes format validation
 
