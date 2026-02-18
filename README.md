@@ -11,7 +11,7 @@
 
 Tek tuşla işe giriş-çıkış saatlerinizi kaydedin, Firebase'e yedekleyin ve CSV olarak dışa aktarın.
 
-**🌐 Languages / Sprachen:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md)
+**🌐 Diller / Languages:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md) • 🇫🇷 Français • 🇵🇹 Português • 🇸🇦 العربية • 🇨🇳 中文 • 🇷🇺 Русский
 
 [Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Kullanım](#-kullanım) • [Katkıda Bulun](#-katkıda-bulun) • [Lisans](#-lisans)
 
@@ -42,7 +42,8 @@ ZeitLog, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **
 - **Canlı Saat Gösterimi**: Gerçek zamanlı saat ve tarih bilgisi
 - **Çalışma Süresi Takibi**: Giriş yaptıktan sonra canlı çalışma süresi gösterimi
 - **Karanlık Mod**: Sistem temasına uyumlu, göz dostu tasarım
-- **Çoklu Dil Desteği**: Türkçe, İngilizce, Almanca
+- **Çoklu Dil Desteği**: Türkçe, İngilizce, Almanca, Fransızca, Portekizce, Arapça, Çince, Rusça
+- **Mola Oyunu**: Molalarınızda stres atmak için entegre mini oyun (Sudoku, 2048 vb.)
 
 ### 💾 Veri Yönetimi
 - **Otomatik Yedekleme**: Kayıtlarınız Firebase'e otomatik olarak yedeklenir
@@ -54,16 +55,19 @@ ZeitLog, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **
 ### 📊 Raporlama
 - **Haftalık Görünüm**: Haftalık çalışma saatleri ve fazla mesai takibi
 - **Günlük Detaylar**: Her gün için detaylı giriş/çıkış bilgileri
+- **Esnek Çalışma Günleri**: Çalışma günlerinizi (Pzt-Paz) özelleştirebilme
 - **Tatil Günü İşaretleme**: Tatil günlerini işaretleyip otomatik 7 saat kaydı
 - **Fazla/Eksik Süre Hesaplama**: Günlük ve haftalık fazla/eksik çalışma süresi
 
-### 🔔 Bildirimler
+### 🔔 Bildirimler ve Güncellemeler
 - **Giriş Bildirimi**: Giriş yaptığınızda anında bildirim
 - **Hatırlatmalar**: 6.5 ve 7 saat sonra otomatik hatırlatma bildirimleri
 - **Çıkış Bildirimi**: Çıkış yaptığınızda özet bildirimi
+- **Otomatik Güncelleme Kontrolü**: Uygulama açılışında yeni versiyon kontrolü
 
 ### 🔐 Güvenlik
 - **Firebase Authentication**: Email/Password ve Google Sign-In desteği
+- **Hesap Silme**: Hesabınızı ve tüm verilerinizi kalıcı olarak silme seçeneği
 - **Güvenli Firestore Kuralları**: Kullanıcılar sadece kendi verilerine erişebilir
 - **Veri Doğrulama**: Tüm veriler format kontrolünden geçer
 
