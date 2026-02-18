@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - Application de Suivi du Temps de Travail
+# ⏱️ KlickZeit - Application de Suivi du Temps de Travail
 
 <div align="center">
 
@@ -21,9 +21,9 @@ Suivez vos heures de travail en un seul clic, sauvegardez sur Firebase et export
 
 ## 📖 À Propos
 
-ZeitLog est une application mobile **totalement gratuite et sans publicité** qui facilite le suivi de vos heures de travail. Avec son interface moderne et conviviale, le suivi de vos heures de travail n'a jamais été aussi simple.
+KlickZeit est une application mobile **totalement gratuite et sans publicité** qui facilite le suivi de vos heures de travail. Avec son interface moderne et conviviale, le suivi de vos heures de travail n'a jamais été aussi simple.
 
-### 🎯 Pourquoi ZeitLog ?
+### 🎯 Pourquoi KlickZeit ?
 
 - ✅ **Totalement Gratuit** - Pas de frais, d'abonnements ou de coûts cachés
 - ✅ **Sans Publicité** - Pas de publicités ou de notifications non sollicitées
@@ -86,8 +86,8 @@ ZeitLog est une application mobile **totalement gratuite et sans publicité** qu
 
 1. **Cloner le dépôt**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Installer les dépendances**
@@ -186,7 +186,7 @@ ZeitLog est une application mobile **totalement gratuite et sans publicité** qu
 ## 📁 Structure du Projet
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Pages Expo Router
 │   ├── (tabs)/              # Navigation par onglets
 │   │   ├── index.tsx        # Écran principal d'enregistrement
@@ -265,7 +265,7 @@ Ce projet est sous [Licence MIT](LICENSE).
 
 <div align="center">
 
-**Suivez vos heures de travail facilement avec ZeitLog !** ⏱️
+**Suivez vos heures de travail facilement avec KlickZeit !** ⏱️
 
 Made with ❤️ by TayTek
 

@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - Aplicativo de Rastreamento de Tempo de Trabalho
+# ⏱️ KlickZeit - Aplicativo de Rastreamento de Tempo de Trabalho
 
 <div align="center">
 
@@ -21,9 +21,9 @@ Registre suas horas de trabalho com um toque, faça backup no Firebase e exporte
 
 ## 📖 Sobre
 
-ZeitLog é um aplicativo móvel **totalmente gratuito e sem anúncios** que facilita o rastreamento de suas horas de trabalho. Com sua interface moderna e fácil de usar, rastrear suas horas de trabalho nunca foi tão fácil.
+KlickZeit é um aplicativo móvel **totalmente gratuito e sem anúncios** que facilita o rastreamento de suas horas de trabalho. Com sua interface moderna e fácil de usar, rastrear suas horas de trabalho nunca foi tão fácil.
 
-### 🎯 Por que ZeitLog?
+### 🎯 Por que KlickZeit?
 
 - ✅ **Totalmente Gratuito** - Sem taxas, assinaturas ou custos ocultos
 - ✅ **Sem Anúncios** - Sem anúncios ou notificações não solicitadas
@@ -86,8 +86,8 @@ ZeitLog é um aplicativo móvel **totalmente gratuito e sem anúncios** que faci
 
 1. **Clonar o repositório**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Instalar dependências**
@@ -186,7 +186,7 @@ ZeitLog é um aplicativo móvel **totalmente gratuito e sem anúncios** que faci
 ## 📁 Estrutura do Projeto
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Páginas Expo Router
 │   ├── (tabs)/              # Navegação por abas
 │   │   ├── index.tsx        # Tela principal de registro
@@ -265,7 +265,7 @@ Este projeto está licenciado sob a [Licença MIT](LICENSE).
 
 <div align="center">
 
-**Rastreie suas horas de trabalho facilmente com ZeitLog!** ⏱️
+**Rastreie suas horas de trabalho facilmente com KlickZeit!** ⏱️
 
 Made with ❤️ by TayTek
 

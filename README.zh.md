@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - 工作时间追踪应用
+# ⏱️ KlickZeit - 工作时间追踪应用
 
 <div align="center">
 
@@ -21,9 +21,9 @@
 
 ## 📖 关于
 
-ZeitLog 是一款**完全免费且无广告**的移动应用程序，可轻松追踪您的工作时间。凭借其现代且用户友好的界面，追踪您的工作时间从未如此简单。
+KlickZeit 是一款**完全免费且无广告**的移动应用程序，可轻松追踪您的工作时间。凭借其现代且用户友好的界面，追踪您的工作时间从未如此简单。
 
-### 🎯 为什么选择 ZeitLog？
+### 🎯 为什么选择 KlickZeit？
 
 - ✅ **完全免费** - 无费用、订阅或隐藏成本
 - ✅ **无广告** - 无广告或未经请求的通知
@@ -86,8 +86,8 @@ ZeitLog 是一款**完全免费且无广告**的移动应用程序，可轻松�
 
 1. **克隆仓库**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **安装依赖**
@@ -186,7 +186,7 @@ ZeitLog 是一款**完全免费且无广告**的移动应用程序，可轻松�
 ## 📁 项目结构
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Expo Router 页面
 │   ├── (tabs)/              # 标签导航
 │   │   ├── index.tsx        # 主记录屏幕
@@ -265,7 +265,7 @@ npx expo run:ios --configuration Release
 
 <div align="center">
 
-**使用 ZeitLog 轻松追踪您的工作时间！** ⏱️
+**使用 KlickZeit 轻松追踪您的工作时间！** ⏱️
 
 Made with ❤️ by TayTek
 

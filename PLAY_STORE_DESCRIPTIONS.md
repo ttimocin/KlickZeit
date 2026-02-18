@@ -4,14 +4,14 @@
 
 ### Kısa Açıklama (80 karakter limiti)
 ```
-ZeitLog - Ücretsiz iş takip uygulaması. Tek dokunuşla giriş/çıkış kaydı.
+KlickZeit - Ücretsiz iş takip uygulaması. Tek dokunuşla giriş/çıkış kaydı.
 ```
 
 ### Uzun Açıklama (4000 karakter limiti)
 ```
-ZeitLog - Ücretsiz ve Reklamsız İş Takip Uygulamanız
+KlickZeit - Ücretsiz ve Reklamsız İş Takip Uygulamanız
 
-ZeitLog, iş saatlerinizi kolayca takip etmenizi sağlayan, tamamen ücretsiz ve reklamsız bir uygulamadır. Tek dokunuşla giriş ve çıkış saatlerinizi kaydedin, çalışma sürelerinizi otomatik olarak hesaplayın.
+KlickZeit, iş saatlerinizi kolayca takip etmenizi sağlayan, tamamen ücretsiz ve reklamsız bir uygulamadır. Tek dokunuşla giriş ve çıkış saatlerinizi kaydedin, çalışma sürelerinizi otomatik olarak hesaplayın.
 
 ✨ ÖZELLİKLER:
 
@@ -65,12 +65,12 @@ ZeitLog, iş saatlerinizi kolayca takip etmenizi sağlayan, tamamen ücretsiz ve
 
 🎯 NEDEN ZEITLOG?
 
-ZeitLog, iş saatlerinizi takip etmek için ihtiyacınız olan her şeyi sunar, karmaşık özellikler olmadan. Basit, hızlı ve güvenilir.
+KlickZeit, iş saatlerinizi takip etmek için ihtiyacınız olan her şeyi sunar, karmaşık özellikler olmadan. Basit, hızlı ve güvenilir.
 
 Hemen indirin ve iş saatlerinizi zahmetsizce takip etmeye başlayın!
 
 📧 Destek: taytekofficial@gmail.com
-🌐 GitHub: https://github.com/ttimocin/ZeitLog
+🌐 GitHub: https://github.com/ttimocin/KlickZeit
 ```
 
 ---
@@ -79,14 +79,14 @@ Hemen indirin ve iş saatlerinizi zahmetsizce takip etmeye başlayın!
 
 ### Short Description (80 character limit)
 ```
-ZeitLog - Free work time tracker. One-tap check-in/out recording.
+KlickZeit - Free work time tracker. One-tap check-in/out recording.
 ```
 
 ### Long Description (4000 character limit)
 ```
-ZeitLog - Your Free and Ad-Free Work Time Tracking App
+KlickZeit - Your Free and Ad-Free Work Time Tracking App
 
-ZeitLog is a completely free and ad-free app that makes it easy to track your work hours. Record your check-in and check-out times with a single tap, and automatically calculate your working hours.
+KlickZeit is a completely free and ad-free app that makes it easy to track your work hours. Record your check-in and check-out times with a single tap, and automatically calculate your working hours.
 
 ✨ FEATURES:
 

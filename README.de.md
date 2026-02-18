@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - Arbeitszeiterfassungs-App
+# ⏱️ KlickZeit - Arbeitszeiterfassungs-App
 
 <div align="center">
 
@@ -21,9 +21,9 @@ Erfassen Sie Ihre Arbeitszeiten mit einem Tipp, sichern Sie sie in Firebase und 
 
 ## 📖 Über
 
-ZeitLog ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es einfach macht, Ihre Arbeitszeiten zu erfassen. Mit ihrer modernen und benutzerfreundlichen Oberfläche war die Erfassung Ihrer Arbeitszeiten noch nie so einfach.
+KlickZeit ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es einfach macht, Ihre Arbeitszeiten zu erfassen. Mit ihrer modernen und benutzerfreundlichen Oberfläche war die Erfassung Ihrer Arbeitszeiten noch nie so einfach.
 
-### 🎯 Warum ZeitLog?
+### 🎯 Warum KlickZeit?
 
 - ✅ **Völlig Kostenlos** - Keine Gebühren, Abonnements oder versteckte Kosten
 - ✅ **Werbefrei** - Keine Werbung oder unerwünschte Benachrichtigungen
@@ -86,8 +86,8 @@ ZeitLog ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es 
 
 1. **Repository klonen**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Abhängigkeiten installieren**
@@ -186,7 +186,7 @@ ZeitLog ist eine **völlig kostenlose und werbefreie** mobile Anwendung, die es 
 ## 📁 Projektstruktur
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Expo Router-Seiten
 │   ├── (tabs)/              # Tab-Navigation
 │   │   ├── index.tsx        # Haupt-Erfassungsbildschirm
@@ -283,7 +283,7 @@ Wir freuen uns über Ihre Beiträge! Bitte folgen Sie diesen Schritten:
 
 ## 🐛 Fehlermeldungen
 
-Wenn Sie einen Fehler finden, melden Sie ihn bitte auf der [Issues](https://github.com/ttimocin/ZeitLog/issues)-Seite. Geben Sie so viele Details wie möglich an:
+Wenn Sie einen Fehler finden, melden Sie ihn bitte auf der [Issues](https://github.com/ttimocin/KlickZeit/issues)-Seite. Geben Sie so viele Details wie möglich an:
 
 - App-Version
 - Gerät und Betriebssystem
@@ -324,7 +324,7 @@ Wenn Ihnen dieses Projekt gefällt, vergessen Sie nicht, einen Stern zu geben! �
 
 <div align="center">
 
-**Erfassen Sie Ihre Arbeitszeiten einfach mit ZeitLog!** ⏱️
+**Erfassen Sie Ihre Arbeitszeiten einfach mit KlickZeit!** ⏱️
 
 Made with ❤️ by TayTek
 

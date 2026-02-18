@@ -1,4 +1,4 @@
-# ⏱️ ZeitLog - İş Takip Uygulaması
+# ⏱️ KlickZeit - İş Takip Uygulaması
 
 <div align="center">
 
@@ -21,9 +21,9 @@ Tek tuşla işe giriş-çıkış saatlerinizi kaydedin, Firebase'e yedekleyin ve
 
 ## 📖 Hakkında
 
-ZeitLog, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **tamamen ücretsiz ve reklamsız** bir mobil uygulamadır. Modern ve kullanıcı dostu arayüzü ile çalışma saatlerinizi kaydetmek hiç bu kadar kolay olmamıştı.
+KlickZeit, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **tamamen ücretsiz ve reklamsız** bir mobil uygulamadır. Modern ve kullanıcı dostu arayüzü ile çalışma saatlerinizi kaydetmek hiç bu kadar kolay olmamıştı.
 
-### 🎯 Neden ZeitLog?
+### 🎯 Neden KlickZeit?
 
 - ✅ **Tamamen Ücretsiz** - Hiçbir ücret, abonelik veya gizli maliyet yok
 - ✅ **Reklamsız** - Hiçbir reklam veya izinsiz bildirim yok
@@ -86,8 +86,8 @@ ZeitLog, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **
 
 1. **Repository'yi klonlayın**
    ```bash
-   git clone https://github.com/ttimocin/ZeitLog.git
-   cd ZeitLog
+   git clone https://github.com/ttimocin/KlickZeit.git
+   cd KlickZeit
    ```
 
 2. **Bağımlılıkları yükleyin**
@@ -186,7 +186,7 @@ ZeitLog, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, **
 ## 📁 Proje Yapısı
 
 ```
-ZeitLog/
+KlickZeit/
 ├── app/                      # Expo Router sayfaları
 │   ├── (tabs)/              # Tab navigation
 │   │   ├── index.tsx        # Ana kayıt ekranı
@@ -229,8 +229,8 @@ ZeitLog/
 
 ## 📄 Yasal Belgeler
 
-- **Gizlilik Politikası**: [Web Versiyonu](https://ttimocin.github.io/ZeitLog/privacy-policy.html) | [Uygulama İçi](app/privacy-policy.tsx)
-- **Kullanım Koşulları**: [Web Versiyonu](https://ttimocin.github.io/ZeitLog/terms-of-service.html) | [Uygulama İçi](app/terms-of-service.tsx)
+- **Gizlilik Politikası**: [Web Versiyonu](https://ttimocin.github.io/KlickZeit/privacy-policy.html) | [Uygulama İçi](app/privacy-policy.tsx)
+- **Kullanım Koşulları**: [Web Versiyonu](https://ttimocin.github.io/KlickZeit/terms-of-service.html) | [Uygulama İçi](app/terms-of-service.tsx)
 
 > **Not**: GitHub Pages kurulumu için `docs/README.md` dosyasına bakın.
 
@@ -290,7 +290,7 @@ Katkılarınızı bekliyoruz! Lütfen şu adımları izleyin:
 
 ## 🐛 Hata Bildirimi
 
-Bir hata bulduysanız, lütfen [Issues](https://github.com/ttimocin/ZeitLog/issues) sayfasında bildirin. Mümkün olduğunca detaylı bilgi verin:
+Bir hata bulduysanız, lütfen [Issues](https://github.com/ttimocin/KlickZeit/issues) sayfasında bildirin. Mümkün olduğunca detaylı bilgi verin:
 
 - Uygulama versiyonu
 - Cihaz ve işletim sistemi
@@ -331,7 +331,7 @@ Bu projeyi beğendiyseniz, bir yıldız vermeyi unutmayın! ⭐
 
 <div align="center">
 
-**ZeitLog ile çalışma saatlerinizi kolayca takip edin!** ⏱️
+**KlickZeit ile çalışma saatlerinizi kolayca takip edin!** ⏱️
 
 Made with ❤️ by TayTek
 
