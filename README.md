@@ -11,7 +11,7 @@
 
 Tek tuşla işe giriş-çıkış saatlerinizi kaydedin, Firebase'e yedekleyin ve CSV olarak dışa aktarın.
 
-**🌐 Diller / Languages:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md) • 🇫🇷 Français • 🇵🇹 Português • 🇸🇦 العربية • 🇨🇳 中文 • 🇷🇺 Русский
+**🌐 Diller / Languages:** [🇹🇷 Türkçe](README.md) • [🇬🇧 English](README.en.md) • [🇩🇪 Deutsch](README.de.md) • [🇫🇷 Français](README.fr.md) • [🇵🇹 Português](README.pt.md) • [🇸🇦 العربية](README.ar.md) • [🇨🇳 中文](README.zh.md) • [🇷🇺 Русский](README.ru.md)
 
 [Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Kullanım](#-kullanım) • [Katkıda Bulun](#-katkıda-bulun) • [Lisans](#-lisans)
 
