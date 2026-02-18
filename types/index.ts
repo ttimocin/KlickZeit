@@ -1,7 +1,7 @@
 // İş kaydı tipi
 export interface WorkRecord {
   id: string;
-  type: 'giris' | 'cikis';
+  type: 'giris' | 'cikis' | 'molagiris' | 'molacikis';
   timestamp: number; // Unix timestamp
   date: string; // YYYY-MM-DD formatında
   time: string; // HH:mm formatında
@@ -16,7 +16,17 @@ export interface DailySummary {
   cikis?: string;
   calismaSuresi?: string;
   isHoliday?: boolean;
+  breakCounted?: boolean; // Mola sayılıyor mu? (true ise mola düşülmez)
+  molaGiris?: string; // İlk mola giriş saati
+  molaCikis?: string; // Son mola çıkış saati
 }
+
+
+
+
+
+
+
 
 
 

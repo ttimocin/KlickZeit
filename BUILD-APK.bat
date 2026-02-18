@@ -67,3 +67,10 @@ echo Bu dosyayi test icin kullanabilirsiniz.
 echo.
 pause
 
+
+
+
+
+
+
+

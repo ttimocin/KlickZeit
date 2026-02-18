@@ -68,3 +68,10 @@ echo Bu dosyayi Play Store'a yukleyebilirsiniz.
 echo.
 pause
 
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 import { getLanguage, loadSavedLanguage, setLanguage as setI18nLanguage } from '@/i18n';
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-type Language = 'tr' | 'en' | 'de';
+type Language = 'tr' | 'en' | 'de' | 'fr' | 'pt' | 'ar' | 'zh' | 'ru' | 'uk';
 
 interface LanguageContextType {
   language: Language;
@@ -45,6 +45,15 @@ export function useLanguage() {
   }
   return context;
 }
+
+
+
+
+
+
+
+
+
 
 
 

@@ -240,3 +240,10 @@ Laden Sie jetzt herunter und beginnen Sie mühelos mit der Erfassung Ihrer Arbei
 - 4000 karakter limiti var (uzun açıklama için)
 - 80 karakter limiti var (kısa açıklama için)
 
+
+
+
+
+
+
+

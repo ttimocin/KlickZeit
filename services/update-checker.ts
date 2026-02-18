@@ -9,7 +9,7 @@ const CURRENT_VERSION = '1.0.0';
 const compareVersions = (v1: string, v2: string): number => {
   const parts1 = v1.split('.').map(Number);
   const parts2 = v2.split('.').map(Number);
-  
+
   for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
     const p1 = parts1[i] || 0;
     const p2 = parts2[i] || 0;
@@ -22,41 +22,54 @@ const compareVersions = (v1: string, v2: string): number => {
 // Remote Config'i başlat ve güncelleme kontrolü yap
 export const checkForUpdates = async (): Promise<void> => {
   try {
-    // Remote Config ayarları
-    await remoteConfig().setDefaults({
-      force_update_version: '1.0.0',
-      latest_version: '1.0.0',
-      update_url: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
+    // Timeout ile Remote Config işlemlerini sınırla (5 saniye)
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('Update check timeout')), 5000);
     });
-    
-    // Minimum fetch interval (debug için 0, production için 3600)
-    await remoteConfig().setConfigSettings({
-      minimumFetchIntervalMillis: __DEV__ ? 0 : 3600000, // 1 saat
-    });
-    
-    // Remote Config'den verileri çek
-    await remoteConfig().fetchAndActivate();
-    
-    // Değerleri al
-    const forceUpdateVersion = remoteConfig().getValue('force_update_version').asString();
-    const latestVersion = remoteConfig().getValue('latest_version').asString();
-    const updateUrl = remoteConfig().getValue('update_url').asString();
-    
-    console.log('Remote Config:', { forceUpdateVersion, latestVersion, updateUrl, currentVersion: CURRENT_VERSION });
-    
-    // Zorunlu güncelleme kontrolü
-    if (compareVersions(CURRENT_VERSION, forceUpdateVersion) < 0) {
-      showForceUpdateDialog(updateUrl);
-      return;
+
+    const updateCheckPromise = async () => {
+      // Remote Config ayarları
+      await remoteConfig().setDefaults({
+        force_update_version: '1.0.0',
+        latest_version: '1.0.0',
+        update_url: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
+      });
+
+      // Minimum fetch interval (debug için 0, production için 3600)
+      await remoteConfig().setConfigSettings({
+        minimumFetchIntervalMillis: __DEV__ ? 0 : 3600000, // 1 saat
+      });
+
+      // Remote Config'den verileri çek
+      await remoteConfig().fetchAndActivate();
+
+      // Değerleri al
+      const forceUpdateVersion = remoteConfig().getValue('force_update_version').asString();
+      const latestVersion = remoteConfig().getValue('latest_version').asString();
+      const updateUrl = remoteConfig().getValue('update_url').asString();
+
+      // Zorunlu güncelleme kontrolü
+      if (compareVersions(CURRENT_VERSION, forceUpdateVersion) < 0) {
+        showForceUpdateDialog(updateUrl);
+        return;
+      }
+
+      // İsteğe bağlı güncelleme kontrolü
+      if (compareVersions(CURRENT_VERSION, latestVersion) < 0) {
+        showOptionalUpdateDialog(latestVersion, updateUrl);
+      }
+    };
+
+    // Timeout ile yarış - hangisi önce biterse onu kullan
+    await Promise.race([updateCheckPromise(), timeoutPromise]);
+  } catch (error: any) {
+    // Network hatalarını özel olarak yakala
+    if (error?.message?.includes('network') || error?.message?.includes('timeout')) {
+      console.log('Güncelleme kontrolü atlandı: İnternet bağlantısı yok veya zaman aşımı');
+    } else {
+      console.error('Remote Config hatası:', error);
     }
-    
-    // İsteğe bağlı güncelleme kontrolü
-    if (compareVersions(CURRENT_VERSION, latestVersion) < 0) {
-      showOptionalUpdateDialog(latestVersion, updateUrl);
-    }
-  } catch (error) {
-    console.error('Remote Config hatası:', error);
-    // Hata durumunda sessizce devam et
+    // Hata durumunda sessizce devam et - uygulamanın açılmasını engelleme
   }
 };
 
@@ -100,4 +113,13 @@ const showOptionalUpdateDialog = (newVersion: string, updateUrl: string) => {
 };
 
 export default { checkForUpdates };
+
+
+
+
+
+
+
+
+
 

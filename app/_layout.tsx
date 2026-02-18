@@ -21,7 +21,10 @@ function RootLayoutNav() {
 
   // Uygulama başladığında güncelleme kontrolü
   useEffect(() => {
-    checkForUpdates();
+    // Güncelleme kontrolü hata verse bile uygulamanın açılmasını engelleme
+    checkForUpdates().catch((error) => {
+      console.log('Güncelleme kontrolü başarısız oldu, uygulama normal şekilde devam ediyor:', error);
+    });
   }, []);
 
   // Giriş yapıldıysa ve login sayfasındaysa ana sayfaya yönlendir
@@ -49,6 +52,9 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false, presentation: 'modal' }} />
         <Stack.Screen name="settings" options={{ headerShown: false, presentation: 'modal' }} />
+        <Stack.Screen name="delete-account" options={{ headerShown: false }} />
+        <Stack.Screen name="privacy-policy" options={{ headerShown: false }} />
+        <Stack.Screen name="terms-of-service" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />

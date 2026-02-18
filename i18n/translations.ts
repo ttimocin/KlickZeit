@@ -9,17 +9,17 @@ export const translations = {
     noRecords: 'Henüz kayıt yok',
     entry: 'Giriş',
     exit: 'Çıkış',
-    
+
     // Selamlama
     goodMorning: '☀️ Günaydın',
     goodAfternoon: '🌤️ İyi günler',
     goodEvening: '🌙 İyi akşamlar',
     goodNight: '🌙 İyi geceler',
-    
+
     // Timer
     workingTime: 'Çalışma Süresi',
     entryAt: 'Giriş:',
-    
+
     // Alertler
     checkInRecorded: '✅ Giriş Kaydedildi',
     checkOutRecorded: '🏠 Çıkış Kaydedildi',
@@ -28,7 +28,7 @@ export const translations = {
     error: 'Hata',
     recordFailed: 'Kayıt yapılamadı. Lütfen tekrar deneyin.',
     ok: 'Tamam',
-    
+
     // Geçmiş ekranı
     records: 'Kayıtlar',
     daysRecorded: 'gün kaydedildi',
@@ -42,7 +42,7 @@ export const translations = {
     workDuration: 'Çalışma Süresi',
     noRecordsYet: 'Henüz kayıt yok',
     addFromHome: 'Ana sayfadan giriş/çıkış kaydedin',
-    
+
     // Sync
     syncComplete: 'Senkronizasyon Tamamlandı',
     successful: 'Başarılı',
@@ -50,7 +50,7 @@ export const translations = {
     info: 'Bilgi',
     noRecordsToSync: 'Senkronize edilecek kayıt bulunamadı.',
     loginToSync: 'Senkronize etmek için giriş yapın.',
-    
+
     // Export / Import
     warning: 'Uyarı',
     noRecordsToExport: 'Dışa aktarılacak kayıt bulunamadı.',
@@ -62,11 +62,11 @@ export const translations = {
     importFailed: 'Dosya okunamadı veya geçersiz format.',
     importCancelled: 'İçe aktarma iptal edildi.',
     noNewRecordsToImport: 'İçe aktarılacak yeni kayıt bulunamadı.',
-    
+
     // Tab bar
     tabRecord: 'Kayıt',
     tabHistory: 'Geçmiş',
-    
+
     // Görünüm
     daily: 'Günlük',
     weekly: 'Haftalık',
@@ -74,13 +74,31 @@ export const translations = {
     total: 'Toplam',
     day: 'Gün',
     duration: 'Süre',
-    
+    totalBalance: 'Toplam Bakiye',
+    totalBalanceDesc: 'Tüm haftaların toplamı',
+    inPlus: 'Artıda',
+    inMinus: 'Ekside',
+    monthlyBalance: 'Aylık Bakiye',
+    monthlyBalanceDesc: 'Son ayın özeti',
+    details: 'Detaylar',
+    hideDetails: 'Detayları Gizle',
+    monthlyDetails: 'Aylık Detaylar',
+    worked: 'Çalışılan',
+    target: 'Hedef',
+    eveningWork: 'Sonrası',
+    standards: 'Standartlar',
+    dailyWorkHours: 'Günlük Çalışma Süresi',
+    defaultBreak: 'Varsayılan Mola Süresi',
+    eveningThreshold: 'Akşam Mesai Başlangıcı',
+    workingDays: 'Çalışma Günleri',
+    dayCount: 'gün',
+
     // Zaman
     hours: 'saat',
     minutes: 'dakika',
     hourShort: 's',
     minuteShort: 'dk',
-    
+
     // Ayarlar
     settings: 'Ayarlar',
     language: 'Dil',
@@ -90,7 +108,7 @@ export const translations = {
     lightMode: 'Açık',
     about: 'Hakkında',
     appDescription: 'İşe giriş-çıkış saatlerinizi kolayca takip edin ve yedekleyin.',
-    
+
     // Auth
     loginTitle: 'Giriş Yap',
     registerTitle: 'Hesap Oluştur',
@@ -112,7 +130,7 @@ export const translations = {
     loadFromCloud: 'Buluttan Yükle',
     recordsLoaded: 'kayıt yüklendi',
     noNewRecords: 'Yüklenecek yeni kayıt yok',
-    
+
     // Güncelleme
     updateRequired: 'Güncelleme Gerekli',
     updateRequiredMessage: 'Uygulamayı kullanmaya devam etmek için güncellemeniz gerekmektedir. Lütfen en son sürümü indirin.',
@@ -120,7 +138,7 @@ export const translations = {
     updateAvailableMessage: 'Yeni bir sürüm ({version}) mevcut. Şimdi güncellemek ister misiniz?',
     updateNow: 'Güncelle',
     later: 'Daha Sonra',
-    
+
     // Tatil
     addHoliday: 'Tatil Ekle',
     addHolidayConfirm: 'Bu günü tatil olarak işaretlemek ister misiniz? (7 saat çalışma eklenecek)',
@@ -128,18 +146,49 @@ export const translations = {
     removeHoliday: 'Tatil Kaldır',
     removeHolidayConfirm: 'Bu günün tatil kaydını kaldırmak ister misiniz?',
     remove: 'Kaldır',
-    
+
     // Mola
     editDay: 'Günü Düzenle',
-    breakCounted: 'Mola sayılıyor',
-    breakCountedDesc: 'Bu seçenek açıksa, mola süresi (30 dk) çalışma süresinden düşülmez.',
+    breakCounted: 'Mola',
+    breakCountedDesc: 'Bu seçenek açıksa, mola süresi çalışma süresinden düşülmez.',
+    breakDuration: 'Mola Süresi',
+    breakDurationMinutes: 'dakika',
     save: 'Kaydet',
-    
+    breakTime: 'Mola Süresi',
+    startBreak: 'MOLAYA GİR',
+    endBreak: 'MOLAYI BİTİR',
+    holiday: 'Tatil',
+    holidayDesc: 'Bu gün tatil günü mü?',
+    entryTimeLabel: 'Giriş Saati',
+    exitTimeLabel: 'Çıkış Saati',
+    breakEntryLabel: 'Mola Giriş',
+    breakExitLabel: 'Mola Çıkış',
+
+    // Game
+    breakGame: 'Mola Oyunu',
+    playGame: '🎮 Oyun Oyna',
+    score: 'Skor',
+    best: 'En İyi',
+    youWon: 'Kazandınız! 🎉',
+    gameOver: 'Oyun Bitti!',
+    newGame: 'Yeni Oyun',
+    restart: 'Yeniden Başlat',
+    swipeToPlay: 'Kaydırarak oyna',
+    selectDifficulty: 'Zorluk Seç',
+    mistakes: 'Hatalar',
+    notes: 'Not',
+    erase: 'Sil',
+    time: 'Süre',
+    newRecord: 'Yeni Rekor! 🏆',
+    bestTime: 'En İyi Süre',
+    nextLevel: 'Sıradaki Seviye',
+    menu: 'Menü',
+
     // Legal
     privacyPolicy: 'Gizlilik Politikası',
     termsOfService: 'Kullanım Koşulları',
     lastUpdated: 'Son Güncelleme',
-    
+
     // Account Deletion
     deleteAccount: 'Hesabı Sil',
     deleteAccountWarning: 'Hesabınızı Silmek İstediğinizden Emin misiniz?',
@@ -157,7 +206,7 @@ export const translations = {
     typeToConfirm: 'Onaylamak için yazın',
     loginRequired: 'Hesap silmek için giriş yapmanız gerekiyor.',
   },
-  
+
   en: {
     // Home screen
     appTitle: 'ZeitLog',
@@ -168,17 +217,17 @@ export const translations = {
     noRecords: 'No records yet',
     entry: 'Entry',
     exit: 'Exit',
-    
+
     // Greetings
     goodMorning: '☀️ Good morning',
     goodAfternoon: '🌤️ Good afternoon',
     goodEvening: '🌙 Good evening',
     goodNight: '🌙 Good night',
-    
+
     // Timer
     workingTime: 'Working Time',
     entryAt: 'Entry:',
-    
+
     // Alerts
     checkInRecorded: '✅ Check-in Recorded',
     checkOutRecorded: '🏠 Check-out Recorded',
@@ -187,7 +236,7 @@ export const translations = {
     error: 'Error',
     recordFailed: 'Recording failed. Please try again.',
     ok: 'OK',
-    
+
     // History screen
     records: 'Records',
     daysRecorded: 'days recorded',
@@ -201,7 +250,7 @@ export const translations = {
     workDuration: 'Work Duration',
     noRecordsYet: 'No records yet',
     addFromHome: 'Add check-in/out from home page',
-    
+
     // Sync
     syncComplete: 'Sync Complete',
     successful: 'Successful',
@@ -209,7 +258,7 @@ export const translations = {
     info: 'Info',
     noRecordsToSync: 'No records to sync.',
     loginToSync: 'Please sign in to sync.',
-    
+
     // Export / Import
     warning: 'Warning',
     noRecordsToExport: 'No records to export.',
@@ -221,11 +270,11 @@ export const translations = {
     importFailed: 'Could not read file or invalid format.',
     importCancelled: 'Import cancelled.',
     noNewRecordsToImport: 'No new records to import.',
-    
+
     // Tab bar
     tabRecord: 'Record',
     tabHistory: 'History',
-    
+
     // Views
     daily: 'Daily',
     weekly: 'Weekly',
@@ -233,13 +282,31 @@ export const translations = {
     total: 'Total',
     day: 'Day',
     duration: 'Duration',
-    
+    totalBalance: 'Total Balance',
+    totalBalanceDesc: 'Total of all weeks',
+    inPlus: 'In Plus',
+    inMinus: 'In Minus',
+    monthlyBalance: 'Monthly Balance',
+    monthlyBalanceDesc: 'Last month summary',
+    details: 'Details',
+    hideDetails: 'Hide Details',
+    monthlyDetails: 'Monthly Details',
+    worked: 'Worked',
+    target: 'Target',
+    eveningWork: 'After',
+    standards: 'Standards',
+    dailyWorkHours: 'Daily Work Hours',
+    defaultBreak: 'Default Break Duration',
+    eveningThreshold: 'Evening Overtime Start',
+    workingDays: 'Working Days',
+    dayCount: 'days',
+
     // Time
     hours: 'hours',
     minutes: 'minutes',
     hourShort: 'h',
     minuteShort: 'm',
-    
+
     // Settings
     settings: 'Settings',
     language: 'Language',
@@ -249,7 +316,7 @@ export const translations = {
     lightMode: 'Light',
     about: 'About',
     appDescription: 'Easily track and backup your work check-in/out times.',
-    
+
     // Auth
     loginTitle: 'Sign In',
     registerTitle: 'Create Account',
@@ -271,7 +338,7 @@ export const translations = {
     loadFromCloud: 'Load from Cloud',
     recordsLoaded: 'records loaded',
     noNewRecords: 'No new records to load',
-    
+
     // Update
     updateRequired: 'Update Required',
     updateRequiredMessage: 'You need to update the app to continue using it. Please download the latest version.',
@@ -279,7 +346,7 @@ export const translations = {
     updateAvailableMessage: 'A new version ({version}) is available. Would you like to update now?',
     updateNow: 'Update',
     later: 'Later',
-    
+
     // Holiday
     addHoliday: 'Add Holiday',
     addHolidayConfirm: 'Do you want to mark this day as holiday? (7 hours of work will be added)',
@@ -287,18 +354,49 @@ export const translations = {
     removeHoliday: 'Remove Holiday',
     removeHolidayConfirm: 'Do you want to remove the holiday record for this day?',
     remove: 'Remove',
-    
+
     // Break
     editDay: 'Edit Day',
-    breakCounted: 'Break counted',
-    breakCountedDesc: 'If this option is enabled, break time (30 min) will not be deducted from work duration.',
+    breakCounted: 'Break',
+    breakCountedDesc: 'If this option is enabled, break time will not be deducted from work duration.',
+    breakDuration: 'Break Duration',
+    breakDurationMinutes: 'minutes',
     save: 'Save',
-    
+    breakTime: 'Break Time',
+    startBreak: 'START BREAK',
+    endBreak: 'END BREAK',
+    holiday: 'Holiday',
+    holidayDesc: 'Is this day a holiday?',
+    entryTimeLabel: 'Entry Time',
+    exitTimeLabel: 'Exit Time',
+    breakEntryLabel: 'Break Entry',
+    breakExitLabel: 'Break Exit',
+
+    // Game
+    breakGame: 'Break Game',
+    playGame: '🎮 Play Game',
+    score: 'Score',
+    best: 'Best',
+
+    newGame: 'New Game',
+    restart: 'Restart',
+    swipeToPlay: 'Swipe to play',
+    selectDifficulty: 'Select Difficulty',
+    mistakes: 'Mistakes',
+    notes: 'Notes',
+    erase: 'Erase',
+    time: 'Time',
+    newRecord: 'New Record! 🏆',
+    bestTime: 'Best Time',
+    nextLevel: 'Next Level',
+    menu: 'Menu',
+
+
     // Legal
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     lastUpdated: 'Last Updated',
-    
+
     // Account Deletion
     deleteAccount: 'Delete Account',
     deleteAccountWarning: 'Are You Sure You Want to Delete Your Account?',
@@ -316,7 +414,7 @@ export const translations = {
     typeToConfirm: 'Type to confirm',
     loginRequired: 'You must be logged in to delete your account.',
   },
-  
+
   de: {
     // Startbildschirm
     appTitle: 'ZeitLog',
@@ -327,17 +425,17 @@ export const translations = {
     noRecords: 'Noch keine Einträge',
     entry: 'Eingang',
     exit: 'Ausgang',
-    
+
     // Begrüßung
     goodMorning: '☀️ Guten Morgen',
     goodAfternoon: '🌤️ Guten Tag',
     goodEvening: '🌙 Guten Abend',
     goodNight: '🌙 Gute Nacht',
-    
+
     // Timer
     workingTime: 'Arbeitszeit',
     entryAt: 'Eingang:',
-    
+
     // Benachrichtigungen
     checkInRecorded: '✅ Eingang erfasst',
     checkOutRecorded: '🏠 Ausgang erfasst',
@@ -346,7 +444,7 @@ export const translations = {
     error: 'Fehler',
     recordFailed: 'Erfassung fehlgeschlagen. Bitte erneut versuchen.',
     ok: 'OK',
-    
+
     // Verlauf
     records: 'Einträge',
     daysRecorded: 'Tage erfasst',
@@ -360,7 +458,7 @@ export const translations = {
     workDuration: 'Arbeitszeit',
     noRecordsYet: 'Noch keine Einträge',
     addFromHome: 'Ein-/Ausstempeln von der Startseite',
-    
+
     // Sync
     syncComplete: 'Synchronisierung abgeschlossen',
     successful: 'Erfolgreich',
@@ -368,7 +466,7 @@ export const translations = {
     info: 'Info',
     noRecordsToSync: 'Keine Einträge zum Synchronisieren.',
     loginToSync: 'Bitte melden Sie sich an, um zu synchronisieren.',
-    
+
     // Export / Import
     warning: 'Warnung',
     noRecordsToExport: 'Keine Einträge zum Exportieren.',
@@ -380,11 +478,11 @@ export const translations = {
     importFailed: 'Datei konnte nicht gelesen werden oder ungültiges Format.',
     importCancelled: 'Import abgebrochen.',
     noNewRecordsToImport: 'Keine neuen Einträge zum Importieren.',
-    
+
     // Tab-Leiste
     tabRecord: 'Erfassen',
     tabHistory: 'Verlauf',
-    
+
     // Ansichten
     daily: 'Täglich',
     weekly: 'Wöchentlich',
@@ -392,13 +490,31 @@ export const translations = {
     total: 'Gesamt',
     day: 'Tag',
     duration: 'Dauer',
-    
+    totalBalance: 'Gesamtsaldo',
+    totalBalanceDesc: 'Gesamt aller Wochen',
+    inPlus: 'Im Plus',
+    inMinus: 'Im Minus',
+    monthlyBalance: 'Monatssaldo',
+    monthlyBalanceDesc: 'Zusammenfassung des letzten Monats',
+    details: 'Details',
+    hideDetails: 'Details ausblenden',
+    monthlyDetails: 'Monatsdetails',
+    worked: 'Gearbeitet',
+    target: 'Ziel',
+    eveningWork: 'Danach',
+    standards: 'Standards',
+    dailyWorkHours: 'Tägliche Arbeitszeit',
+    defaultBreak: 'Standard-Pausendauer',
+    eveningThreshold: 'Abendüberstunden ab',
+    workingDays: 'Arbeitstage',
+    dayCount: 'Tage',
+
     // Zeit
     hours: 'Stunden',
     minutes: 'Minuten',
     hourShort: 'St',
     minuteShort: 'Min',
-    
+
     // Einstellungen
     settings: 'Einstellungen',
     language: 'Sprache',
@@ -408,7 +524,7 @@ export const translations = {
     lightMode: 'Hell',
     about: 'Über',
     appDescription: 'Erfassen und sichern Sie Ihre Arbeitszeiten ganz einfach.',
-    
+
     // Auth
     loginTitle: 'Anmelden',
     registerTitle: 'Konto erstellen',
@@ -430,7 +546,7 @@ export const translations = {
     loadFromCloud: 'Aus Cloud laden',
     recordsLoaded: 'Einträge geladen',
     noNewRecords: 'Keine neuen Einträge zum Laden',
-    
+
     // Aktualisierung
     updateRequired: 'Aktualisierung erforderlich',
     updateRequiredMessage: 'Sie müssen die App aktualisieren, um sie weiter zu nutzen. Bitte laden Sie die neueste Version herunter.',
@@ -438,7 +554,7 @@ export const translations = {
     updateAvailableMessage: 'Eine neue Version ({version}) ist verfügbar. Möchten Sie jetzt aktualisieren?',
     updateNow: 'Aktualisieren',
     later: 'Später',
-    
+
     // Urlaub
     addHoliday: 'Urlaub hinzufügen',
     addHolidayConfirm: 'Möchten Sie diesen Tag als Urlaub markieren? (7 Stunden Arbeit werden hinzugefügt)',
@@ -446,18 +562,49 @@ export const translations = {
     removeHoliday: 'Urlaub entfernen',
     removeHolidayConfirm: 'Möchten Sie den Urlaubseintrag für diesen Tag entfernen?',
     remove: 'Entfernen',
-    
+
     // Pause
     editDay: 'Tag bearbeiten',
-    breakCounted: 'Pause zählt',
-    breakCountedDesc: 'Wenn diese Option aktiviert ist, wird die Pausenzeit (30 Min) nicht von der Arbeitszeit abgezogen.',
+    breakCounted: 'Pause',
+    breakCountedDesc: 'Wenn diese Option aktiviert ist, wird die Pausenzeit nicht von der Arbeitszeit abgezogen.',
+    breakDuration: 'Pausendauer',
+    breakDurationMinutes: 'Minuten',
     save: 'Speichern',
-    
+    breakTime: 'Pausenzeit',
+    startBreak: 'PAUSE STARTEN',
+    endBreak: 'PAUSE BEENDEN',
+    holiday: 'Urlaub',
+    holidayDesc: 'Ist dieser Tag ein Urlaubstag?',
+    entryTimeLabel: 'Eintrittszeit',
+    exitTimeLabel: 'Austrittszeit',
+    breakEntryLabel: 'Pausenbeginn',
+    breakExitLabel: 'Pausenende',
+
+    // Game
+    breakGame: 'Pausenspiel',
+    playGame: '🎮 Spiel spielen',
+    score: 'Punkte',
+    best: 'Beste',
+
+    newGame: 'Neues Spiel',
+    restart: 'Neu starten',
+    swipeToPlay: 'Wischen zum Spielen',
+    selectDifficulty: 'Schwierigkeit wählen',
+    mistakes: 'Fehler',
+    notes: 'Notizen',
+    erase: 'Löschen',
+    time: 'Zeit',
+    newRecord: 'Neuer Rekord! 🏆',
+    bestTime: 'Bestzeit',
+    nextLevel: 'Nächstes Level',
+    menu: 'Menü',
+
+
     // Legal
     privacyPolicy: 'Datenschutzerklärung',
     termsOfService: 'Nutzungsbedingungen',
     lastUpdated: 'Zuletzt aktualisiert',
-    
+
     // Account Deletion
     deleteAccount: 'Konto löschen',
     deleteAccountWarning: 'Sind Sie sicher, dass Sie Ihr Konto löschen möchten?',
@@ -475,10 +622,1256 @@ export const translations = {
     typeToConfirm: 'Zum Bestätigen eingeben',
     loginRequired: 'Sie müssen angemeldet sein, um Ihr Konto zu löschen.',
   },
+
+  fr: {
+    // Écran d'accueil
+    appTitle: 'ZeitLog',
+    checkIn: 'POINTER',
+    checkOut: 'DÉPOINTER',
+    tapToRecord: 'Appuyez pour enregistrer',
+    todayRecords: "Enregistrements d'aujourd'hui",
+    noRecords: 'Aucun enregistrement',
+    entry: 'Entrée',
+    exit: 'Sortie',
+
+    // Salutations
+    goodMorning: '☀️ Bonjour',
+    goodAfternoon: '🌤️ Bon après-midi',
+    goodEvening: '🌙 Bonsoir',
+    goodNight: '🌙 Bonne nuit',
+
+    // Minuteur
+    workingTime: 'Temps de travail',
+    entryAt: 'Entrée:',
+
+    // Alertes
+    checkInRecorded: '✅ Pointage enregistré',
+    checkOutRecorded: '🏠 Dépointage enregistré',
+    cloudBackup: '☁️ Sauvegardé dans le cloud',
+    localSave: '📱 Enregistré localement',
+    error: 'Erreur',
+    recordFailed: "L'enregistrement a échoué. Veuillez réessayer.",
+    ok: 'OK',
+
+    // Écran historique
+    records: 'Enregistrements',
+    daysRecorded: 'jours enregistrés',
+    syncronize: 'Sync',
+    syncing: 'Sync...',
+    downloadCSV: 'Exporter',
+    today: "Aujourd'hui",
+    date: 'Date',
+    entryTime: 'Entrée',
+    exitTime: 'Sortie',
+    workDuration: 'Durée de travail',
+    noRecordsYet: 'Aucun enregistrement',
+    addFromHome: "Ajouter pointage/dépointage depuis l'accueil",
+
+    // Sync
+    syncComplete: 'Synchronisation terminée',
+    successful: 'Réussi',
+    failed: 'Échoué',
+    info: 'Info',
+    noRecordsToSync: 'Aucun enregistrement à synchroniser.',
+    loginToSync: 'Veuillez vous connecter pour synchroniser.',
+
+    // Export / Import
+    warning: 'Attention',
+    noRecordsToExport: 'Aucun enregistrement à exporter.',
+    exportFailed: 'Impossible de créer le fichier ou partage non pris en charge.',
+    importCSV: 'Importer',
+    importSuccess: 'Importation réussie',
+    importedRecords: 'nouveaux enregistrements ajoutés',
+    updatedRecords: 'enregistrements mis à jour',
+    importFailed: 'Impossible de lire le fichier ou format invalide.',
+    importCancelled: 'Importation annulée.',
+    noNewRecordsToImport: 'Aucun nouvel enregistrement à importer.',
+
+    // Barre d'onglets
+    tabRecord: 'Enregistrer',
+    tabHistory: 'Historique',
+
+    // Vues
+    daily: 'Quotidien',
+    weekly: 'Hebdomadaire',
+    thisWeek: 'Cette semaine',
+    total: 'Total',
+    day: 'Jour',
+    duration: 'Durée',
+    totalBalance: 'Solde total',
+    totalBalanceDesc: 'Total de toutes les semaines',
+    inPlus: 'En plus',
+    inMinus: 'En moins',
+    monthlyBalance: 'Solde mensuel',
+    monthlyBalanceDesc: 'Résumé du dernier mois',
+    details: 'Détails',
+    hideDetails: 'Masquer les détails',
+    monthlyDetails: 'Détails mensuels',
+    worked: 'Travaillé',
+    target: 'Objectif',
+    eveningWork: 'Après',
+    standards: 'Standards',
+    dailyWorkHours: 'Heures de travail quotidiennes',
+    defaultBreak: 'Durée de pause par défaut',
+    eveningThreshold: 'Début des heures supplémentaires du soir',
+    workingDays: 'Jours de travail',
+    dayCount: 'jours',
+
+    // Temps
+    hours: 'heures',
+    minutes: 'minutes',
+    hourShort: 'h',
+    minuteShort: 'min',
+
+    // Paramètres
+    settings: 'Paramètres',
+    language: 'Langue',
+    theme: 'Thème',
+    systemTheme: 'Système',
+    darkMode: 'Sombre',
+    lightMode: 'Clair',
+    about: 'À propos',
+    appDescription: 'Suivez et sauvegardez facilement vos heures de travail.',
+
+    // Auth
+    loginTitle: 'Se connecter',
+    registerTitle: 'Créer un compte',
+    email: 'E-mail',
+    password: 'Mot de passe',
+    login: 'Se connecter',
+    register: "S'inscrire",
+    or: 'ou',
+    continueWithGoogle: 'Continuer avec Google',
+    noAccount: "Vous n'avez pas de compte?",
+    hasAccount: 'Vous avez déjà un compte?',
+    fillAllFields: 'Veuillez remplir tous les champs',
+    logout: 'Se déconnecter',
+    logoutConfirm: 'Êtes-vous sûr de vouloir vous déconnecter?',
+    cancel: 'Annuler',
+    account: 'Compte',
+    loginHint: 'Connectez-vous pour sauvegarder vos enregistrements dans le cloud et y accéder depuis différents appareils.',
+    syncToCloud: 'Sauvegarder dans le cloud',
+    loadFromCloud: 'Charger depuis le cloud',
+    recordsLoaded: 'enregistrements chargés',
+    noNewRecords: 'Aucun nouvel enregistrement à charger',
+
+    // Mise à jour
+    updateRequired: 'Mise à jour requise',
+    updateRequiredMessage: "Vous devez mettre à jour l'application pour continuer à l'utiliser. Veuillez télécharger la dernière version.",
+    updateAvailable: 'Mise à jour disponible',
+    updateAvailableMessage: 'Une nouvelle version ({version}) est disponible. Voulez-vous mettre à jour maintenant?',
+    updateNow: 'Mettre à jour',
+    later: 'Plus tard',
+
+    // Vacances
+    addHoliday: 'Ajouter vacances',
+    addHolidayConfirm: 'Voulez-vous marquer ce jour comme vacances? (7 heures de travail seront ajoutées)',
+    addHolidayBtn: 'Ajouter vacances',
+    removeHoliday: 'Supprimer vacances',
+    removeHolidayConfirm: "Voulez-vous supprimer l'enregistrement de vacances pour ce jour?",
+    remove: 'Supprimer',
+
+    // Pause
+    editDay: 'Modifier le jour',
+    breakCounted: 'Pause',
+    breakCountedDesc: 'Si cette option est activée, le temps de pause ne sera pas déduit de la durée de travail.',
+    breakDuration: 'Durée de la pause',
+    breakDurationMinutes: 'minutes',
+    save: 'Enregistrer',
+    breakTime: 'Temps de pause',
+    startBreak: 'COMMENCER LA PAUSE',
+    endBreak: 'TERMINER LA PAUSE',
+    holiday: 'Vacances',
+    holidayDesc: 'Ce jour est-il un jour de vacances?',
+    entryTimeLabel: "Heure d'entrée",
+    exitTimeLabel: 'Heure de sortie',
+    breakEntryLabel: 'Début de pause',
+    breakExitLabel: 'Fin de pause',
+
+    // Game
+    breakGame: 'Jeu de pause',
+    playGame: '🎮 Jouer',
+    score: 'Score',
+    best: 'Meilleur',
+
+    newGame: 'Nouveau jeu',
+    restart: 'Recommencer',
+    swipeToPlay: 'Glissez pour jouer',
+    selectDifficulty: 'Choisir la difficulté',
+    mistakes: 'Erreurs',
+    notes: 'Notes',
+    erase: 'Effacer',
+    time: 'Temps',
+    newRecord: 'Nouveau record! 🏆',
+    bestTime: 'Meilleur temps',
+    nextLevel: 'Niveau suivant',
+    menu: 'Menu',
+    youWon: 'Vous avez gagné! 🎉',
+    gameOver: 'Jeu terminé!',
+
+
+    // Légal
+    privacyPolicy: 'Politique de confidentialité',
+    termsOfService: "Conditions d'utilisation",
+    lastUpdated: 'Dernière mise à jour',
+
+    // Suppression de compte
+    deleteAccount: 'Supprimer le compte',
+    deleteAccountWarning: 'Êtes-vous sûr de vouloir supprimer votre compte?',
+    deleteAccountWarningText: 'Cette action ne peut pas être annulée. Toutes vos données seront définitivement supprimées.',
+    deleteAccountConfirmationError: 'Vous devez taper "DELETE" pour confirmer.',
+    deleteAccountFinalWarning: 'Cette action ne peut pas être annulée. Toutes vos données seront définitivement supprimées. Êtes-vous sûr de vouloir continuer?',
+    deleteAccountError: 'Une erreur est survenue lors de la suppression de votre compte.',
+    accountDeleted: 'Compte supprimé',
+    accountDeletedMessage: 'Votre compte et toutes les données ont été supprimés avec succès.',
+    whatWillBeDeleted: 'Ce qui sera supprimé:',
+    allWorkRecords: 'Tous les enregistrements de travail',
+    cloudBackupData: 'Données de sauvegarde cloud',
+    localStorageData: 'Données de stockage local',
+    userAccount: 'Compte utilisateur',
+    typeToConfirm: 'Tapez pour confirmer',
+    loginRequired: 'Vous devez être connecté pour supprimer votre compte.',
+  },
+
+  pt: {
+    // Tela inicial
+    appTitle: 'ZeitLog',
+    checkIn: 'ENTRADA',
+    checkOut: 'SAÍDA',
+    tapToRecord: 'Toque para registrar',
+    todayRecords: 'Registros de hoje',
+    noRecords: 'Nenhum registro',
+    entry: 'Entrada',
+    exit: 'Saída',
+
+    // Saudações
+    goodMorning: '☀️ Bom dia',
+    goodAfternoon: '🌤️ Boa tarde',
+    goodEvening: '🌙 Boa noite',
+    goodNight: '🌙 Boa noite',
+
+    // Temporizador
+    workingTime: 'Tempo de trabalho',
+    entryAt: 'Entrada:',
+
+    // Alertas
+    checkInRecorded: '✅ Entrada registrada',
+    checkOutRecorded: '🏠 Saída registrada',
+    cloudBackup: '☁️ Backup na nuvem',
+    localSave: '📱 Salvo localmente',
+    error: 'Erro',
+    recordFailed: 'Falha ao registrar. Por favor, tente novamente.',
+    ok: 'OK',
+
+    // Tela de histórico
+    records: 'Registros',
+    daysRecorded: 'dias registrados',
+    syncronize: 'Sincronizar',
+    syncing: 'Sincronizando...',
+    downloadCSV: 'Exportar',
+    today: 'Hoje',
+    date: 'Data',
+    entryTime: 'Entrada',
+    exitTime: 'Saída',
+    workDuration: 'Duração do trabalho',
+    noRecordsYet: 'Nenhum registro ainda',
+    addFromHome: 'Adicionar entrada/saída da tela inicial',
+
+    // Sincronização
+    syncComplete: 'Sincronização concluída',
+    successful: 'Bem-sucedido',
+    failed: 'Falhou',
+    info: 'Info',
+    noRecordsToSync: 'Nenhum registro para sincronizar.',
+    loginToSync: 'Por favor, faça login para sincronizar.',
+
+    // Exportar / Importar
+    warning: 'Aviso',
+    noRecordsToExport: 'Nenhum registro para exportar.',
+    exportFailed: 'Não foi possível criar o arquivo ou compartilhamento não suportado.',
+    importCSV: 'Importar',
+    importSuccess: 'Importação bem-sucedida',
+    importedRecords: 'novos registros adicionados',
+    updatedRecords: 'registros atualizados',
+    importFailed: 'Não foi possível ler o arquivo ou formato inválido.',
+    importCancelled: 'Importação cancelada.',
+    noNewRecordsToImport: 'Nenhum novo registro para importar.',
+
+    // Barra de abas
+    tabRecord: 'Registrar',
+    tabHistory: 'Histórico',
+
+    // Visualizações
+    daily: 'Diário',
+    weekly: 'Semanal',
+    thisWeek: 'Esta semana',
+    total: 'Total',
+    day: 'Dia',
+    duration: 'Duração',
+    totalBalance: 'Saldo total',
+    totalBalanceDesc: 'Total de todas as semanas',
+    inPlus: 'No positivo',
+    inMinus: 'No negativo',
+    monthlyBalance: 'Saldo mensal',
+    monthlyBalanceDesc: 'Resumo do último mês',
+    details: 'Detalhes',
+    hideDetails: 'Ocultar detalhes',
+    monthlyDetails: 'Detalhes mensais',
+    worked: 'Trabalhado',
+    target: 'Meta',
+    eveningWork: 'Depois',
+    standards: 'Padrões',
+    dailyWorkHours: 'Horas de trabalho diárias',
+    defaultBreak: 'Duração padrão da pausa',
+    eveningThreshold: 'Início das horas extras noturnas',
+    workingDays: 'Dias de trabalho',
+    dayCount: 'dias',
+
+    // Tempo
+    hours: 'horas',
+    minutes: 'minutos',
+    hourShort: 'h',
+    minuteShort: 'min',
+
+    // Configurações
+    settings: 'Configurações',
+    language: 'Idioma',
+    theme: 'Tema',
+    systemTheme: 'Sistema',
+    darkMode: 'Escuro',
+    lightMode: 'Claro',
+    about: 'Sobre',
+    appDescription: 'Rastreie e faça backup de seus horários de trabalho facilmente.',
+
+    // Autenticação
+    loginTitle: 'Entrar',
+    registerTitle: 'Criar conta',
+    email: 'E-mail',
+    password: 'Senha',
+    login: 'Entrar',
+    register: 'Cadastrar',
+    or: 'ou',
+    continueWithGoogle: 'Continuar com Google',
+    noAccount: 'Não tem uma conta?',
+    hasAccount: 'Já tem uma conta?',
+    fillAllFields: 'Por favor, preencha todos os campos',
+    logout: 'Sair',
+    logoutConfirm: 'Tem certeza de que deseja sair?',
+    cancel: 'Cancelar',
+    account: 'Conta',
+    loginHint: 'Faça login para fazer backup de seus registros na nuvem e acessá-los de diferentes dispositivos.',
+    syncToCloud: 'Backup na nuvem',
+    loadFromCloud: 'Carregar da nuvem',
+    recordsLoaded: 'registros carregados',
+    noNewRecords: 'Nenhum novo registro para carregar',
+
+    // Atualização
+    updateRequired: 'Atualização necessária',
+    updateRequiredMessage: 'Você precisa atualizar o aplicativo para continuar usando. Por favor, baixe a versão mais recente.',
+    updateAvailable: 'Atualização disponível',
+    updateAvailableMessage: 'Uma nova versão ({version}) está disponível. Deseja atualizar agora?',
+    updateNow: 'Atualizar',
+    later: 'Mais tarde',
+
+    // Feriado
+    addHoliday: 'Adicionar feriado',
+    addHolidayConfirm: 'Deseja marcar este dia como feriado? (7 horas de trabalho serão adicionadas)',
+    addHolidayBtn: 'Adicionar feriado',
+    removeHoliday: 'Remover feriado',
+    removeHolidayConfirm: 'Deseja remover o registro de feriado para este dia?',
+    remove: 'Remover',
+
+    // Pausa
+    editDay: 'Editar dia',
+    breakCounted: 'Pausa',
+    breakCountedDesc: 'Se esta opção estiver ativada, o tempo de pausa não será deduzido da duração do trabalho.',
+    breakDuration: 'Duração da pausa',
+    breakDurationMinutes: 'minutos',
+    save: 'Salvar',
+    breakTime: 'Tempo de pausa',
+    startBreak: 'INICIAR PAUSA',
+    endBreak: 'TERMINAR PAUSA',
+    holiday: 'Feriado',
+    holidayDesc: 'Este dia é um feriado?',
+    entryTimeLabel: 'Horário de entrada',
+    exitTimeLabel: 'Horário de saída',
+    breakEntryLabel: 'Início da pausa',
+    breakExitLabel: 'Fim da pausa',
+
+    // Game
+    breakGame: 'Jogo de pausa',
+    playGame: '🎮 Jogar',
+    score: 'Pontuação',
+    best: 'Melhor',
+    newGame: 'Novo jogo',
+    restart: 'Reiniciar',
+    swipeToPlay: 'Deslize para jogar',
+    selectDifficulty: 'Selecionar Dificuldade',
+    mistakes: 'Erros',
+    notes: 'Notas',
+    erase: 'Apagar',
+    time: 'Tempo',
+    newRecord: 'Novo Recorde! 🏆',
+    bestTime: 'Melhor Tempo',
+    nextLevel: 'Próximo Nível',
+    menu: 'Menu',
+    youWon: 'Você ganhou! 🎉',
+    gameOver: 'Fim de jogo!',
+
+    // Legal
+    privacyPolicy: 'Política de privacidade',
+    termsOfService: 'Termos de serviço',
+    lastUpdated: 'Última atualização',
+
+    // Exclusão de conta
+    deleteAccount: 'Excluir conta',
+    deleteAccountWarning: 'Tem certeza de que deseja excluir sua conta?',
+    deleteAccountWarningText: 'Esta ação não pode ser desfeita. Todos os seus dados serão excluídos permanentemente.',
+    deleteAccountConfirmationError: 'Você deve digitar "DELETE" para confirmar.',
+    deleteAccountFinalWarning: 'Esta ação não pode ser desfeita. Todos os seus dados serão excluídos permanentemente. Tem certeza de que deseja continuar?',
+    deleteAccountError: 'Ocorreu um erro ao excluir sua conta.',
+    accountDeleted: 'Conta excluída',
+    accountDeletedMessage: 'Sua conta e todos os dados foram excluídos com sucesso.',
+    whatWillBeDeleted: 'O que será excluído:',
+    allWorkRecords: 'Todos os registros de trabalho',
+    cloudBackupData: 'Dados de backup na nuvem',
+    localStorageData: 'Dados de armazenamento local',
+    userAccount: 'Conta de usuário',
+    typeToConfirm: 'Digite para confirmar',
+    loginRequired: 'Você deve estar logado para excluir sua conta.',
+  },
+
+  ar: {
+    // الشاشة الرئيسية
+    appTitle: 'ZeitLog',
+    checkIn: 'تسجيل الدخول',
+    checkOut: 'تسجيل الخروج',
+    tapToRecord: 'اضغط للتسجيل',
+    todayRecords: 'سجلات اليوم',
+    noRecords: 'لا توجد سجلات',
+    entry: 'دخول',
+    exit: 'خروج',
+
+    // التحيات
+    goodMorning: '☀️ صباح الخير',
+    goodAfternoon: '🌤️ مساء الخير',
+    goodEvening: '🌙 مساء الخير',
+    goodNight: '🌙 تصبح على خير',
+
+    // المؤقت
+    workingTime: 'وقت العمل',
+    entryAt: 'الدخول:',
+
+    // التنبيهات
+    checkInRecorded: '✅ تم تسجيل الدخول',
+    checkOutRecorded: '🏠 تم تسجيل الخروج',
+    cloudBackup: '☁️ تم النسخ الاحتياطي إلى السحابة',
+    localSave: '📱 تم الحفظ محلياً',
+    error: 'خطأ',
+    recordFailed: 'فشل التسجيل. يرجى المحاولة مرة أخرى.',
+    ok: 'موافق',
+
+    // شاشة السجل
+    records: 'السجلات',
+    daysRecorded: 'أيام مسجلة',
+    syncronize: 'مزامنة',
+    syncing: 'جارٍ المزامنة...',
+    downloadCSV: 'تصدير',
+    today: 'اليوم',
+    date: 'التاريخ',
+    entryTime: 'الدخول',
+    exitTime: 'الخروج',
+    workDuration: 'مدة العمل',
+    noRecordsYet: 'لا توجد سجلات بعد',
+    addFromHome: 'أضف تسجيل الدخول/الخروج من الصفحة الرئيسية',
+
+    // المزامنة
+    syncComplete: 'اكتملت المزامنة',
+    successful: 'نجح',
+    failed: 'فشل',
+    info: 'معلومات',
+    noRecordsToSync: 'لا توجد سجلات للمزامنة.',
+    loginToSync: 'يرجى تسجيل الدخول للمزامنة.',
+
+    // التصدير / الاستيراد
+    warning: 'تحذير',
+    noRecordsToExport: 'لا توجد سجلات للتصدير.',
+    exportFailed: 'تعذر إنشاء الملف أو المشاركة غير مدعومة.',
+    importCSV: 'استيراد',
+    importSuccess: 'نجح الاستيراد',
+    importedRecords: 'سجلات جديدة مضافة',
+    updatedRecords: 'سجلات محدثة',
+    importFailed: 'تعذر قراءة الملف أو تنسيق غير صالح.',
+    importCancelled: 'تم إلغاء الاستيراد.',
+    noNewRecordsToImport: 'لا توجد سجلات جديدة للاستيراد.',
+
+    // شريط التبويب
+    tabRecord: 'تسجيل',
+    tabHistory: 'السجل',
+
+    // العروض
+    daily: 'يومي',
+    weekly: 'أسبوعي',
+    thisWeek: 'هذا الأسبوع',
+    total: 'المجموع',
+    day: 'اليوم',
+    duration: 'المدة',
+    totalBalance: 'الرصيد الإجمالي',
+    totalBalanceDesc: 'مجموع كل الأسابيع',
+    inPlus: 'في الزائد',
+    inMinus: 'في الناقص',
+    monthlyBalance: 'الرصيد الشهري',
+    monthlyBalanceDesc: 'ملخص الشهر الأخير',
+    details: 'التفاصيل',
+    hideDetails: 'إخفاء التفاصيل',
+    monthlyDetails: 'التفاصيل الشهرية',
+    worked: 'العمل',
+    target: 'الهدف',
+    eveningWork: 'بعد',
+    standards: 'المعايير',
+    dailyWorkHours: 'ساعات العمل اليومية',
+    defaultBreak: 'مدة الاستراحة الافتراضية',
+    eveningThreshold: 'بداية العمل الإضافي المسائي',
+    workingDays: 'أيام العمل',
+    dayCount: 'أيام',
+
+    // الوقت
+    hours: 'ساعات',
+    minutes: 'دقائق',
+    hourShort: 'س',
+    minuteShort: 'د',
+
+    // الإعدادات
+    settings: 'الإعدادات',
+    language: 'اللغة',
+    theme: 'المظهر',
+    systemTheme: 'النظام',
+    darkMode: 'داكن',
+    lightMode: 'فاتح',
+    about: 'حول',
+    appDescription: 'تتبع واحتفظ بنسخة احتياطية من أوقات عملك بسهولة.',
+
+    // المصادقة
+    loginTitle: 'تسجيل الدخول',
+    registerTitle: 'إنشاء حساب',
+    email: 'البريد الإلكتروني',
+    password: 'كلمة المرور',
+    login: 'تسجيل الدخول',
+    register: 'التسجيل',
+    or: 'أو',
+    continueWithGoogle: 'المتابعة مع Google',
+    noAccount: 'ليس لديك حساب؟',
+    hasAccount: 'لديك حساب بالفعل؟',
+    fillAllFields: 'يرجى ملء جميع الحقول',
+    logout: 'تسجيل الخروج',
+    logoutConfirm: 'هل أنت متأكد أنك تريد تسجيل الخروج؟',
+    cancel: 'إلغاء',
+    account: 'الحساب',
+    loginHint: 'سجل الدخول لنسخ سجلاتك احتياطياً إلى السحابة والوصول إليها من أجهزة مختلفة.',
+    syncToCloud: 'النسخ الاحتياطي إلى السحابة',
+    loadFromCloud: 'التحميل من السحابة',
+    recordsLoaded: 'سجلات محملة',
+    noNewRecords: 'لا توجد سجلات جديدة للتحميل',
+
+    // التحديث
+    updateRequired: 'التحديث مطلوب',
+    updateRequiredMessage: 'تحتاج إلى تحديث التطبيق لمواصلة استخدامه. يرجى تنزيل أحدث إصدار.',
+    updateAvailable: 'التحديث متاح',
+    updateAvailableMessage: 'إصدار جديد ({version}) متاح. هل تريد التحديث الآن؟',
+    updateNow: 'التحديث',
+    later: 'لاحقاً',
+
+    // العطلة
+    addHoliday: 'إضافة عطلة',
+    addHolidayConfirm: 'هل تريد وضع علامة على هذا اليوم كعطلة؟ (سيتم إضافة 7 ساعات عمل)',
+    addHolidayBtn: 'إضافة عطلة',
+    removeHoliday: 'إزالة العطلة',
+    removeHolidayConfirm: 'هل تريد إزالة سجل العطلة لهذا اليوم؟',
+    remove: 'إزالة',
+
+    // الاستراحة
+    editDay: 'تعديل اليوم',
+    breakCounted: 'استراحة',
+    breakCountedDesc: 'إذا تم تمكين هذا الخيار، فلن يتم خصم وقت الاستراحة من مدة العمل.',
+    breakDuration: 'مدة الاستراحة',
+    breakDurationMinutes: 'دقائق',
+    save: 'حفظ',
+    breakTime: 'وقت الاستراحة',
+    startBreak: 'بدء الاستراحة',
+    endBreak: 'إنهاء الاستراحة',
+    holiday: 'عطلة',
+    holidayDesc: 'هل هذا اليوم عطلة؟',
+    entryTimeLabel: 'وقت الدخول',
+    exitTimeLabel: 'وقت الخروج',
+    breakEntryLabel: 'بداية الاستراحة',
+    breakExitLabel: 'نهاية الاستراحة',
+
+    // Game
+    breakGame: 'لعبة الاستراحة',
+    playGame: '🎮 العب',
+    score: 'النتيجة',
+    best: 'الأفضل',
+    youWon: 'لقد فزت! 🎉',
+    gameOver: 'انتهت اللعبة!',
+    newGame: 'لعبة جديدة',
+    restart: 'إعادة البدء',
+    swipeToPlay: 'اسحب للعب',
+    selectDifficulty: 'اختر الصعوبة',
+    mistakes: 'الأخطاء',
+    notes: 'ملاحظات',
+    erase: 'مسح',
+    time: 'الوقت',
+    newRecord: 'رقم قياسي جديد! 🏆',
+    bestTime: 'أفضل وقت',
+    nextLevel: 'المستوى التالي',
+    menu: 'القائمة',
+
+    // القانونية
+    privacyPolicy: 'سياسة الخصوصية',
+    termsOfService: 'شروط الخدمة',
+    lastUpdated: 'آخر تحديث',
+
+    // حذف الحساب
+    deleteAccount: 'حذف الحساب',
+    deleteAccountWarning: 'هل أنت متأكد أنك تريد حذف حسابك؟',
+    deleteAccountWarningText: 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع بياناتك نهائياً.',
+    deleteAccountConfirmationError: 'يجب عليك كتابة "DELETE" للتأكيد.',
+    deleteAccountFinalWarning: 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف جميع بياناتك نهائياً. هل أنت متأكد أنك تريد المتابعة؟',
+    deleteAccountError: 'حدث خطأ أثناء حذف حسابك.',
+    accountDeleted: 'تم حذف الحساب',
+    accountDeletedMessage: 'تم حذف حسابك وجميع البيانات بنجاح.',
+    whatWillBeDeleted: 'ما سيتم حذفه:',
+    allWorkRecords: 'جميع سجلات العمل',
+    cloudBackupData: 'بيانات النسخ الاحتياطي السحابي',
+    localStorageData: 'بيانات التخزين المحلي',
+    userAccount: 'حساب المستخدم',
+    typeToConfirm: 'اكتب للتأكيد',
+    loginRequired: 'يجب أن تكون مسجلاً الدخول لحذف حسابك.',
+  },
+
+  zh: {
+    // 主屏幕
+    appTitle: 'ZeitLog',
+    checkIn: '签到',
+    checkOut: '签退',
+    tapToRecord: '点击记录',
+    todayRecords: '今日记录',
+    noRecords: '暂无记录',
+    entry: '进入',
+    exit: '退出',
+
+    // 问候语
+    goodMorning: '☀️ 早上好',
+    goodAfternoon: '🌤️ 下午好',
+    goodEvening: '🌙 晚上好',
+    goodNight: '🌙 晚安',
+
+    // 计时器
+    workingTime: '工作时间',
+    entryAt: '进入:',
+
+    // 警报
+    checkInRecorded: '✅ 签到已记录',
+    checkOutRecorded: '🏠 签退已记录',
+    cloudBackup: '☁️ 已备份到云端',
+    localSave: '📱 已本地保存',
+    error: '错误',
+    recordFailed: '记录失败。请重试。',
+    ok: '确定',
+
+    // 历史记录屏幕
+    records: '记录',
+    daysRecorded: '天已记录',
+    syncronize: '同步',
+    syncing: '同步中...',
+    downloadCSV: '导出',
+    today: '今天',
+    date: '日期',
+    entryTime: '进入',
+    exitTime: '退出',
+    workDuration: '工作时长',
+    noRecordsYet: '暂无记录',
+    addFromHome: '从主页添加签到/签退',
+
+    // 同步
+    syncComplete: '同步完成',
+    successful: '成功',
+    failed: '失败',
+    info: '信息',
+    noRecordsToSync: '没有要同步的记录。',
+    loginToSync: '请登录以同步。',
+
+    // 导出/导入
+    warning: '警告',
+    noRecordsToExport: '没有要导出的记录。',
+    exportFailed: '无法创建文件或不支持共享。',
+    importCSV: '导入',
+    importSuccess: '导入成功',
+    importedRecords: '新记录已添加',
+    updatedRecords: '记录已更新',
+    importFailed: '无法读取文件或格式无效。',
+    importCancelled: '导入已取消。',
+    noNewRecordsToImport: '没有要导入的新记录。',
+
+    // 标签栏
+    tabRecord: '记录',
+    tabHistory: '历史',
+
+    // 视图
+    daily: '每日',
+    weekly: '每周',
+    thisWeek: '本周',
+    total: '总计',
+    day: '天',
+    duration: '时长',
+    totalBalance: '总余额',
+    totalBalanceDesc: '所有周的总和',
+    inPlus: '正数',
+    inMinus: '负数',
+    monthlyBalance: '月度余额',
+    monthlyBalanceDesc: '上月摘要',
+    details: '详情',
+    hideDetails: '隐藏详情',
+    monthlyDetails: '月度详情',
+    worked: '已工作',
+    target: '目标',
+    eveningWork: '之后',
+    standards: '标准',
+    dailyWorkHours: '每日工作时间',
+    defaultBreak: '默认休息时长',
+    eveningThreshold: '晚间加班开始',
+    workingDays: '工作日',
+    dayCount: '天',
+
+    // 时间
+    hours: '小时',
+    minutes: '分钟',
+    hourShort: '时',
+    minuteShort: '分',
+
+    // 设置
+    settings: '设置',
+    language: '语言',
+    theme: '主题',
+    systemTheme: '系统',
+    darkMode: '深色',
+    lightMode: '浅色',
+    about: '关于',
+    appDescription: '轻松跟踪和备份您的工作时间。',
+
+    // 认证
+    loginTitle: '登录',
+    registerTitle: '创建账户',
+    email: '电子邮件',
+    password: '密码',
+    login: '登录',
+    register: '注册',
+    or: '或',
+    continueWithGoogle: '使用 Google 继续',
+    noAccount: '没有账户？',
+    hasAccount: '已有账户？',
+    fillAllFields: '请填写所有字段',
+    logout: '登出',
+    logoutConfirm: '您确定要登出吗？',
+    cancel: '取消',
+    account: '账户',
+    loginHint: '登录以将您的记录备份到云端并从不同设备访问它们。',
+    syncToCloud: '备份到云端',
+    loadFromCloud: '从云端加载',
+    recordsLoaded: '记录已加载',
+    noNewRecords: '没有要加载的新记录',
+
+    // 更新
+    updateRequired: '需要更新',
+    updateRequiredMessage: '您需要更新应用程序才能继续使用。请下载最新版本。',
+    updateAvailable: '有可用更新',
+    updateAvailableMessage: '新版本 ({version}) 可用。您想现在更新吗？',
+    updateNow: '更新',
+    later: '稍后',
+
+    // 假期
+    addHoliday: '添加假期',
+    addHolidayConfirm: '您想将这一天标记为假期吗？（将添加7小时工作）',
+    addHolidayBtn: '添加假期',
+    removeHoliday: '删除假期',
+    removeHolidayConfirm: '您想删除这一天的假期记录吗？',
+    remove: '删除',
+
+    // 休息
+    editDay: '编辑日期',
+    breakCounted: '休息',
+    breakCountedDesc: '如果启用此选项，休息时间将不会从工作时长中扣除。',
+    breakDuration: '休息时长',
+    breakDurationMinutes: '分钟',
+    save: '保存',
+    breakTime: '休息时间',
+    startBreak: '开始休息',
+    endBreak: '结束休息',
+    holiday: '假期',
+    holidayDesc: '这一天是假期吗？',
+    entryTimeLabel: '进入时间',
+    exitTimeLabel: '退出时间',
+    breakEntryLabel: '休息开始',
+    breakExitLabel: '休息结束',
+
+    // Game
+    breakGame: '休息游戏',
+    playGame: '🎮 玩游戏',
+    score: '分数',
+    best: '最佳',
+    youWon: '你赢了！🎉',
+    gameOver: '游戏结束！',
+    newGame: '新游戏',
+    restart: '重新开始',
+    swipeToPlay: '滑动来玩',
+    selectDifficulty: '选择难度',
+    mistakes: '错误',
+    notes: '笔记',
+    erase: '擦除',
+    time: '时间',
+    newRecord: '新纪录！ 🏆',
+    bestTime: '最佳时间',
+    nextLevel: '下一关',
+    menu: '菜单',
+
+    // 法律
+    privacyPolicy: '隐私政策',
+    termsOfService: '服务条款',
+    lastUpdated: '最后更新',
+
+    // 账户删除
+    deleteAccount: '删除账户',
+    deleteAccountWarning: '您确定要删除您的账户吗？',
+    deleteAccountWarningText: '此操作无法撤消。您的所有数据将被永久删除。',
+    deleteAccountConfirmationError: '您必须输入"DELETE"以确认。',
+    deleteAccountFinalWarning: '此操作无法撤消。您的所有数据将被永久删除。您确定要继续吗？',
+    deleteAccountError: '删除您的账户时发生错误。',
+    accountDeleted: '账户已删除',
+    accountDeletedMessage: '您的账户和所有数据已成功删除。',
+    whatWillBeDeleted: '将被删除的内容：',
+    allWorkRecords: '所有工作记录',
+    cloudBackupData: '云备份数据',
+    localStorageData: '本地存储数据',
+    userAccount: '用户账户',
+    typeToConfirm: '输入以确认',
+    loginRequired: '您必须登录才能删除您的账户。',
+  },
+
+  ru: {
+    // Главный экран
+    appTitle: 'ZeitLog',
+    checkIn: 'ВХОД',
+    checkOut: 'ВЫХОД',
+    tapToRecord: 'Нажмите для записи',
+    todayRecords: 'Записи сегодня',
+    noRecords: 'Нет записей',
+    entry: 'Вход',
+    exit: 'Выход',
+
+    // Приветствия
+    goodMorning: '☀️ Доброе утро',
+    goodAfternoon: '🌤️ Добрый день',
+    goodEvening: '🌙 Добрый вечер',
+    goodNight: '🌙 Спокойной ночи',
+
+    // Таймер
+    workingTime: 'Рабочее время',
+    entryAt: 'Вход:',
+
+    // Уведомления
+    checkInRecorded: '✅ Вход записан',
+    checkOutRecorded: '🏠 Выход записан',
+    cloudBackup: '☁️ Резервная копия в облаке',
+    localSave: '📱 Сохранено локально',
+    error: 'Ошибка',
+    recordFailed: 'Не удалось записать. Пожалуйста, попробуйте еще раз.',
+    ok: 'ОК',
+
+    // Экран истории
+    records: 'Записи',
+    daysRecorded: 'дней записано',
+    syncronize: 'Синхронизация',
+    syncing: 'Синхронизация...',
+    downloadCSV: 'Экспорт',
+    today: 'Сегодня',
+    date: 'Дата',
+    entryTime: 'Вход',
+    exitTime: 'Выход',
+    workDuration: 'Продолжительность работы',
+    noRecordsYet: 'Пока нет записей',
+    addFromHome: 'Добавить вход/выход с главной страницы',
+
+    // Синхронизация
+    syncComplete: 'Синхронизация завершена',
+    successful: 'Успешно',
+    failed: 'Не удалось',
+    info: 'Информация',
+    noRecordsToSync: 'Нет записей для синхронизации.',
+    loginToSync: 'Пожалуйста, войдите для синхронизации.',
+
+    // Экспорт / Импорт
+    warning: 'Предупреждение',
+    noRecordsToExport: 'Нет записей для экспорта.',
+    exportFailed: 'Не удалось создать файл или общий доступ не поддерживается.',
+    importCSV: 'Импорт',
+    importSuccess: 'Импорт успешен',
+    importedRecords: 'новых записей добавлено',
+    updatedRecords: 'записей обновлено',
+    importFailed: 'Не удалось прочитать файл или неверный формат.',
+    importCancelled: 'Импорт отменен.',
+    noNewRecordsToImport: 'Нет новых записей для импорта.',
+
+    // Панель вкладок
+    tabRecord: 'Запись',
+    tabHistory: 'История',
+
+    // Просмотры
+    daily: 'Ежедневно',
+    weekly: 'Еженедельно',
+    thisWeek: 'Эта неделя',
+    total: 'Всего',
+    day: 'День',
+    duration: 'Продолжительность',
+    totalBalance: 'Общий баланс',
+    totalBalanceDesc: 'Сумма всех недель',
+    inPlus: 'В плюсе',
+    inMinus: 'В минусе',
+    monthlyBalance: 'Месячный баланс',
+    monthlyBalanceDesc: 'Итоги прошлого месяца',
+    details: 'Подробности',
+    hideDetails: 'Скрыть подробности',
+    monthlyDetails: 'Подробности за месяц',
+    worked: 'Отработано',
+    target: 'Цель',
+    eveningWork: 'После',
+    standards: 'Стандарты',
+    dailyWorkHours: 'Ежедневное рабочее время',
+    defaultBreak: 'Стандартная пауза',
+    eveningThreshold: 'Начало вечерних сверхурочных',
+    workingDays: 'Рабочие дни',
+    dayCount: 'дней',
+
+    // Время
+    hours: 'часов',
+    minutes: 'минут',
+    hourShort: 'ч',
+    minuteShort: 'мин',
+
+    // Настройки
+    settings: 'Настройки',
+    language: 'Язык',
+    theme: 'Тема',
+    systemTheme: 'Системная',
+    darkMode: 'Темная',
+    lightMode: 'Светлая',
+    about: 'О приложении',
+    appDescription: 'Легко отслеживайте и создавайте резервные копии вашего рабочего времени.',
+
+    // Аутентификация
+    loginTitle: 'Войти',
+    registerTitle: 'Создать аккаунт',
+    email: 'Электронная почта',
+    password: 'Пароль',
+    login: 'Войти',
+    register: 'Зарегистрироваться',
+    or: 'или',
+    continueWithGoogle: 'Продолжить с Google',
+    noAccount: 'Нет аккаунта?',
+    hasAccount: 'Уже есть аккаунт?',
+    fillAllFields: 'Пожалуйста, заполните все поля',
+    logout: 'Выйти',
+    logoutConfirm: 'Вы уверены, что хотите выйти?',
+    cancel: 'Отмена',
+    account: 'Аккаунт',
+    loginHint: 'Войдите, чтобы создать резервную копию ваших записей в облаке и получить к ним доступ с разных устройств.',
+    syncToCloud: 'Резервная копия в облако',
+    loadFromCloud: 'Загрузить из облака',
+    recordsLoaded: 'записей загружено',
+    noNewRecords: 'Нет новых записей для загрузки',
+
+    // Обновление
+    updateRequired: 'Требуется обновление',
+    updateRequiredMessage: 'Вам необходимо обновить приложение, чтобы продолжить его использование. Пожалуйста, загрузите последнюю версию.',
+    updateAvailable: 'Доступно обновление',
+    updateAvailableMessage: 'Доступна новая версия ({version}). Хотите обновить сейчас?',
+    updateNow: 'Обновить',
+    later: 'Позже',
+
+    // Праздник
+    addHoliday: 'Добавить праздник',
+    addHolidayConfirm: 'Вы хотите отметить этот день как праздник? (Будет добавлено 7 часов работы)',
+    addHolidayBtn: 'Добавить праздник',
+    removeHoliday: 'Удалить праздник',
+    removeHolidayConfirm: 'Вы хотите удалить запись о празднике для этого дня?',
+    remove: 'Удалить',
+
+    // Перерыв
+    editDay: 'Редактировать день',
+    breakCounted: 'Перерыв',
+    breakCountedDesc: 'Если этот параметр включен, время перерыва не будет вычитаться из продолжительности работы.',
+    breakDuration: 'Продолжительность перерыва',
+    breakDurationMinutes: 'минут',
+    save: 'Сохранить',
+    breakTime: 'Время перерыва',
+    startBreak: 'НАЧАТЬ ПЕРЕРЫВ',
+    endBreak: 'ЗАКОНЧИТЬ ПЕРЕРЫВ',
+    holiday: 'Праздник',
+    holidayDesc: 'Этот день праздник?',
+    entryTimeLabel: 'Время входа',
+    exitTimeLabel: 'Время выхода',
+    breakEntryLabel: 'Начало перерыва',
+    breakExitLabel: 'Конец перерыва',
+
+    // Game
+    breakGame: 'Игра для перерыва',
+    playGame: '🎮 Играть',
+    score: 'Счет',
+    best: 'Лучший',
+    youWon: 'Вы выиграли! 🎉',
+    gameOver: 'Игра окончена!',
+    newGame: 'Новая игра',
+    restart: 'Перезапустить',
+    swipeToPlay: 'Проведите для игры',
+    selectDifficulty: 'Выберите сложность',
+    mistakes: 'Ошибки',
+    notes: 'Заметки',
+    erase: 'Стереть',
+    time: 'Время',
+    newRecord: 'Новый рекорд! 🏆',
+    bestTime: 'Лучшее время',
+    nextLevel: 'Следующий уровень',
+    menu: 'Меню',
+
+    // Юридическая информация
+    privacyPolicy: 'Политика конфиденциальности',
+    termsOfService: 'Условия использования',
+    lastUpdated: 'Последнее обновление',
+
+    // Удаление аккаунта
+    deleteAccount: 'Удалить аккаунт',
+    deleteAccountWarning: 'Вы уверены, что хотите удалить свой аккаунт?',
+    deleteAccountWarningText: 'Это действие нельзя отменить. Все ваши данные будут удалены навсегда.',
+    deleteAccountConfirmationError: 'Вы должны ввести "DELETE" для подтверждения.',
+    deleteAccountFinalWarning: 'Это действие нельзя отменить. Все ваши данные будут удалены навсегда. Вы уверены, что хотите продолжить?',
+    deleteAccountError: 'Произошла ошибка при удалении вашего аккаунта.',
+    accountDeleted: 'Аккаунт удален',
+    accountDeletedMessage: 'Ваш аккаунт и все данные были успешно удалены.',
+    whatWillBeDeleted: 'Что будет удалено:',
+    allWorkRecords: 'Все рабочие записи',
+    cloudBackupData: 'Данные резервной копии в облаке',
+    localStorageData: 'Данные локального хранилища',
+    userAccount: 'Учетная запись пользователя',
+    typeToConfirm: 'Введите для подтверждения',
+    loginRequired: 'Вы должны войти в систему, чтобы удалить свой аккаунт.',
+  },
+
+  uk: {
+    // Головний екран
+    appTitle: 'ZeitLog',
+    checkIn: 'ВХІД',
+    checkOut: 'ВИХІД',
+    tapToRecord: 'Натисніть для запису',
+    todayRecords: 'Записи сьогодні',
+    noRecords: 'Немає записів',
+    entry: 'Вхід',
+    exit: 'Вихід',
+
+    // Вітання
+    goodMorning: '☀️ Доброго ранку',
+    goodAfternoon: '🌤️ Добрий день',
+    goodEvening: '🌙 Добрий вечір',
+    goodNight: '🌙 На добраніч',
+
+    // Таймер
+    workingTime: 'Робочий час',
+    entryAt: 'Вхід:',
+
+    // Сповіщення
+    checkInRecorded: '✅ Вхід записано',
+    checkOutRecorded: '🏠 Вихід записано',
+    cloudBackup: '☁️ Резервна копія в хмарі',
+    localSave: '📱 Збережено локально',
+    error: 'Помилка',
+    recordFailed: 'Не вдалося записати. Будь ласка, спробуйте ще раз.',
+    ok: 'ОК',
+
+    // Екран історії
+    records: 'Записи',
+    daysRecorded: 'днів записано',
+    syncronize: 'Синхронізація',
+    syncing: 'Синхронізація...',
+    downloadCSV: 'Експорт',
+    today: 'Сьогодні',
+    date: 'Дата',
+    entryTime: 'Вхід',
+    exitTime: 'Вихід',
+    workDuration: 'Тривалість роботи',
+    noRecordsYet: 'Поки немає записів',
+    addFromHome: 'Додати вхід/вихід з головної сторінки',
+
+    // Синхронізація
+    syncComplete: 'Синхронізацію завершено',
+    successful: 'Успішно',
+    failed: 'Не вдалося',
+    info: 'Інформація',
+    noRecordsToSync: 'Немає записів для синхронізації.',
+    loginToSync: 'Будь ласка, увійдіть для синхронізації.',
+
+    // Експорт / Імпорт
+    warning: 'Попередження',
+    noRecordsToExport: 'Немає записів для експорту.',
+    exportFailed: 'Не вдалося створити файл або спільний доступ не підтримується.',
+    importCSV: 'Імпорт',
+    importSuccess: 'Імпорт успішний',
+    importedRecords: 'нових записів додано',
+    updatedRecords: 'записів оновлено',
+    importFailed: 'Не вдалося прочитати файл або невірний формат.',
+    importCancelled: 'Імпорт скасовано.',
+    noNewRecordsToImport: 'Немає нових записів для імпорту.',
+
+    // Панель вкладок
+    tabRecord: 'Запис',
+    tabHistory: 'Історія',
+
+    // Перегляди
+    daily: 'Щоденно',
+    weekly: 'Щотижня',
+    thisWeek: 'Цей тиждень',
+    total: 'Всього',
+    day: 'День',
+    duration: 'Тривалість',
+    totalBalance: 'Загальний баланс',
+    totalBalanceDesc: 'Сума всіх тижнів',
+    inPlus: 'В плюсі',
+    inMinus: 'В мінусі',
+    monthlyBalance: 'Місячний баланс',
+    monthlyBalanceDesc: 'Підсумки минулого місяця',
+    details: 'Деталі',
+    hideDetails: 'Сховати деталі',
+    monthlyDetails: 'Деталі за місяць',
+    worked: 'Відпрацьовано',
+    target: 'Ціль',
+    eveningWork: 'Після',
+    standards: 'Стандарти',
+    dailyWorkHours: 'Щоденний робочий час',
+    defaultBreak: 'Стандартна перерва',
+    eveningThreshold: 'Початок вечірніх наднормових',
+    workingDays: 'Робочі дні',
+    dayCount: 'днів',
+
+    // Час
+    hours: 'годин',
+    minutes: 'хвилин',
+    hourShort: 'год',
+    minuteShort: 'хв',
+
+    // Налаштування
+    settings: 'Налаштування',
+    language: 'Мова',
+    theme: 'Тема',
+    systemTheme: 'Системна',
+    darkMode: 'Темна',
+    lightMode: 'Світла',
+    about: 'Про додаток',
+    appDescription: 'Легко відстежуйте та створюйте резервні копії вашого робочого часу.',
+
+    // Аутентифікація
+    loginTitle: 'Увійти',
+    registerTitle: 'Створити обліковий запис',
+    email: 'Електронна пошта',
+    password: 'Пароль',
+    login: 'Увійти',
+    register: 'Зареєструватися',
+    or: 'або',
+    continueWithGoogle: 'Продовжити з Google',
+    noAccount: 'Немає облікового запису?',
+    hasAccount: 'Вже є обліковий запис?',
+    fillAllFields: 'Будь ласка, заповніть всі поля',
+    logout: 'Вийти',
+    logoutConfirm: 'Ви впевнені, що хочете вийти?',
+    cancel: 'Скасувати',
+    account: 'Обліковий запис',
+    loginHint: 'Увійдіть, щоб створити резервну копію ваших записів у хмарі та отримати до них доступ з різних пристроїв.',
+    syncToCloud: 'Резервна копія в хмару',
+    loadFromCloud: 'Завантажити з хмари',
+    recordsLoaded: 'записів завантажено',
+    noNewRecords: 'Немає нових записів для завантаження',
+
+    // Оновлення
+    updateRequired: 'Потрібне оновлення',
+    updateRequiredMessage: 'Вам потрібно оновити додаток, щоб продовжити його використання. Будь ласка, завантажте останню версію.',
+    updateAvailable: 'Доступне оновлення',
+    updateAvailableMessage: 'Доступна нова версія ({version}). Хочете оновити зараз?',
+    updateNow: 'Оновити',
+    later: 'Пізніше',
+
+    // Свято
+    addHoliday: 'Додати свято',
+    addHolidayConfirm: 'Ви хочете позначити цей день як свято? (Буде додано 7 годин роботи)',
+    addHolidayBtn: 'Додати свято',
+    removeHoliday: 'Видалити свято',
+    removeHolidayConfirm: 'Ви хочете видалити запис про свято для цього дня?',
+    remove: 'Видалити',
+
+    // Перерва
+    editDay: 'Редагувати день',
+    breakCounted: 'Перерва',
+    breakCountedDesc: 'Якщо цей параметр увімкнено, час перерви не буде віднімати від тривалості роботи.',
+    breakDuration: 'Тривалість перерви',
+    breakDurationMinutes: 'хвилин',
+    save: 'Зберегти',
+    breakTime: 'Час перерви',
+    startBreak: 'ПОЧАТИ ПЕРЕРВУ',
+    endBreak: 'ЗАКІНЧИТИ ПЕРЕРВУ',
+    holiday: 'Свято',
+    holidayDesc: 'Цей день свято?',
+    entryTimeLabel: 'Час входу',
+    exitTimeLabel: 'Час виходу',
+    breakEntryLabel: 'Початок перерви',
+    breakExitLabel: 'Кінець перерви',
+
+    // Game
+    breakGame: 'Гра перерви',
+    playGame: '🎮 Грати',
+    score: 'Рахунок',
+    best: 'Найкращий',
+    newGame: 'Нова гра',
+    restart: 'Перезапустити',
+    swipeToPlay: 'Проведіть, щоб грати',
+    selectDifficulty: 'Виберіть складність',
+    mistakes: 'Помилки',
+    notes: 'Нотатки',
+    erase: 'Стерти',
+    time: 'Час',
+    newRecord: 'Новий рекорд! 🏆',
+    bestTime: 'Найкращий час',
+    nextLevel: 'Наступний рівень',
+    menu: 'Меню',
+    youWon: 'Ви виграли! 🎉',
+    gameOver: 'Гра закінчена!',
+
+    // Юридична інформація
+    privacyPolicy: 'Політика конфіденційності',
+    termsOfService: 'Умови використання',
+    lastUpdated: 'Останнє оновлення',
+
+    // Видалення облікового запису
+    deleteAccount: 'Видалити обліковий запис',
+    deleteAccountWarning: 'Ви впевнені, що хочете видалити свій обліковий запис?',
+    deleteAccountWarningText: 'Цю дію не можна скасувати. Всі ваші дані будуть видалені назавжди.',
+    deleteAccountConfirmationError: 'Ви повинні ввести "DELETE" для підтвердження.',
+    deleteAccountFinalWarning: 'Цю дію не можна скасувати. Всі ваші дані будуть видалені назавжди. Ви впевнені, що хочете продовжити?',
+    deleteAccountError: 'Сталася помилка під час видалення вашого облікового запису.',
+    accountDeleted: 'Обліковий запис видалено',
+    accountDeletedMessage: 'Ваш обліковий запис та всі дані були успішно видалені.',
+    whatWillBeDeleted: 'Що буде видалено:',
+    allWorkRecords: 'Всі робочі записи',
+    cloudBackupData: 'Дані резервної копії в хмарі',
+    localStorageData: 'Дані локального сховища',
+    userAccount: 'Обліковий запис користувача',
+    typeToConfirm: 'Введіть для підтвердження',
+    loginRequired: 'Ви повинні увійти в систему, щоб видалити свій обліковий запис.',
+  },
 };
 
 export type TranslationKey = keyof typeof translations.tr;
-
-
-
-
