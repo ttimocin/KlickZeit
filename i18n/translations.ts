@@ -1,7 +1,7 @@
 export const translations = {
   tr: {
     // Ana ekran
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'GİRİŞ YAP',
     checkOut: 'ÇIKIŞ YAP',
     tapToRecord: 'Kaydetmek için dokun',
@@ -209,7 +209,7 @@ export const translations = {
 
   en: {
     // Home screen
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'CHECK IN',
     checkOut: 'CHECK OUT',
     tapToRecord: 'Tap to record',
@@ -417,7 +417,7 @@ export const translations = {
 
   de: {
     // Startbildschirm
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'EINSTEMPELN',
     checkOut: 'AUSSTEMPELN',
     tapToRecord: 'Tippen zum Erfassen',
@@ -625,7 +625,7 @@ export const translations = {
 
   fr: {
     // Écran d'accueil
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'POINTER',
     checkOut: 'DÉPOINTER',
     tapToRecord: 'Appuyez pour enregistrer',
@@ -835,7 +835,7 @@ export const translations = {
 
   pt: {
     // Tela inicial
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'ENTRADA',
     checkOut: 'SAÍDA',
     tapToRecord: 'Toque para registrar',
@@ -1043,7 +1043,7 @@ export const translations = {
 
   ar: {
     // الشاشة الرئيسية
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'تسجيل الدخول',
     checkOut: 'تسجيل الخروج',
     tapToRecord: 'اضغط للتسجيل',
@@ -1251,7 +1251,7 @@ export const translations = {
 
   zh: {
     // 主屏幕
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: '签到',
     checkOut: '签退',
     tapToRecord: '点击记录',
@@ -1459,7 +1459,7 @@ export const translations = {
 
   ru: {
     // Главный экран
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'ВХОД',
     checkOut: 'ВЫХОД',
     tapToRecord: 'Нажмите для записи',
@@ -1667,7 +1667,7 @@ export const translations = {
 
   uk: {
     // Головний екран
-    appTitle: 'ZeitLog',
+    appTitle: 'KlickZeit',
     checkIn: 'ВХІД',
     checkOut: 'ВИХІД',
     tapToRecord: 'Натисніть для запису',

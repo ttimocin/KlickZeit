@@ -22,7 +22,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Veri Toplama',
-          content: 'ZeitLog, işe giriş-çıkış saatlerinizi kaydetmek için aşağıdaki verileri toplar:\n\n• E-posta adresi (Firebase Authentication için)\n• Giriş/çıkış saatleri ve tarihleri\n• Çalışma süreleri\n• Cihazınızda yerel olarak saklanan kayıtlar',
+          content: 'KlickZeit, işe giriş-çıkış saatlerinizi kaydetmek için aşağıdaki verileri toplar:\n\n• E-posta adresi (Firebase Authentication için)\n• Giriş/çıkış saatleri ve tarihleri\n• Çalışma süreleri\n• Cihazınızda yerel olarak saklanan kayıtlar',
         },
         {
           title: '2. Veri Kullanımı',
@@ -46,7 +46,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. İletişim',
-          content: 'Gizlilik politikası hakkında sorularınız için:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Issues sayfasından bize ulaşabilirsiniz',
+          content: 'Gizlilik politikası hakkında sorularınız için:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Issues sayfasından bize ulaşabilirsiniz',
         },
       ],
     },
@@ -56,7 +56,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Data Collection',
-          content: 'ZeitLog collects the following data to record your work check-in/out times:\n\n• Email address (for Firebase Authentication)\n• Check-in/out times and dates\n• Work durations\n• Records stored locally on your device',
+          content: 'KlickZeit collects the following data to record your work check-in/out times:\n\n• Email address (for Firebase Authentication)\n• Check-in/out times and dates\n• Work durations\n• Records stored locally on your device',
         },
         {
           title: '2. Data Usage',
@@ -80,7 +80,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Contact',
-          content: 'For questions about privacy policy:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• You can reach us via the Issues page',
+          content: 'For questions about privacy policy:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• You can reach us via the Issues page',
         },
       ],
     },
@@ -90,7 +90,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Datenerfassung',
-          content: 'ZeitLog erfasst folgende Daten, um Ihre Arbeitszeiten zu erfassen:\n\n• E-Mail-Adresse (für Firebase Authentication)\n• Ein-/Ausstempelzeiten und -daten\n• Arbeitsdauern\n• Lokal auf Ihrem Gerät gespeicherte Einträge',
+          content: 'KlickZeit erfasst folgende Daten, um Ihre Arbeitszeiten zu erfassen:\n\n• E-Mail-Adresse (für Firebase Authentication)\n• Ein-/Ausstempelzeiten und -daten\n• Arbeitsdauern\n• Lokal auf Ihrem Gerät gespeicherte Einträge',
         },
         {
           title: '2. Datennutzung',
@@ -114,7 +114,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Kontakt',
-          content: 'Bei Fragen zur Datenschutzerklärung:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Sie können uns über die Issues-Seite erreichen',
+          content: 'Bei Fragen zur Datenschutzerklärung:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Sie können uns über die Issues-Seite erreichen',
         },
       ],
     },
@@ -124,7 +124,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Collecte de données',
-          content: 'ZeitLog collecte les données suivantes pour enregistrer vos heures d\'entrée/sortie de travail :\n\n• Adresse e-mail (pour l\'authentification Firebase)\n• Heures et dates d\'entrée/sortie\n• Durées de travail\n• Enregistrements stockés localement sur votre appareil',
+          content: 'KlickZeit collecte les données suivantes pour enregistrer vos heures d\'entrée/sortie de travail :\n\n• Adresse e-mail (pour l\'authentification Firebase)\n• Heures et dates d\'entrée/sortie\n• Durées de travail\n• Enregistrements stockés localement sur votre appareil',
         },
         {
           title: '2. Utilisation des données',
@@ -148,7 +148,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Contact',
-          content: 'Pour toute question concernant la politique de confidentialité :\n\n• GitHub : https://github.com/ttimocin/ZeitLog\n• Vous pouvez nous contacter via la page Issues',
+          content: 'Pour toute question concernant la politique de confidentialité :\n\n• GitHub : https://github.com/ttimocin/KlickZeit\n• Vous pouvez nous contacter via la page Issues',
         },
       ],
     },
@@ -158,7 +158,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Coleta de Dados',
-          content: 'ZeitLog coleta os seguintes dados para registrar seus horários de entrada/saída do trabalho:\n\n• Endereço de e-mail (para autenticação Firebase)\n• Horários e datas de entrada/saída\n• Durações de trabalho\n• Registros armazenados localmente no seu dispositivo',
+          content: 'KlickZeit coleta os seguintes dados para registrar seus horários de entrada/saída do trabalho:\n\n• Endereço de e-mail (para autenticação Firebase)\n• Horários e datas de entrada/saída\n• Durações de trabalho\n• Registros armazenados localmente no seu dispositivo',
         },
         {
           title: '2. Uso de Dados',
@@ -182,7 +182,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Contato',
-          content: 'Para perguntas sobre a política de privacidade:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Você pode nos contatar através da página Issues',
+          content: 'Para perguntas sobre a política de privacidade:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Você pode nos contatar através da página Issues',
         },
       ],
     },
@@ -192,7 +192,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. جمع البيانات',
-          content: 'يجمع ZeitLog البيانات التالية لتسجيل أوقات تسجيل الدخول/الخروج في العمل:\n\n• عنوان البريد الإلكتروني (لمصادقة Firebase)\n• أوقات وتواريخ تسجيل الدخول/الخروج\n• مدد العمل\n• السجلات المخزنة محليًا على جهازك',
+          content: 'يجمع KlickZeit البيانات التالية لتسجيل أوقات تسجيل الدخول/الخروج في العمل:\n\n• عنوان البريد الإلكتروني (لمصادقة Firebase)\n• أوقات وتواريخ تسجيل الدخول/الخروج\n• مدد العمل\n• السجلات المخزنة محليًا على جهازك',
         },
         {
           title: '2. استخدام البيانات',
@@ -216,7 +216,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. الاتصال',
-          content: 'للأسئلة حول سياسة الخصوصية:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• يمكنك الوصول إلينا عبر صفحة المشكلات (Issues)',
+          content: 'للأسئلة حول سياسة الخصوصية:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• يمكنك الوصول إلينا عبر صفحة المشكلات (Issues)',
         },
       ],
     },
@@ -226,7 +226,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. 数据收集',
-          content: 'ZeitLog 收集以下数据以记录您的工作签入/签出时间：\n\n• 电子邮件地址（用于 Firebase 身份验证）\n• 签入/签出时间和日期\n• 工作时长\n• 本地存储在您设备上的记录',
+          content: 'KlickZeit 收集以下数据以记录您的工作签入/签出时间：\n\n• 电子邮件地址（用于 Firebase 身份验证）\n• 签入/签出时间和日期\n• 工作时长\n• 本地存储在您设备上的记录',
         },
         {
           title: '2. 数据使用',
@@ -250,7 +250,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. 联系方式',
-          content: '有关隐私政策的问题：\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• 您可以通过 Issues 页面联系我们',
+          content: '有关隐私政策的问题：\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• 您可以通过 Issues 页面联系我们',
         },
       ],
     },
@@ -260,7 +260,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Сбор данных',
-          content: 'ZeitLog собирает следующие данные для записи времени вашего прихода/ухода с работы:\n\n• Адрес электронной почты (для аутентификации Firebase)\n• Время и даты прихода/ухода\n• Продолжительность работы\n• Записи, хранящиеся локально на вашем устройстве',
+          content: 'KlickZeit собирает следующие данные для записи времени вашего прихода/ухода с работы:\n\n• Адрес электронной почты (для аутентификации Firebase)\n• Время и даты прихода/ухода\n• Продолжительность работы\n• Записи, хранящиеся локально на вашем устройстве',
         },
         {
           title: '2. Использование данных',
@@ -284,7 +284,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Контакт',
-          content: 'По вопросам политики конфиденциальности:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Вы можете связаться с нами через страницу Issues',
+          content: 'По вопросам политики конфиденциальности:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Вы можете связаться с нами через страницу Issues',
         },
       ],
     },
@@ -294,7 +294,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Збір даних',
-          content: 'ZeitLog збирає наступні дані для запису часу вашого приходу/виходу з роботи:\n\n• Адреса електронної пошти (для аутентифікації Firebase)\n• Час і дати приходу/виходу\n• Тривалість роботи\n• Записи, що зберігаються локально на вашому пристрої',
+          content: 'KlickZeit збирає наступні дані для запису часу вашого приходу/виходу з роботи:\n\n• Адреса електронної пошти (для аутентифікації Firebase)\n• Час і дати приходу/виходу\n• Тривалість роботи\n• Записи, що зберігаються локально на вашому пристрої',
         },
         {
           title: '2. Використання даних',
@@ -318,7 +318,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '7. Контакт',
-          content: 'З питань політики конфіденційності:\n\n• GitHub: https://github.com/ttimocin/ZeitLog\n• Ви можете зв\'язатися з нами через сторінку Issues',
+          content: 'З питань політики конфіденційності:\n\n• GitHub: https://github.com/ttimocin/KlickZeit\n• Ви можете зв\'язатися з нами через сторінку Issues',
         },
       ],
     },
