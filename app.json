@@ -10,10 +10,10 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.taytek.klickzeit"
+      "bundleIdentifier": "com.taytek.zeitlog"
     },
     "android": {
-      "package": "com.taytek.klickzeit",
+      "package": "com.taytek.zeitlog",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "backgroundColor": "#4CAF50",
