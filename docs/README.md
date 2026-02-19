@@ -1,4 +1,4 @@
-# ZeitLog - Legal Documents
+# KlickZeit - Legal Documents
 
 Bu klasör GitHub Pages için web tabanlı yasal belgeleri içerir.
 
@@ -13,28 +13,28 @@ Bu klasör GitHub Pages için web tabanlı yasal belgeleri içerir.
 
 Birkaç dakika sonra sayfalarınız şu adreslerde yayınlanacak:
 
-- Ana Sayfa: `https://ttimocin.github.io/ZeitLog/`
+- Ana Sayfa: `https://ttimocin.github.io/KlickZeit/`
 - Gizlilik Politikası: 
-  - Türkçe: `https://ttimocin.github.io/ZeitLog/privacy-policy.html`
-  - İngilizce: `https://ttimocin.github.io/ZeitLog/privacy-policy-en.html`
-  - Almanca: `https://ttimocin.github.io/ZeitLog/privacy-policy-de.html`
+  - Türkçe: `https://ttimocin.github.io/KlickZeit/privacy-policy.html`
+  - İngilizce: `https://ttimocin.github.io/KlickZeit/privacy-policy-en.html`
+  - Almanca: `https://ttimocin.github.io/KlickZeit/privacy-policy-de.html`
 - Kullanım Koşulları:
-  - Türkçe: `https://ttimocin.github.io/ZeitLog/terms-of-service.html`
-  - İngilizce: `https://ttimocin.github.io/ZeitLog/terms-of-service-en.html`
-  - Almanca: `https://ttimocin.github.io/ZeitLog/terms-of-service-de.html`
+  - Türkçe: `https://ttimocin.github.io/KlickZeit/terms-of-service.html`
+  - İngilizce: `https://ttimocin.github.io/KlickZeit/terms-of-service-en.html`
+  - Almanca: `https://ttimocin.github.io/KlickZeit/terms-of-service-de.html`
 
 ## Play Store için URL'ler
 
 Play Store'a uygulama yüklerken şu URL'leri kullanın (Türkçe varsayılan, diğer diller de mevcut):
 
-- **Privacy Policy URL**: `https://ttimocin.github.io/ZeitLog/privacy-policy.html`
-- **Terms of Service URL**: `https://ttimocin.github.io/ZeitLog/terms-of-service.html`
+- **Privacy Policy URL**: `https://ttimocin.github.io/KlickZeit/privacy-policy.html`
+- **Terms of Service URL**: `https://ttimocin.github.io/KlickZeit/terms-of-service.html`
 
 Alternatif diller:
-- Privacy Policy (EN): `https://ttimocin.github.io/ZeitLog/privacy-policy-en.html`
-- Privacy Policy (DE): `https://ttimocin.github.io/ZeitLog/privacy-policy-de.html`
-- Terms of Service (EN): `https://ttimocin.github.io/ZeitLog/terms-of-service-en.html`
-- Terms of Service (DE): `https://ttimocin.github.io/ZeitLog/terms-of-service-de.html`
+- Privacy Policy (EN): `https://ttimocin.github.io/KlickZeit/privacy-policy-en.html`
+- Privacy Policy (DE): `https://ttimocin.github.io/KlickZeit/privacy-policy-de.html`
+- Terms of Service (EN): `https://ttimocin.github.io/KlickZeit/terms-of-service-en.html`
+- Terms of Service (DE): `https://ttimocin.github.io/KlickZeit/terms-of-service-de.html`
 
 ## Dosyalar
 
