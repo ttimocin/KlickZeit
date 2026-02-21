@@ -249,6 +249,13 @@ npx expo run:ios --configuration Release
 
 ---
 
+## 📄 法律文件
+
+- **隐私政策**: [网页版](https://ttimocin.github.io/KlickZeit/privacy-policy-zh.html) | [应用内](app/privacy-policy.tsx)
+- **使用条款**: [网页版](https://ttimocin.github.io/KlickZeit/terms-of-service-zh.html) | [应用内](app/terms-of-service.tsx)
+
+---
+
 ## 📄 许可证
 
 本项目根据 [MIT 许可证](LICENSE) 授权。

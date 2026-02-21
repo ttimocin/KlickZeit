@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service - KlickZeit</title>
+    <title>隐私政策 - KlickZeit</title>
     <style>
         * {
             margin: 0;
@@ -141,89 +141,90 @@
 <body>
     <div class="container">
         <div class="lang-switcher">
-            <a href="terms-of-service.html">🇹🇷 TR</a>
-            <a href="terms-of-service-en.html">🇬🇧 EN</a>
-            <a href="terms-of-service-de.html">🇩🇪 DE</a>
-            <a href="terms-of-service-fr.html">🇫🇷 FR</a>
-            <a href="terms-of-service-pt.html">🇵🇹 PT</a>
-            <a href="terms-of-service-ar.html">🇸🇦 AR</a>
-            <a href="terms-of-service-zh.html">🇨🇳 ZH</a>
-            <a href="terms-of-service-ru.html">🇷🇺 RU</a>
-            <a href="terms-of-service-uk.html">🇺🇦 UK</a>
+            <a href="privacy-policy.html">🇹🇷 TR</a>
+            <a href="privacy-policy-en.html">🇬🇧 EN</a>
+            <a href="privacy-policy-de.html">🇩🇪 DE</a>
+            <a href="privacy-policy-fr.html">🇫🇷 FR</a>
+            <a href="privacy-policy-pt.html">🇵🇹 PT</a>
+            <a href="privacy-policy-ar.html">🇸🇦 AR</a>
+            <a href="privacy-policy-zh.html">🇨🇳 ZH</a>
+            <a href="privacy-policy-ru.html">🇷🇺 RU</a>
+            <a href="privacy-policy-uk.html">🇺🇦 UK</a>
         </div>
 
-        <h1>Terms of Service</h1>
-        <p class="last-updated">Last Updated: 2025</p>
+        <h1>隐私政策</h1>
+        <p class="last-updated">最后更新：2025</p>
 
         <div class="section">
-            <h2>1. Acceptance</h2>
-            <p>By using the KlickZeit application, you agree to these Terms of Service. If you continue to use the app,
-                you agree to be bound by these terms.</p>
-        </div>
+            <h2>1. 数据收集</h2>
+            <p>KlickZeit 收集以下数据以提供核心应用程序功能和游戏功能：
 
-        <div class="section">
-            <h2>2. Service Description</h2>
-            <p>KlickZeit is a free mobile application that allows you to record your work check-in/out times. The app:
-
-                • Allows you to record your check-in/out times
-                • Allows you to backup your data via Firebase
-                • Provides CSV data export functionality
-                • Is completely free and ad-free</p>
+                • 电子邮件地址（用于 Firebase 身份验证）
+                • 签入/签出时间和工作时长
+                • 游戏分数和最佳时间（用于排行榜）
+                • 分配给每个用户的匿名用户代码（例如：KZ-ABCD1234)
+                • 本地存储在您设备上的记录</p>
         </div>
 
         <div class="section">
-            <h2>3. User Responsibilities</h2>
-            <p>When using the app:
+            <h2>2. 数据使用</h2>
+            <p>收集的数据仅用于：
 
-                • You are responsible for keeping your account information secure
-                • You are responsible for the accuracy of your data
-                • You may not use the app for illegal purposes
-                • You may not attempt to access others' accounts</p>
+                • 提供核心应用程序功能
+                • 通过 Firebase 备份您的数据
+                • 允许您在不同设备上访问您的数据
+
+                您的数据绝不会与第三方共享或用于广告目的。</p>
         </div>
 
         <div class="section">
-            <h2>4. Service Availability</h2>
-            <p>KlickZeit strives to provide uninterrupted service, but:
+            <h2>3. 数据存储</h2>
+            <p>您的数据存储在：
 
-                • Service interruptions may occur due to maintenance or updates
-                • Features requiring internet connection (Firebase sync) depend on connection status
-                • The app can also work in offline mode</p>
+                • 本地设备上 (AsyncStorage)
+                • 可选地存储在 Firebase Firestore 中作为云备份
+                • 排行榜分数和您的用户代码对所有用户可见
+                • 您的数据仅链接到您的帐户，其他用户无法访问</p>
         </div>
 
         <div class="section">
-            <h2>5. Intellectual Property</h2>
-            <p>KlickZeit and all its content are protected by copyright and other intellectual property laws. The app is
-                open source under the MIT License.</p>
+            <h2>4. 安全性</h2>
+            <p>为了您的数据安全：
+
+                • 使用 Firebase 身份验证进行安全登录
+                • 使用 Firestore 安全规则进行数据访问控制
+                • 所有数据均通过加密连接传输</p>
         </div>
 
         <div class="section">
-            <h2>6. Disclaimer</h2>
-            <p>KlickZeit:
+            <h2>5. 数据删除</h2>
+            <p>当您想要删除您的帐户时：
 
-                • Cannot be held responsible for loss of your data
-                • Is not liable for any damages arising from app usage
-                • Is provided "AS IS" without warranty</p>
+                • 您可以在应用程序内注销
+                • 您可以通过 Firebase 控制台删除您的帐户
+                • 卸载应用程序时，本地数据将被自动删除</p>
         </div>
 
         <div class="section">
-            <h2>7. Changes</h2>
-            <p>These Terms of Service may be updated from time to time. Significant changes will be notified to users.
-                Continued use of the app after changes means you accept the updated terms.</p>
+            <h2>6. 第三方服务</h2>
+            <p>本应用程序使用以下第三方服务：
+
+                • Firebase (Google)：身份验证和 Firestore 数据库
+                • 这些服务的隐私政策可在其网站上找到</p>
         </div>
 
         <div class="section">
-            <h2>8. Contact</h2>
-            <p>For questions or suggestions:
+            <h2>7. 联系方式</h2>
+            <p>有关隐私政策的问题：
 
-                • GitHub: <a href="https://github.com/ttimocin/KlickZeit"
+                • GitHub : <a href="https://github.com/ttimocin/KlickZeit"
                     target="_blank">https://github.com/ttimocin/KlickZeit</a>
-                • You can reach us via the Issues page</p>
+                • 您可以通过 Issues 页面联系我们</p>
         </div>
 
         <div class="footer">
-            <p>KlickZeit - Free and Ad-Free Work Tracking App</p>
-            <p><a href="https://github.com/ttimocin/KlickZeit">GitHub</a> • <a href="privacy-policy-en.html">Privacy
-                    Policy</a></p>
+            <p>KlickZeit - 免费且无广告的工作追踪应用</p>
+            <p><a href="https://github.com/ttimocin/KlickZeit">GitHub</a> • <a href="terms-of-service.html">使用条款</a></p>
         </div>
     </div>
 </body>

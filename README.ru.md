@@ -249,6 +249,13 @@ npx expo run:ios --configuration Release
 
 ---
 
+## 📄 Юридические документы
+
+- **Политика конфиденциальности**: [Веб-версия](https://ttimocin.github.io/KlickZeit/privacy-policy-ru.html) | [В приложении](app/privacy-policy.tsx)
+- **Условия использования**: [Веб-версия](https://ttimocin.github.io/KlickZeit/terms-of-service-ru.html) | [В приложении](app/terms-of-service.tsx)
+
+---
+
 ## 📄 Лицензия
 
 Этот проект лицензирован под [лицензией MIT](LICENSE).

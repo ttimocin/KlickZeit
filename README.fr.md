@@ -249,6 +249,13 @@ Nous accueillons vos contributions ! Veuillez suivre ces étapes :
 
 ---
 
+## 📄 Documents Juridiques
+
+- **Politique de Confidentialité**: [Version Web](https://ttimocin.github.io/KlickZeit/privacy-policy-fr.html) | [Dans l'Application](app/privacy-policy.tsx)
+- **Conditions d'Utilisation**: [Version Web](https://ttimocin.github.io/KlickZeit/terms-of-service.html) | [Dans l'Application](app/terms-of-service.tsx)
+
+---
+
 ## 📄 Licence
 
 Ce projet est sous [Licence MIT](LICENSE).

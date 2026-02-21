@@ -22,7 +22,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Veri Toplama',
-          content: 'KlickZeit, işe giriş-çıkış saatlerinizi kaydetmek için aşağıdaki verileri toplar:\n\n• E-posta adresi (Firebase Authentication için)\n• Giriş/çıkış saatleri ve tarihleri\n• Çalışma süreleri\n• Cihazınızda yerel olarak saklanan kayıtlar',
+          content: 'KlickZeit, uygulamanın temel işlevlerini ve oyun özelliklerini sağlamak için aşağıdaki verileri toplar:\n\n• E-posta adresi (Firebase Authentication için)\n• Giriş/çıkış saatleri ve çalışma süreleri\n• Oyun skorları ve en iyi süreler (Liderlik tablosu için)\n• Her kullanıcıya atanan anonim Kullanıcı Kodu (örn: KZ-ABCD1234)\n• Cihazınızda yerel olarak saklanan kayıtlar',
         },
         {
           title: '2. Veri Kullanımı',
@@ -30,7 +30,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Veri Saklama',
-          content: 'Verileriniz:\n\n• Cihazınızda yerel olarak (AsyncStorage) saklanır\n• İsteğe bağlı olarak Firebase Firestore\'da bulut yedekleme olarak saklanır\n• Verileriniz sadece sizin hesabınıza bağlıdır ve başka kullanıcılar erişemez',
+          content: 'Verileriniz:\n\n• Cihazınızda yerel olarak (AsyncStorage) saklanır\n• İsteğe bağlı olarak Firebase Firestore\'da bulut yedekleme olarak saklanır\n• Liderlik tablolarındaki skorlar ve Kullanıcı Kodunuz tüm kullanıcılara görünebilir\n• Diğer veriler sadece sizin hesabınıza bağlıdır ve başka kullanıcılar erişemez',
         },
         {
           title: '4. Güvenlik',
@@ -56,7 +56,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Data Collection',
-          content: 'KlickZeit collects the following data to record your work check-in/out times:\n\n• Email address (for Firebase Authentication)\n• Check-in/out times and dates\n• Work durations\n• Records stored locally on your device',
+          content: 'KlickZeit collects the following data to provide core app functionality and game features:\n\n• Email address (for Firebase Authentication)\n• Check-in/out times and work durations\n• Game scores and best times (for leaderboards)\n• Anonymous User Code assigned to each user (e.g., KZ-ABCD1234)\n• Records stored locally on your device',
         },
         {
           title: '2. Data Usage',
@@ -64,7 +64,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Data Storage',
-          content: 'Your data is stored:\n\n• Locally on your device (AsyncStorage)\n• Optionally in Firebase Firestore as cloud backup\n• Your data is only linked to your account and other users cannot access it',
+          content: 'Your data is stored:\n\n• Locally on your device (AsyncStorage)\n• Optionally in Firebase Firestore as cloud backup\n• Leaderboard scores and your User Code are visible to all users\n• Other data is only linked to your account and other users cannot access it',
         },
         {
           title: '4. Security',
@@ -90,7 +90,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Datenerfassung',
-          content: 'KlickZeit erfasst folgende Daten, um Ihre Arbeitszeiten zu erfassen:\n\n• E-Mail-Adresse (für Firebase Authentication)\n• Ein-/Ausstempelzeiten und -daten\n• Arbeitsdauern\n• Lokal auf Ihrem Gerät gespeicherte Einträge',
+          content: 'KlickZeit erfasst folgende Daten, um die Kernfunktionen der App und Spielfunktionen bereitzustellen:\n\n• E-Mail-Adresse (für Firebase Authentication)\n• Ein-/Ausstempelzeiten und Arbeitsdauern\n• Spielergebnisse und Bestzeiten (für Bestenlisten)\n• Anonymer Benutzercode, der jedem Benutzer zugewiesen wird (z. B. KZ-ABCD1234)\n• Lokal auf Ihrem Gerät gespeicherte Einträge',
         },
         {
           title: '2. Datennutzung',
@@ -98,7 +98,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Datenspeicherung',
-          content: 'Ihre Daten werden gespeichert:\n\n• Lokal auf Ihrem Gerät (AsyncStorage)\n• Optional in Firebase Firestore als Cloud-Backup\n• Ihre Daten sind nur mit Ihrem Konto verknüpft und andere Benutzer können nicht darauf zugreifen',
+          content: 'Ihre Daten werden gespeichert:\n\n• Lokal auf Ihrem Gerät (AsyncStorage)\n• Optional in Firebase Firestore als Cloud-Backup\n• Bestenlistenergebnisse und Ihr Benutzercode sind für alle Benutzer sichtbar\n• Ihre Daten sind nur mit Ihrem Konto verknüpft und andere Benutzer können nicht darauf zugreifen',
         },
         {
           title: '4. Sicherheit',
@@ -124,7 +124,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Collecte de données',
-          content: 'KlickZeit collecte les données suivantes pour enregistrer vos heures d\'entrée/sortie de travail :\n\n• Adresse e-mail (pour l\'authentification Firebase)\n• Heures et dates d\'entrée/sortie\n• Durées de travail\n• Enregistrements stockés localement sur votre appareil',
+          content: 'KlickZeit collecte les données suivantes pour fournir les fonctionnalités de base de l\'application et les fonctionnalités de jeu :\n\n• Adresse e-mail (pour l\'authentification Firebase)\n• Heures d\'entrée/sortie et durées de travail\n• Scores de jeu et meilleurs temps (pour les classements)\n• Code utilisateur anonyme attribué à chaque utilisateur (ex. : KZ-ABCD1234)\n• Enregistrements stockés localement sur votre appareil',
         },
         {
           title: '2. Utilisation des données',
@@ -132,7 +132,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Stockage des données',
-          content: 'Vos données sont stockées :\n\n• Localement sur votre appareil (AsyncStorage)\n• Optionnellement dans Firebase Firestore comme sauvegarde cloud\n• Vos données sont uniquement liées à votre compte et les autres utilisateurs ne peuvent pas y accéder',
+          content: 'Vos données sont stockées :\n\n• Localement sur votre appareil (AsyncStorage)\n• Optionnellement dans Firebase Firestore comme sauvegarde cloud\n• Les scores des classements et votre code utilisateur sont visibles par tous les utilisateurs\n• Vos données sont uniquement liées à votre compte et les autres utilisateurs ne peuvent pas y accéder',
         },
         {
           title: '4. Sécurité',
@@ -158,7 +158,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Coleta de Dados',
-          content: 'KlickZeit coleta os seguintes dados para registrar seus horários de entrada/saída do trabalho:\n\n• Endereço de e-mail (para autenticação Firebase)\n• Horários e datas de entrada/saída\n• Durações de trabalho\n• Registros armazenados localmente no seu dispositivo',
+          content: 'KlickZeit coleta os seguintes dados para fornecer a funcionalidade principal do aplicativo e recursos de jogo:\n\n• Endereço de e-mail (para autenticação Firebase)\n• Horários de entrada/saída e durações de trabalho\n• Pontuações de jogos e melhores tempos (para classificações)\n• Código de usuário anônimo atribuído a cada usuário (ex.: KZ-ABCD1234)\n• Registros armazenados localmente no seu dispositivo',
         },
         {
           title: '2. Uso de Dados',
@@ -166,7 +166,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Armazenamento de Dados',
-          content: 'Seus dados são armazenados:\n\n• Localmente no seu dispositivo (AsyncStorage)\n• Opcionalmente no Firebase Firestore como backup na nuvem\n• Seus dados estão vinculados apenas à sua conta e outros usuários não podem acessá-los',
+          content: 'Seus dados são armazenados:\n\n• Localmente no seu dispositivo (AsyncStorage)\n• Opcionalmente no Firebase Firestore como backup na nuvem\n• As pontuações de classificação e seu código de usuário são visíveis para todos os usuários\n• Seus dados estão vinculados apenas à sua conta e outros usuários não podem acessá-los',
         },
         {
           title: '4. Segurança',
@@ -192,7 +192,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. جمع البيانات',
-          content: 'يجمع KlickZeit البيانات التالية لتسجيل أوقات تسجيل الدخول/الخروج في العمل:\n\n• عنوان البريد الإلكتروني (لمصادقة Firebase)\n• أوقات وتواريخ تسجيل الدخول/الخروج\n• مدد العمل\n• السجلات المخزنة محليًا على جهازك',
+          content: 'يجمع KlickZeit البيانات التالية لتوفير الوظائف الأساسية للتطبيق وميزات الألعاب:\n\n• عنوان البريد الإلكتروني (لمصادقة Firebase)\n• أوقات تسجيل الدخول/الخروج ومدد العمل\n• درجات الألعاب وأفضل الأوقات (للوحات الصدارة)\n• كود مستخدم مجهول مخصص لكل مستخدم (مثال: KZ-ABCD1234)\n• السجلات المخزنة محليًا على جهازك',
         },
         {
           title: '2. استخدام البيانات',
@@ -200,7 +200,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. تخزين البيانات',
-          content: 'يتم تخزين بياناتك:\n\n• محليًا على جهازك (AsyncStorage)\n• اختياريًا في Firebase Firestore كنسخة احتياطية سحابية\n• بياناتك مرتبطة بحسابك فقط ولا يمكن للمستخدمين الآخرين الوصول إليها',
+          content: 'يتم تخزين بياناتك:\n\n• محليًا على جهازك (AsyncStorage)\n• اختياريًا في Firebase Firestore كنسخة احتياطية سحابية\n• نتائج لوحة الصدارة وكود المستخدم الخاص بك مرئية لجميع المستخدمين\n• بياناتك مرتبطة بحسابك فقط ولا يمكن للمستخدمين الآخرين الوصول إليها',
         },
         {
           title: '4. الأمان',
@@ -226,7 +226,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. 数据收集',
-          content: 'KlickZeit 收集以下数据以记录您的工作签入/签出时间：\n\n• 电子邮件地址（用于 Firebase 身份验证）\n• 签入/签出时间和日期\n• 工作时长\n• 本地存储在您设备上的记录',
+          content: 'KlickZeit 收集以下数据以提供核心应用程序功能和游戏功能：\n\n• 电子邮件地址（用于 Firebase 身份验证）\n• 签入/签出时间和工作时长\n• 游戏分数和最佳时间（用于排行榜）\n• 分配给每个用户的匿名用户代码（例如：KZ-ABCD1234)\n• 本地存储在您设备上的记录',
         },
         {
           title: '2. 数据使用',
@@ -234,7 +234,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. 数据存储',
-          content: '您的数据存储在：\n\n• 本地设备上 (AsyncStorage)\n• 可选地存储在 Firebase Firestore 中作为云备份\n• 您的数据仅链接到您的帐户，其他用户无法访问',
+          content: '您的数据存储在：\n\n• 本地设备上 (AsyncStorage)\n• 可选地存储在 Firebase Firestore 中作为云备份\n• 排行榜分数和您的用户代码对所有用户可见\n• 您的数据仅链接到您的帐户，其他用户无法访问',
         },
         {
           title: '4. 安全性',
@@ -260,7 +260,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Сбор данных',
-          content: 'KlickZeit собирает следующие данные для записи времени вашего прихода/ухода с работы:\n\n• Адрес электронной почты (для аутентификации Firebase)\n• Время и даты прихода/ухода\n• Продолжительность работы\n• Записи, хранящиеся локально на вашем устройстве',
+          content: 'KlickZeit собирает следующие данные для обеспечения основных функций приложения и игровых возможностей:\n\n• Адрес электронной почты (для аутентификации Firebase)\n• Время прихода/ухода и продолжительность работы\n• Игровые очки и лучшие результаты (для таблиц лидеров)\n• Анонимный код пользователя, назначенный каждому пользователю (например, KZ-ABCD1234)\n• Записи, хранящиеся локально на вашем устройстве',
         },
         {
           title: '2. Использование данных',
@@ -268,7 +268,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Хранение данных',
-          content: 'Ваши данные хранятся:\n\n• Локально на вашем устройстве (AsyncStorage)\n• Опционально в Firebase Firestore в качестве облачной резервной копии\n• Ваши данные связаны только с вашей учетной записью, и другие пользователи не могут получить к ним доступ',
+          content: 'Ваши данные хранятся:\n\n• Локально на вашем устройстве (AsyncStorage)\n• Опционально в Firebase Firestore в качестве облачной резервной копии\n• Результаты в таблицах лидеров и ваш код пользователя видны всем пользователям\n• Ваши данные связаны только с вашей учетной записью, и другие пользователи не могут получить к ним доступ',
         },
         {
           title: '4. Безопасность',
@@ -294,7 +294,7 @@ export default function PrivacyPolicyScreen() {
       sections: [
         {
           title: '1. Збір даних',
-          content: 'KlickZeit збирає наступні дані для запису часу вашого приходу/виходу з роботи:\n\n• Адреса електронної пошти (для аутентифікації Firebase)\n• Час і дати приходу/виходу\n• Тривалість роботи\n• Записи, що зберігаються локально на вашому пристрої',
+          content: 'KlickZeit збирає наступні дані для забезпечення основних функцій додатка та ігрових можливостей:\n\n• Адреса електронної пошти (для автентифікації Firebase)\n• Час приходу/виходу та тривалість роботи\n• Ігрові очки та найкращі результати (для таблиць лідерів)\n• Анонімний код користувача, призначений кожному користувачеві (наприклад, KZ-ABCD1234)\n• Записи, що зберігаються локально на вашому пристрої',
         },
         {
           title: '2. Використання даних',
@@ -302,11 +302,11 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '3. Зберігання даних',
-          content: 'Ваші дані зберігаються:\n\n• Локально на вашому пристрої (AsyncStorage)\n• Опціонально в Firebase Firestore як хмарна резервна копія\n• Ваші дані пов\'язані лише з вашим обліковим записом, і інші користувачі не можуть отримати до них доступ',
+          content: 'Ваші дані зберігаються:\n\n• Локально на вашому пристрої (AsyncStorage)\n• Опціонально в Firebase Firestore як хмарна резервна копія\n• Результати в таблицях лідерів та ваш код користувача видно всім користувачам\n• Ваші дані пов\'язані лише з вашим обліковим записом, і інші користувачі не можуть отримати до них доступ',
         },
         {
           title: '4. Безпека',
-          content: 'Для безпеки ваших даних:\n\n• Безпечний вхід за допомогою аутентифікації Firebase\n• Контроль доступу до даних за допомогою правил безпеки Firestore\n• Всі дані передаються через зашифровані з\'єднання',
+          content: 'Для безпеки ваших даних:\n\n• Безпечний вхід за допомогою автентифікації Firebase\n• Контроль доступу до даних за допомогою правил безпеки Firestore\n• Всі дані передаються через зашифровані з\'єднання',
         },
         {
           title: '5. Видалення даних',
@@ -314,7 +314,7 @@ export default function PrivacyPolicyScreen() {
         },
         {
           title: '6. Сторонні сервіси',
-          content: 'Додаток використовує наступні сторонні сервіси:\n\n• Firebase (Google): Аутентифікація та база даних Firestore\n• Політики конфіденційності цих сервісів доступні на їх веб-сайтах',
+          content: 'Додаток використовує наступні сторонні сервіси:\n\n• Firebase (Google): автентифікація та база даних Firestore\n• Політики конфіденційності цих сервісів доступні на їх веб-сайтах',
         },
         {
           title: '7. Контакт',
