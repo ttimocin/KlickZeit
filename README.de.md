@@ -229,6 +229,13 @@ KlickZeit/
 
 ---
 
+## 📄 Rechtliche Dokumente
+
+- **Datenschutzerklärung**: [Web-Version](https://ttimocin.github.io/KlickZeit/privacy-policy-de.html) | [In-App](app/privacy-policy.tsx)
+- **Nutzungsbedingungen**: [Web-Version](https://ttimocin.github.io/KlickZeit/terms-of-service-de.html) | [In-App](app/terms-of-service.tsx)
+
+---
+
 ## 📦 APK erstellen
 
 ### Mit EAS Build (Empfohlen)

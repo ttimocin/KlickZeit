@@ -249,6 +249,13 @@ npx expo run:ios --configuration Release
 
 ---
 
+## 📄 الوثائق القانونية
+
+- **سياسة الخصوصية**: [نسخة الويب](https://ttimocin.github.io/KlickZeit/privacy-policy-ar.html) | [داخل التطبيق](app/privacy-policy.tsx)
+- **شروط الخدمة**: [نسخة الويب](https://ttimocin.github.io/KlickZeit/terms-of-service.html) | [داخل التطبيق](app/terms-of-service.tsx)
+
+---
+
 ## 📄 الترخيص
 
 هذا المشروع مرخص بموجب [ترخيص MIT](LICENSE).

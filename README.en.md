@@ -229,6 +229,13 @@ KlickZeit/
 
 ---
 
+## 📄 Legal Documents
+
+- **Privacy Policy**: [Web Version](https://ttimocin.github.io/KlickZeit/privacy-policy-en.html) | [In-App](app/privacy-policy.tsx)
+- **Terms of Service**: [Web Version](https://ttimocin.github.io/KlickZeit/terms-of-service-en.html) | [In-App](app/terms-of-service.tsx)
+
+---
+
 ## 📦 Building APK
 
 ### With EAS Build (Recommended)
