@@ -1,16 +1,20 @@
+﻿import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
+import TetrisGame from '@/components/TetrisGame';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { syncToFirebase } from '@/services/firebase-sync';
+import { hasSeenNicknamePrompt, markNicknamePromptSeen, setGameNickname, syncNicknameFromFirestore } from '@/services/game-nickname';
 import {
   requestNotificationPermissions,
+  rescheduleRemindersAfterBreak,
   setupNotificationChannel,
   showCheckInNotification,
   showCheckOutNotification,
 } from '@/services/notifications';
-import { addRecord, getBreakDuration as getBreakDurationFromStorage, getLastBreakRecord, getLastRecord, getTodayBreakRecords, setBreakDuration } from '@/services/storage';
+import { addRecord, getBreakDuration as getBreakDurationFromStorage, getLastBreakRecord, getLastRecord, getTodayBreakRecords, getTodayWorkRecords, setBreakDuration } from '@/services/storage';
 import { sendEntryTimeToWear } from '@/services/wearable-sync';
 import { WorkRecord } from '@/types';
 import { displayDate, formatDate, formatTime, generateId, getDayName } from '@/utils/helpers';
@@ -23,9 +27,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View
 } from 'react-native';
@@ -41,11 +47,33 @@ export default function HomeScreen() {
   const [lastRecord, setLastRecord] = useState<WorkRecord | null>(null);
   const [lastBreakRecord, setLastBreakRecord] = useState<WorkRecord | null>(null);
   const [todayBreakRecords, setTodayBreakRecords] = useState<WorkRecord[]>([]);
+  const [todayWorkRecords, setTodayWorkRecords] = useState<WorkRecord[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBreakLoading, setIsBreakLoading] = useState(false);
   const [gameVisible, setGameVisible] = useState(false);
+  const [snakeVisible, setSnakeVisible] = useState(false);
+  const [gameSelectVisible, setGameSelectVisible] = useState(false);
+  const [tetrisVisible, setTetrisVisible] = useState(false);
+  const [nicknamePromptVisible, setNicknamePromptVisible] = useState(false);
+  const [pendingNickname, setPendingNickname] = useState('');
 
 
+
+  // Nickname sync on login
+  useEffect(() => {
+    syncNicknameFromFirestore();
+  }, [user]);
+
+  // Oyun butonuna basınca — ilk kez ise takma ad sor
+  const handleOpenGames = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const seen = await hasSeenNicknamePrompt();
+    if (!seen) {
+      setNicknamePromptVisible(true);
+    } else {
+      setGameSelectVisible(true);
+    }
+  };
 
   // Throttle için zaman kilidi
   const lastActionTime = useRef(0);
@@ -75,6 +103,8 @@ export default function HomeScreen() {
     setLastBreakRecord(lastBreak);
     const breakRecords = await getTodayBreakRecords();
     setTodayBreakRecords(breakRecords);
+    const workRecords = await getTodayWorkRecords();
+    setTodayWorkRecords(workRecords);
   }, []);
 
   useFocusEffect(
@@ -96,29 +126,40 @@ export default function HomeScreen() {
   // Çalışma süresi hesapla (mola sırasında durur)
   const getWorkDuration = () => {
     if (!lastRecord || lastRecord.type !== 'giris') return null;
+    if (todayWorkRecords.length === 0) return null;
 
-    let elapsed = currentTime.getTime() - lastRecord.timestamp;
+    // Günün ilk girişi
+    const firstGiris = todayWorkRecords.find(r => r.type === 'giris');
+    if (!firstGiris) return null;
 
-    // Bugünün tamamlanmış mola sürelerini çıkar
-    const sorted = [...todayBreakRecords].sort((a, b) => a.timestamp - b.timestamp);
+    // Toplam süre = Şimdi - İlk Giriş (aradaki yanlışlıkla çıkışlar sayılır)
+    let elapsed = currentTime.getTime() - firstGiris.timestamp;
+
+    // Tüm mola sürelerini (ilk girişten sonrakiler) çıkar
+    const breaksSinceStart = todayBreakRecords.filter(
+      r => r.timestamp >= firstGiris.timestamp
+    );
+    const sortedBreaks = [...breaksSinceStart].sort((a, b) => a.timestamp - b.timestamp);
     let totalBreakTime = 0;
-    for (let i = 0; i < sorted.length; i += 2) {
-      if (sorted[i].type === 'molagiris' && sorted[i + 1]?.type === 'molacikis') {
-        totalBreakTime += sorted[i + 1].timestamp - sorted[i].timestamp;
+    for (let i = 0; i < sortedBreaks.length; i += 2) {
+      if (sortedBreaks[i].type === 'molagiris' && sortedBreaks[i + 1]?.type === 'molacikis') {
+        totalBreakTime += sortedBreaks[i + 1].timestamp - sortedBreaks[i].timestamp;
       }
     }
     elapsed -= totalBreakTime;
 
-    // Eğer şu an mola yapılıyorsa, devam eden molayı da çıkar
-    if (isOnBreak && lastBreakRecord) {
+    // Aktif mola varsa onu da çıkar
+    if (isOnBreak && lastBreakRecord && lastBreakRecord.timestamp >= firstGiris.timestamp) {
       elapsed -= (currentTime.getTime() - lastBreakRecord.timestamp);
     }
 
+    elapsed = Math.max(0, elapsed);
     const hours = Math.floor(elapsed / (1000 * 60 * 60));
     const minutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
     return { hours, minutes, seconds, total: elapsed };
   };
+
 
   const workDuration = getWorkDuration();
 
@@ -199,6 +240,15 @@ export default function HomeScreen() {
         // Mevcut mola süresine ekle (birden fazla mola olabilir)
         const totalBreakMinutes = (existingDuration || 0) + breakDurationMinutes;
         await setBreakDuration(today, totalBreakMinutes);
+
+        // Giriş kaydı varsa hatırlatmaları yeniden zamanla
+        if (lastRecord && lastRecord.type === 'giris') {
+          await rescheduleRemindersAfterBreak(
+            lastRecord.timestamp,
+            lastRecord.time,
+            totalBreakMinutes,
+          );
+        }
       }
 
       await loadRecords();
@@ -413,19 +463,16 @@ export default function HomeScreen() {
                   </View>
 
                   {/* Butonlar yan yana */}
-                  {/* Butonlar yan yana */}
                   <View style={styles.breakButtonsRow}>
                     {/* Oyun Butonu */}
                     <TouchableOpacity
                       style={styles.gameButtonSmall}
-                      onPress={() => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                        setGameVisible(true);
-                      }}
+                      onPress={handleOpenGames}
                       activeOpacity={0.8}
                     >
+                      <Ionicons name="game-controller" size={18} color="#fff" />
                       <Text style={styles.gameButtonTextSmall} adjustsFontSizeToFit numberOfLines={1}>
-                        Sudoku
+                        {i18n.t('game') || 'Oyun'}
                       </Text>
                     </TouchableOpacity>
 
@@ -468,8 +515,133 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
+      {/* Nickname Prompt Modal - ilk kez oyun alanına girişte */}
+      <Modal
+        visible={nicknamePromptVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => {
+          markNicknamePromptSeen();
+          setNicknamePromptVisible(false);
+          setGameSelectVisible(true);
+        }}
+      >
+        <View style={styles.gameSelectOverlay}>
+          <View style={styles.gameSelectContainer}>
+            <Text style={styles.gameSelectTitle}>🎮 Oyun Takma Adı</Text>
+            <Text style={{ color: isDark ? '#aaa' : '#666', fontSize: 14, textAlign: 'center', marginBottom: 16, lineHeight: 20 }}>
+              {'Puan tablolarinda gorunecek takma adinizi belirleyin.\nBos birakirsan anonim kod kullanilir.'}
+            </Text>
+
+            <View style={{ borderWidth: 1, borderColor: isDark ? '#444' : '#ddd', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 16 }}>
+              <TextInput
+                style={{ fontSize: 16, color: isDark ? '#fff' : '#000' }}
+                placeholder="Takma adın (max 24 karakter)"
+                placeholderTextColor={isDark ? '#555' : '#bbb'}
+                maxLength={24}
+                autoCapitalize="words"
+                value={pendingNickname}
+                onChangeText={setPendingNickname}
+              />
+            </View>
+
+            <TouchableOpacity
+              style={[styles.gameSelectCard, { backgroundColor: isDark ? '#7c3aed' : '#8b5cf6', marginBottom: 8 }]}
+              onPress={async () => {
+                const name = pendingNickname.trim();
+                if (name) {
+                  await setGameNickname(name);
+                } else {
+                  await markNicknamePromptSeen();
+                }
+                setPendingNickname('');
+                setNicknamePromptVisible(false);
+                setGameSelectVisible(true);
+              }}
+            >
+              <View style={styles.gameSelectInfo}>
+                <Text style={[styles.gameSelectName, { color: '#fff' }]}>
+                  {pendingNickname.trim() ? '✅ Kaydet ve Devam Et' : '👻 Anonim Devam Et'}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Sudoku Game Modal */}
-      <SudokuGame visible={gameVisible} onClose={() => setGameVisible(false)} />
+      <SudokuGame visible={gameVisible} onClose={() => setGameVisible(false)} breakStartTime={isOnBreak && lastBreakRecord ? lastBreakRecord.timestamp : null} />
+      {/* Snake Game Modal */}
+      <SnakeGame visible={snakeVisible} onClose={() => setSnakeVisible(false)} breakStartTime={isOnBreak && lastBreakRecord ? lastBreakRecord.timestamp : null} />
+
+      {/* Game Selection Modal */}
+      <Modal visible={gameSelectVisible} animationType="fade" transparent onRequestClose={() => setGameSelectVisible(false)}>
+        <View style={styles.gameSelectOverlay}>
+          <View style={styles.gameSelectContainer}>
+            <Text style={styles.gameSelectTitle}>{i18n.t('selectGame') || 'Oyun Seç'}</Text>
+
+            <TouchableOpacity
+              style={styles.gameSelectCard}
+              onPress={() => {
+                setGameSelectVisible(false);
+                setGameVisible(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.gameSelectEmoji}>🧩</Text>
+              <View style={styles.gameSelectInfo}>
+                <Text style={styles.gameSelectName}>Sudoku</Text>
+                <Text style={styles.gameSelectDesc}>{i18n.t('sudokuDesc') || 'Sayı bulmaca oyunu'}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#666' : '#ccc'} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.gameSelectCard}
+              onPress={() => {
+                setGameSelectVisible(false);
+                setSnakeVisible(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.gameSelectEmoji}>🐍</Text>
+              <View style={styles.gameSelectInfo}>
+                <Text style={styles.gameSelectName}>Snake</Text>
+                <Text style={styles.gameSelectDesc}>{i18n.t('snakeDesc') || 'Klasik yılan oyunu'}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#666' : '#ccc'} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.gameSelectCard}
+              onPress={() => {
+                setGameSelectVisible(false);
+                setTetrisVisible(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.gameSelectEmoji}>🧱</Text>
+              <View style={styles.gameSelectInfo}>
+                <Text style={styles.gameSelectName}>Block</Text>
+                <Text style={styles.gameSelectDesc}>{i18n.t('tetrisDesc') || 'Klasik blok oyunu'}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={isDark ? '#666' : '#ccc'} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.gameSelectClose}
+              onPress={() => setGameSelectVisible(false)}
+            >
+              <Text style={styles.gameSelectCloseText}>{i18n.t('cancel') || 'İptal'}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Tetris Game Modal */}
+      <TetrisGame visible={tetrisVisible} onClose={() => setTetrisVisible(false)} breakStartTime={isOnBreak && lastBreakRecord ? lastBreakRecord.timestamp : null} />
     </View>
   );
 
@@ -574,7 +746,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       paddingVertical: 4,
       borderRadius: 12,
       alignSelf: 'center',
-      marginBottom: 0,
+      marginBottom: 8,
       gap: 6,
       maxWidth: '80%',
     },
@@ -761,6 +933,22 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       color: '#fff',
       letterSpacing: 0.5,
     },
+    gameButtonSnake: {
+      flex: 1,
+      flexDirection: 'row',
+      backgroundColor: isDark ? '#22c55e' : '#16a34a',
+      paddingHorizontal: isSmallScreen ? 16 : 20,
+      paddingVertical: isSmallScreen ? 10 : 12,
+      borderRadius: isSmallScreen ? 20 : 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      shadowColor: '#22c55e',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 5,
+    },
     breakButtonSmall: {
       flex: 1,
       flexDirection: 'row',
@@ -771,6 +959,23 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       alignItems: 'center',
       justifyContent: 'center',
       gap: 8,
+      shadowColor: '#3b82f6',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    breakButtonFull: {
+      flexDirection: 'row',
+      backgroundColor: isDark ? '#3b82f6' : '#2563eb',
+      paddingHorizontal: isSmallScreen ? 24 : 32,
+      paddingVertical: isSmallScreen ? 10 : 12,
+      borderRadius: isSmallScreen ? 20 : 24,
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      gap: 8,
+      marginTop: 10,
       shadowColor: '#3b82f6',
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.3,
@@ -788,5 +993,62 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       fontWeight: '700',
       color: '#fff',
       letterSpacing: 0.5,
+    },
+    // Game Selection Modal
+    gameSelectOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.6)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 30,
+    },
+    gameSelectContainer: {
+      backgroundColor: isDark ? '#1e1e1e' : '#fff',
+      borderRadius: 24,
+      padding: 24,
+      width: '100%',
+      maxWidth: 340,
+    },
+    gameSelectTitle: {
+      fontSize: 20,
+      fontWeight: 'bold',
+      color: isDark ? '#fff' : '#000',
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    gameSelectCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: isDark ? '#2a2a2a' : '#f5f5f5',
+      borderRadius: 16,
+      padding: 16,
+      marginBottom: 12,
+    },
+    gameSelectEmoji: {
+      fontSize: 36,
+      marginRight: 14,
+    },
+    gameSelectInfo: {
+      flex: 1,
+    },
+    gameSelectName: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: isDark ? '#fff' : '#000',
+    },
+    gameSelectDesc: {
+      fontSize: 13,
+      color: isDark ? '#888' : '#666',
+      marginTop: 2,
+    },
+    gameSelectClose: {
+      alignItems: 'center',
+      paddingVertical: 12,
+      marginTop: 4,
+    },
+    gameSelectCloseText: {
+      fontSize: 16,
+      color: isDark ? '#888' : '#999',
+      fontWeight: '500',
     },
   });

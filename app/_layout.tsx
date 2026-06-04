@@ -33,7 +33,7 @@ function RootLayoutNav() {
 
     const inAuthGroup = segments[0] === 'login';
 
-    if (user && inAuthGroup) {
+    if (user && !user.isAnonymous && inAuthGroup) {
       router.replace('/(tabs)');
     }
   }, [user, isLoading, segments]);

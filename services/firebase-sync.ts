@@ -95,16 +95,22 @@ export const syncToFirebase = async (record: WorkRecord): Promise<boolean> => {
     if (record.type === 'giris') {
       updateData.giris = record.time;
       updateData.girisTimestamp = record.timestamp;
-      // Tatil bilgisini kaydet
+      // Tatil veya yıllık izin bilgisini kaydet
       if (record.isHoliday) {
         updateData.isHoliday = true;
+      }
+      if (record.isAnnualLeave) {
+        updateData.isAnnualLeave = true;
       }
     } else if (record.type === 'cikis') {
       updateData.cikis = record.time;
       updateData.cikisTimestamp = record.timestamp;
-      // Tatil bilgisini kaydet
+      // Tatil veya yıllık izin bilgisini kaydet
       if (record.isHoliday) {
         updateData.isHoliday = true;
+      }
+      if (record.isAnnualLeave) {
+        updateData.isAnnualLeave = true;
       }
     } else if (record.type === 'molagiris') {
       // Sadece ilk mola girişini kaydet (eğer yoksa)
@@ -223,8 +229,9 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
           continue;
         }
 
-        // Tatil bilgisini al
+        // Tatil ve yıllık izin bilgisini al
         const isHoliday = data.isHoliday === true;
+        const isAnnualLeave = data.isAnnualLeave === true;
 
         // Giriş kaydı
         if (data.giris && data.girisTimestamp) {
@@ -236,6 +243,7 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
             time: String(data.giris),
             synced: true,
             isHoliday,
+            isAnnualLeave,
           });
         }
 
@@ -249,6 +257,7 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
             time: String(data.cikis),
             synced: true,
             isHoliday,
+            isAnnualLeave,
           });
         }
 
@@ -332,6 +341,7 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
 
         // Tatil bilgisi
         const isHoliday = data.isHoliday === true;
+        const isAnnualLeave = data.isAnnualLeave === true;
 
         if (data.giris && data.girisTimestamp) {
           records.push({
@@ -342,6 +352,7 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
             time: String(data.giris),
             synced: true,
             isHoliday,
+            isAnnualLeave,
           });
         }
 
@@ -354,6 +365,7 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
             time: String(data.cikis),
             synced: true,
             isHoliday,
+            isAnnualLeave,
           });
         }
 
@@ -389,5 +401,53 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
   } catch (error) {
     Logger.error('Firebase kayıtları alınırken hata:', error);
     return [];
+  }
+};
+
+// Standartları Firebase'e sync et
+export const syncStandards = async (): Promise<boolean> => {
+  if (!isUserLoggedIn()) return false;
+  const userId = getUserId();
+  if (!userId) return false;
+
+  try {
+    const { getAppStandards } = await import('./storage');
+    const standards = await getAppStandards();
+    const standardsDocRef = doc(db, 'users', userId, 'settings', 'standards');
+
+    await setDoc(standardsDocRef, {
+      ...standards,
+      updatedAt: serverTimestamp(),
+    });
+
+    return true;
+  } catch (error) {
+    Logger.error('Standartlar sync hatası:', error);
+    return false;
+  }
+};
+
+// Standartları Firebase'den yükle
+export const loadStandardsFromFirebase = async (): Promise<boolean> => {
+  if (!isUserLoggedIn()) return false;
+  const userId = getUserId();
+  if (!userId) return false;
+
+  try {
+    const standardsDocRef = doc(db, 'users', userId, 'settings', 'standards');
+    const docSnap = await getDoc(standardsDocRef);
+
+    if (docSnap.exists()) {
+      const { setAppStandards } = await import('./storage');
+      const data = docSnap.data();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { updatedAt, ...standards } = data;
+      await setAppStandards(standards);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    Logger.error('Standartlar yükleme hatası:', error);
+    return false;
   }
 };

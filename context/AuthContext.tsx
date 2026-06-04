@@ -8,6 +8,7 @@ import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   onAuthStateChanged,
+  signInAnonymously,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
@@ -36,9 +37,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setIsLoading(false);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        // Kullanıcı yoksa anonim giriş yap
+        try {
+          await signInAnonymously(auth);
+        } catch (error) {
+          Logger.error('Anonim giriş hatası:', error);
+          setIsLoading(false);
+        }
+      } else {
+        setUser(currentUser);
+        setIsLoading(false);
+      }
     });
 
     return unsubscribe;
@@ -108,10 +119,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Çıkış sonrası anonim giriş yap (leaderboard vb. için UID gerekli)
+      await signInAnonymously(auth);
     } catch (error: unknown) {
       Logger.error('Çıkış yapılırken hata:', error);
-      // Hata olsa bile kullanıcıyı çıkış yapmış say
-      // Çünkü yerel state zaten temizlenecek
     }
   };
 

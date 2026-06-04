@@ -1,0 +1,7 @@
+{
+  "platforms": ["android"],
+  "android": {
+    "modules": ["com.taytek.zeitlog.wearabledatalayer.WearableDataLayerModule"]
+  }
+}
+

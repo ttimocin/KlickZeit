@@ -3,18 +3,20 @@ import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
-import { loadFromFirebase, syncAllPendingRecords } from '@/services/firebase-sync';
 import { AppStandards, DEFAULT_STANDARDS, getAppStandards, setAppStandards } from '@/services/storage';
+import { getUserCode } from '@/services/user-code';
 import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
   Linking,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -43,10 +45,12 @@ export default function SettingsScreen() {
   const { language, setLanguage, forceUpdate } = useLanguage();
   const { user, logout } = useAuth();
   const { showModal, ModalComponent } = useModal();
+  const userCode = getUserCode();
 
   const [isSyncing, setIsSyncing] = useState(false);
 
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Standartlar
   const [standards, setStandards] = useState<AppStandards>(DEFAULT_STANDARDS);
@@ -55,10 +59,14 @@ export default function SettingsScreen() {
     getAppStandards().then(setStandards);
   }, []);
 
-  const updateStandard = async (key: keyof AppStandards, value: number) => {
+  const updateStandard = async (key: keyof AppStandards, value: number | string | undefined) => {
     const updated = { ...standards, [key]: value };
     setStandards(updated);
-    await setAppStandards({ [key]: value });
+    await setAppStandards(updated);
+
+    // Firebase'e yedekle
+    const { syncStandards } = await import('@/services/firebase-sync');
+    await syncStandards();
   };
 
   const handleLogout = async () => {
@@ -75,7 +83,9 @@ export default function SettingsScreen() {
 
   const handleSyncToCloud = async () => {
     setIsSyncing(true);
+    const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
     const result = await syncAllPendingRecords();
+    await syncStandards();
     setIsSyncing(false);
 
     showModal({
@@ -88,15 +98,23 @@ export default function SettingsScreen() {
 
   const handleLoadFromCloud = async () => {
     setIsSyncing(true);
+    const { loadFromFirebase, loadStandardsFromFirebase } = await import('@/services/firebase-sync');
     const result = await loadFromFirebase();
+    const standardsLoaded = await loadStandardsFromFirebase();
     setIsSyncing(false);
+
+    if (standardsLoaded) {
+      const { getAppStandards } = await import('@/services/storage');
+      const updated = await getAppStandards();
+      setStandards(updated);
+    }
 
     showModal({
       title: i18n.t('info'),
-      message: result.loaded > 0
-        ? `${result.loaded} ${i18n.t('recordsLoaded')}`
+      message: result.loaded > 0 || standardsLoaded
+        ? `${result.loaded} ${i18n.t('recordsLoaded')}${standardsLoaded ? ` & ${i18n.t('settingsRestored')}` : ''}`
         : i18n.t('noNewRecords'),
-      icon: result.loaded > 0 ? '✅' : 'ℹ️',
+      icon: result.loaded > 0 || standardsLoaded ? '✅' : 'ℹ️',
       buttons: [{ text: 'OK', style: 'default' }],
     });
   };
@@ -360,6 +378,101 @@ export default function SettingsScreen() {
               })()}
             </View>
           </View>
+
+          {/* Yıllık İzin Hakkı */}
+          <View style={[styles.standardRow, { borderBottomWidth: 0, flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
+            <View style={styles.standardInfo}>
+              <Ionicons name="airplane-outline" size={20} color={isDark ? '#fbbf24' : '#d97706'} />
+              <View style={styles.standardTextGroup}>
+                <Text style={styles.standardLabel}>{i18n.t('annualLeaveQuota')}</Text>
+                <Text style={styles.standardHint}>{standards.annualLeaveQuota || 0} {i18n.t('dayCount')}</Text>
+              </View>
+            </View>
+            <View style={styles.stepperContainer}>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                onPress={() => {
+                  if (standards.annualLeaveQuota > 0) updateStandard('annualLeaveQuota', standards.annualLeaveQuota - 1);
+                }}
+              >
+                <Ionicons name="remove" size={18} color={isDark ? '#fff' : '#333'} />
+              </TouchableOpacity>
+              <Text style={styles.stepperValue}>{standards.annualLeaveQuota || 0}</Text>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                onPress={() => {
+                  if (standards.annualLeaveQuota < 100) updateStandard('annualLeaveQuota', standards.annualLeaveQuota + 1);
+                }}
+              >
+                <Ionicons name="add" size={18} color={isDark ? '#fff' : '#333'} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* İşe Başlama Tarihi */}
+          <View style={[styles.standardRow, { borderBottomWidth: 0, flexDirection: 'column', alignItems: 'flex-start', gap: 8 }]}>
+            <View style={styles.standardInfo}>
+              <Ionicons name="briefcase-outline" size={20} color={isDark ? '#34d399' : '#059669'} />
+              <View style={styles.standardTextGroup}>
+                <Text style={styles.standardLabel}>{i18n.t('workStartDate')}</Text>
+                <Text style={styles.standardHint}>{i18n.t('workStartDateHint')}</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, width: '100%' }}>
+              <TouchableOpacity
+                style={[
+                  styles.stepperValue,
+                  {
+                    flex: 1,
+                    paddingHorizontal: 12,
+                    paddingVertical: 12,
+                    borderRadius: 10,
+                    backgroundColor: isDark ? '#2a2a2a' : '#f0f0f0',
+                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                  },
+                ]}
+                onPress={() => setShowDatePicker(true)}
+              >
+                <Text style={{
+                  color: standards.workStartDate ? (isDark ? '#fff' : '#1a1a1a') : (isDark ? '#555' : '#bbb'),
+                  fontWeight: '500',
+                  fontSize: 14,
+                }}>
+                  {standards.workStartDate || 'YYYY-MM-DD'}
+                </Text>
+              </TouchableOpacity>
+
+              {showDatePicker && (
+                <DateTimePicker
+                  value={standards.workStartDate ? new Date(standards.workStartDate) : new Date()}
+                  mode="date"
+                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                  onChange={(event: DateTimePickerEvent, selectedDate?: Date) => {
+                    setShowDatePicker(false);
+                    if (selectedDate && event.type === 'set') {
+                      const year = selectedDate.getFullYear();
+                      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                      const day = String(selectedDate.getDate()).padStart(2, '0');
+                      const dateString = `${year}-${month}-${day}`;
+                      updateStandard('workStartDate', dateString);
+                    }
+                  }}
+                />
+              )}
+              {standards.workStartDate ? (
+                <TouchableOpacity
+                  style={[styles.stepperButton, { backgroundColor: isDark ? '#3a2020' : '#ffebee', borderRadius: 8 }]}
+                  onPress={() => {
+                    setStandards(prev => ({ ...prev, workStartDate: undefined }));
+                    updateStandard('workStartDate', undefined);
+                  }}
+                >
+                  <Ionicons name="close-circle-outline" size={18} color="#ef4444" />
+                </TouchableOpacity>
+              ) : null}
+            </View>
+          </View>
         </View>
 
         {/* Hakkında */}
@@ -367,7 +480,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('about')}</Text>
           <View style={styles.aboutCard}>
             <Text style={styles.appName}>KlickZeit</Text>
-            <Text style={styles.appVersion}>v1.0.0</Text>
+            <Text style={styles.appVersion}>v1.0.1</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
 
@@ -406,10 +519,18 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{i18n.t('account')}</Text>
 
-          {user ? (
+          {user && !user.isAnonymous ? (
             <>
               <View style={styles.userInfo}>
-                <Ionicons name="person-circle-outline" size={40} color="#4CAF50" />
+                <Ionicons name="finger-print-outline" size={32} color="#4CAF50" />
+                <View>
+                  <Text style={styles.userCodeLabel}>{i18n.t('yourCode')}</Text>
+                  <Text style={styles.userCodeValue}>{userCode}</Text>
+                </View>
+              </View>
+
+              <View style={styles.userInfo}>
+                <Ionicons name="person-circle-outline" size={32} color="#4CAF50" />
                 <Text style={styles.userEmail}>{user.email}</Text>
               </View>
 
@@ -464,11 +585,11 @@ export default function SettingsScreen() {
           <Text style={styles.footerText}>Made with ❤️ by TayTek</Text>
           <Text style={styles.copyright}>© 2025</Text>
         </View>
-      </ScrollView>
+      </ScrollView >
 
       {/* Custom Modal */}
-      <ModalComponent />
-    </View>
+      < ModalComponent />
+    </View >
   );
 }
 
@@ -636,6 +757,17 @@ const createStyles = (isDark: boolean) =>
       fontSize: 14,
       color: isDark ? '#aaa' : '#666',
       flex: 1,
+    },
+    userCodeLabel: {
+      fontSize: 12,
+      color: isDark ? '#888' : '#999',
+      textTransform: 'uppercase',
+    },
+    userCodeValue: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: isDark ? '#fff' : '#1a1a1a',
+      letterSpacing: 1,
     },
     syncButton: {
       flexDirection: 'row',

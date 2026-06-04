@@ -29,6 +29,11 @@ KlickZeit, iş saatlerinizi kolayca takip etmenizi sağlayan, tamamen ücretsiz 
 • Akıllı saatinizde giriş saatini görün
 • Telefon uygulaması ile otomatik senkronizasyon
 
+🎮 Mola Oyunları (YENİ!)
+• Mola verirken eğlenin: Snake, Tetris ve Sudoku
+• Global liderlik tablolarında yarışın
+• Yeni rekorlar kırın ve kupalar kazanın
+
 🌍 Çoklu Dil Desteği
 • Türkçe, İngilizce ve Almanca
 • Otomatik dil algılama
@@ -104,6 +109,11 @@ KlickZeit is a completely free and ad-free app that makes it easy to track your 
 • View your entry time on your smartwatch
 • Automatic synchronization with phone app
 
+🎮 Break Games (NEW!)
+• Have fun while on break: Snake, Tetris, and Sudoku
+• Compete on global leaderboards
+• Break new records and win trophies
+
 🌍 Multi-Language Support
 • English, Turkish, and German
 • Automatic language detection
@@ -145,7 +155,7 @@ ZeitLog provides everything you need to track your work hours without unnecessar
 Download now and start tracking your work hours effortlessly!
 
 📧 Support: taytekofficial@gmail.com
-🌐 GitHub: https://github.com/ttimocin/ZeitLog
+🌐 GitHub: https://github.com/ttimocin/KlickZeit
 ```
 
 ---
@@ -220,7 +230,7 @@ ZeitLog bietet alles, was Sie brauchen, um Ihre Arbeitszeiten zu erfassen, ohne 
 Laden Sie jetzt herunter und beginnen Sie mühelos mit der Erfassung Ihrer Arbeitszeiten!
 
 📧 Support: taytekofficial@gmail.com
-🌐 GitHub: https://github.com/ttimocin/ZeitLog
+🌐 GitHub: https://github.com/ttimocin/KlickZeit
 ```
 
 ---

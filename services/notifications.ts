@@ -1,7 +1,9 @@
+import i18n from '@/i18n';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { getAppStandards } from './storage';
 
-// Bildirim kanalı ID'si - yeni kanal
+// Bildirim kanalı ID'si
 const CHANNEL_ID = 'klickzeit-alerts';
 const NOTIFICATION_ID = 'klickzeit-work';
 
@@ -31,7 +33,7 @@ export const setupNotificationChannel = async (): Promise<void> => {
   }
 };
 
-// Giriş bildirimi göster
+// Giriş bildirimi göster + hatırlatmaları zamanla
 export const showCheckInNotification = async (time: string, timestamp: number): Promise<void> => {
   try {
     // Anında bildirim
@@ -39,40 +41,50 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
       identifier: NOTIFICATION_ID,
       content: {
         title: 'KlickZeit',
-        body: `Giris: ${time}`,
-        data: { type: 'check-in', time },
+        body: `${i18n.t('entry')}: ${time}`,
+        data: { type: 'check-in', time, checkInTimestamp: timestamp },
         sound: true,
       },
-      trigger: null, // Hemen göster
+      trigger: null,
     });
 
-    // 6.5 saat sonra hatırlatma
+    // Ayarlardan çalışma süresini ve mola süresini al
+    const standards = await getAppStandards();
+    const dailyWorkMinutes = standards.dailyWorkMinutes; // ör. 420 (7 saat)
+    const defaultBreakMinutes = standards.defaultBreakMinutes; // ör. 30
+
+    // Toplam süre = çalışma + mola (brüt gün süresi)
+    const totalMinutes = dailyWorkMinutes + defaultBreakMinutes;
+
+    // Yarım saat kala hatırlatma
+    const reminderSeconds = Math.max((totalMinutes - 30) * 60, 60);
     await Notifications.scheduleNotificationAsync({
-      identifier: 'reminder-6h30',
+      identifier: 'reminder-30min',
       content: {
-        title: 'KlickZeit',
-        body: `Giris: ${time} - Yarim saat kaldi!`,
+        title: 'KlickZeit ⏰',
+        body: `${i18n.t('entry')}: ${time} — 30 ${i18n.t('minutes')}!`,
         data: { type: 'reminder', time },
         sound: true,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 6.5 * 60 * 60, // 6.5 saat
+        seconds: reminderSeconds,
       },
     });
 
-    // 7 saat sonra hatırlatma
+    // Tam çıkış zamanı hatırlatma
+    const exitSeconds = totalMinutes * 60;
     await Notifications.scheduleNotificationAsync({
-      identifier: 'reminder-7h',
+      identifier: 'reminder-exit',
       content: {
-        title: 'KlickZeit',
-        body: `Giris: ${time} - Cikis zamani!`,
+        title: 'KlickZeit ✅',
+        body: `${i18n.t('entry')}: ${time} — ${i18n.t('checkOut')}!`,
         data: { type: 'reminder', time },
         sound: true,
       },
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 7 * 60 * 60, // 7 saat
+        seconds: exitSeconds,
       },
     });
   } catch (error) {
@@ -80,19 +92,77 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
   }
 };
 
+// Mola bittiğinde hatırlatmaları yeniden zamanla
+export const rescheduleRemindersAfterBreak = async (
+  checkInTimestamp: number,
+  checkInTime: string,
+  totalBreakMinutesTaken: number,
+): Promise<void> => {
+  try {
+    // Mevcut hatırlatmaları iptal et
+    await cancelWorkReminders();
+
+    const standards = await getAppStandards();
+    const dailyWorkMinutes = standards.dailyWorkMinutes;
+
+    // Giriş'ten beri geçen dakika - toplam mola = net çalışma
+    const now = Date.now();
+    const elapsedMinutes = (now - checkInTimestamp) / (1000 * 60);
+    const workedMinutes = elapsedMinutes - totalBreakMinutesTaken;
+
+    // Kalan çalışma süresi
+    const remainingWorkMinutes = dailyWorkMinutes - workedMinutes;
+
+    // Yarım saat kala hatırlatma
+    const reminderMinutes = remainingWorkMinutes - 30;
+    if (reminderMinutes > 0) {
+      await Notifications.scheduleNotificationAsync({
+        identifier: 'reminder-30min',
+        content: {
+          title: 'KlickZeit ⏰',
+          body: `${i18n.t('entry')}: ${checkInTime} — 30 ${i18n.t('minutes')}!`,
+          data: { type: 'reminder', time: checkInTime },
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: Math.max(Math.round(reminderMinutes * 60), 60),
+        },
+      });
+    }
+
+    // Çıkış zamanı hatırlatma
+    if (remainingWorkMinutes > 0) {
+      await Notifications.scheduleNotificationAsync({
+        identifier: 'reminder-exit',
+        content: {
+          title: 'KlickZeit ✅',
+          body: `${i18n.t('entry')}: ${checkInTime} — ${i18n.t('checkOut')}!`,
+          data: { type: 'reminder', time: checkInTime },
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: Math.max(Math.round(remainingWorkMinutes * 60), 60),
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Hatırlatma yeniden zamanlanırken hata:', error);
+  }
+};
+
 // Çıkış bildirimi göster
 export const showCheckOutNotification = async (checkOutTime: string): Promise<void> => {
   try {
-    // Önce mevcut bildirimi ve hatırlatmaları kaldır
     await dismissOngoingNotification();
     await cancelWorkReminders();
 
-    // Özet bildirimi göster
     await Notifications.scheduleNotificationAsync({
       identifier: 'checkout-summary',
       content: {
         title: 'KlickZeit',
-        body: `Cikis: ${checkOutTime}`,
+        body: `${i18n.t('exit')}: ${checkOutTime}`,
         data: { type: 'check-out' },
         sound: true,
       },
@@ -105,8 +175,8 @@ export const showCheckOutNotification = async (checkOutTime: string): Promise<vo
 
 // Çalışma hatırlatmalarını iptal et
 export const cancelWorkReminders = async () => {
-  await Notifications.cancelScheduledNotificationAsync('reminder-6h30');
-  await Notifications.cancelScheduledNotificationAsync('reminder-7h');
+  await Notifications.cancelScheduledNotificationAsync('reminder-30min');
+  await Notifications.cancelScheduledNotificationAsync('reminder-exit');
 };
 
 // Kalıcı bildirimi kaldır
@@ -138,7 +208,3 @@ export const hasOngoingNotification = async (): Promise<boolean> => {
   const notifications = await Notifications.getPresentedNotificationsAsync();
   return notifications.some(n => n.request.identifier === NOTIFICATION_ID);
 };
-
-
-
-

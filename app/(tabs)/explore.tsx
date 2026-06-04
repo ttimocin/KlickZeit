@@ -2,8 +2,7 @@ import { useModal } from '@/components/custom-modal';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
-import { exportToCSV, getDailySummaries, importFromCSV } from '@/services/export';
-import { syncAllPendingRecords } from '@/services/firebase-sync';
+import { exportToCSV, exportToExcel, exportToPDF, getDailySummaries, importFromCSV } from '@/services/export';
 import { addHolidayRecord, getAppStandards, getBreakCounted, getBreakDuration, removeHolidayRecord, setBreakCounted, setBreakDuration, upsertRecordByDateType } from '@/services/storage';
 import { DailySummary } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
@@ -49,6 +48,7 @@ interface WeekDayData {
   overtime: number;
   overtimeText: string;
   isHoliday: boolean;
+  isAnnualLeave: boolean;
   breakCounted: boolean;
 }
 
@@ -129,6 +129,7 @@ export default function RecordsScreen() {
   const [editingGiris, setEditingGiris] = useState<string>('');
   const [editingCikis, setEditingCikis] = useState<string>('');
   const [editingIsHoliday, setEditingIsHoliday] = useState(false);
+  const [editingIsAnnualLeave, setEditingIsAnnualLeave] = useState(false);
   const [editingBreakCounted, setEditingBreakCounted] = useState(false);
   const [editingBreakDuration, setEditingBreakDuration] = useState<string>('30');
   const [editingMolaGiris, setEditingMolaGiris] = useState<string>('');
@@ -141,6 +142,8 @@ export default function RecordsScreen() {
   const [breakMinutes, setBreakMinutes] = useState(DEFAULT_BREAK_MINUTES);
   const [eveningThresholdMinutes, setEveningThresholdMinutes] = useState(DEFAULT_EVENING_THRESHOLD_MINUTES);
   const [workingDays, setWorkingDays] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [workStartDate, setWorkStartDate] = useState<string | undefined>(undefined);
+  const [annualLeaveQuota, setAnnualLeaveQuota] = useState(0);
 
   const loadSummaries = useCallback(async () => {
     // Standartları yükle
@@ -150,6 +153,8 @@ export default function RecordsScreen() {
     setBreakMinutes(standards.defaultBreakMinutes);
     setEveningThresholdMinutes(standards.eveningThresholdMinutes);
     setWorkingDays(standards.workingDays || [1, 2, 3, 4, 5]);
+    setWorkStartDate(standards.workStartDate);
+    setAnnualLeaveQuota(standards.annualLeaveQuota || 0);
     const data = await getDailySummaries();
     setSummaries(data);
 
@@ -174,7 +179,14 @@ export default function RecordsScreen() {
   );
 
   // Çalışma süresini hesapla (mola dahil)
-  const calculateDuration = (giris: string | null, cikis: string | null, isHoliday: boolean = false, breakCounted: boolean = false, breakDurationMinutes: number = breakMinutes): { duration: number; netDuration: number; overtime: number } => {
+  const calculateDuration = (
+    giris: string | null,
+    cikis: string | null,
+    isHoliday: boolean,
+    breakCounted: boolean,
+    breakDurationMinutes: number,
+    isAnnualLeave: boolean
+  ): { duration: number; netDuration: number; overtime: number } => {
     if (!giris || !cikis) return { duration: 0, netDuration: 0, overtime: 0 };
     const [girisH, girisM] = giris.split(':').map(Number);
     const [cikisH, cikisM] = cikis.split(':').map(Number);
@@ -183,8 +195,14 @@ export default function RecordsScreen() {
     if (grossDuration <= 0) return { duration: 0, netDuration: 0, overtime: 0 };
 
     // Tatil günlerinde veya mola sayılıyorsa mola düşme
-    const netDuration = (isHoliday || breakCounted) ? grossDuration : grossDuration - breakDurationMinutes;
-    const overtime = netDuration - dailyWorkMinutes;
+    let netDuration = (isHoliday || breakCounted) ? grossDuration : grossDuration - breakDurationMinutes;
+
+    // Yıllık izin ise tam çalışma günü say
+    if (isAnnualLeave) {
+      netDuration = dailyWorkMinutes;
+    }
+
+    const overtime = isAnnualLeave ? 0 : netDuration - dailyWorkMinutes;
 
     return { duration: grossDuration, netDuration: netDuration > 0 ? netDuration : 0, overtime };
   };
@@ -204,18 +222,26 @@ export default function RecordsScreen() {
     // Mevcut değerleri yükle
     const summary = summaries.find(s => s.date === day.date);
     const currentBreakCounted = breakCountedMap[day.date] || false;
-    const currentBreakDuration = breakDurationMap[day.date] || breakMinutes;
+    const currentBreakDuration = breakDurationMap[day.date] ?? 0;
 
     setEditingDate(day.date);
     setEditingGiris(day.giris || '');
     setEditingCikis(day.cikis || '');
     setEditingIsHoliday(day.isHoliday);
+    setEditingIsAnnualLeave(day.isAnnualLeave);
     setEditingBreakCounted(currentBreakCounted);
     setEditingBreakDuration(String(currentBreakDuration));
     setEditingMolaGiris(summary?.molaGiris || '');
     setEditingMolaCikis(summary?.molaCikis || '');
     setEditDayModalVisible(true);
   };
+
+  // Kullanılan yıllık izin sayısı
+  const usedAnnualLeave = useMemo(() => {
+    return summaries.filter(s => s.isAnnualLeave).length;
+  }, [summaries]);
+
+  const remainingAnnualLeave = annualLeaveQuota - usedAnnualLeave;
 
   // Haftalık verileri hesapla
   const weeklyData = useMemo((): WeekData[] => {
@@ -269,6 +295,7 @@ export default function RecordsScreen() {
               overtime: 0,
               overtimeText: '-',
               isHoliday: false,
+              isAnnualLeave: false,
               breakCounted: false,
             };
           }),
@@ -291,13 +318,14 @@ export default function RecordsScreen() {
         week.days[dayIndex].isHoliday = summary.isHoliday || false;
         week.days[dayIndex].breakCounted = breakCountedMap[summary.date] || false;
 
-        const breakDur = breakDurationMap[summary.date] || breakMinutes;
+        const breakDur = breakDurationMap[summary.date] ?? 0;
         const { netDuration, overtime } = calculateDuration(
           summary.giris || null,
           summary.cikis || null,
           summary.isHoliday || false,
           breakCountedMap[summary.date] || false,
-          breakDur
+          breakDur,
+          summary.isAnnualLeave || false
         );
         if (netDuration > 0) {
           week.days[dayIndex].duration = netDuration;
@@ -350,6 +378,7 @@ export default function RecordsScreen() {
             overtime: 0,
             overtimeText: '-',
             isHoliday: false,
+            isAnnualLeave: false,
             breakCounted: false,
           };
         }),
@@ -370,6 +399,8 @@ export default function RecordsScreen() {
     setRefreshing(false);
   };
 
+  const [exportFormatModalVisible, setExportFormatModalVisible] = useState(false);
+
   const handleExport = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
@@ -378,7 +409,23 @@ export default function RecordsScreen() {
       return;
     }
 
-    const success = await exportToCSV();
+    setExportFormatModalVisible(true);
+  };
+
+  const handleExportFormat = async (format: 'csv' | 'pdf' | 'excel') => {
+    setExportFormatModalVisible(false);
+    let success = false;
+    switch (format) {
+      case 'csv':
+        success = await exportToCSV();
+        break;
+      case 'pdf':
+        success = await exportToPDF();
+        break;
+      case 'excel':
+        success = await exportToExcel();
+        break;
+    }
     if (!success) {
       showError(i18n.t('error'), i18n.t('exportFailed'));
     }
@@ -422,7 +469,9 @@ export default function RecordsScreen() {
     setSyncing(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
+    const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
     const result = await syncAllPendingRecords();
+    await syncStandards();
 
     if (result.notLoggedIn) {
       showInfo(i18n.t('info'), i18n.t('loginToSync'));
@@ -458,44 +507,69 @@ export default function RecordsScreen() {
     const monthsMap = new Map<string, { totalMinutes: number; targetMinutes: number; dayCount: number; year: number; month: number; eveningMinutes: number }>();
 
     const today = new Date();
-    const todayStr = formatDateStr(today);
+    today.setHours(0, 0, 0, 0);
     const EVENING_THRESHOLD = eveningThresholdMinutes;
 
+    // weeklyData'dan gün verilerini hızlı erişim için indeksle
+    const dayDataByDate = new Map<string, WeekDayData>();
     for (const week of weeklyData) {
       for (const day of week.days) {
-        if (day.date < todayStr) {
-          const date = new Date(day.date);
-          const year = date.getFullYear();
-          const month = date.getMonth();
-          const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+        dayDataByDate.set(day.date, day);
+      }
+    }
 
-          if (!monthsMap.has(key)) {
-            monthsMap.set(key, { totalMinutes: 0, targetMinutes: 0, dayCount: 0, year, month, eveningMinutes: 0 });
-          }
+    // Başlangıç tarihini belirle: workStartDate yoksa en eski summary
+    let effectiveStartStr: string | null = workStartDate ?? null;
+    if (!effectiveStartStr && summaries.length > 0) {
+      effectiveStartStr = summaries.reduce(
+        (min, s) => (s.date < min ? s.date : min),
+        summaries[0].date
+      );
+    }
 
-          const entry = monthsMap.get(key)!;
-          const dayOfWeek = date.getDay();
-          const isWorkingDay = workingDays.includes(dayOfWeek);
+    if (!effectiveStartStr) return [];
 
-          if (isWorkingDay) {
-            entry.targetMinutes += dailyWorkMinutes;
-          }
-          entry.dayCount += 1;
+    // workStartDate'ten dünkü güne kadar tüm günleri gez
+    let current = new Date(effectiveStartStr);
+    current.setHours(0, 0, 0, 0);
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
 
-          if (day.duration > 0) {
-            entry.totalMinutes += day.duration;
-          }
+    while (current <= yesterday) {
+      const dateStr = formatDateStr(current);
+      const year = current.getFullYear();
+      const month = current.getMonth();
+      const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const dayOfWeek = current.getDay();
+      const isWorkingDay = workingDays.includes(dayOfWeek);
 
-          // 20:00 sonrası çalışma hesapla
-          if (day.cikis) {
-            const [cH, cM] = day.cikis.split(':').map(Number);
-            const cikisMinutes = cH * 60 + cM;
-            if (cikisMinutes > EVENING_THRESHOLD) {
-              entry.eveningMinutes += (cikisMinutes - EVENING_THRESHOLD);
-            }
-          }
+      if (!monthsMap.has(key)) {
+        monthsMap.set(key, { totalMinutes: 0, targetMinutes: 0, dayCount: 0, year, month, eveningMinutes: 0 });
+      }
+
+      const entry = monthsMap.get(key)!;
+
+      if (isWorkingDay) {
+        entry.targetMinutes += dailyWorkMinutes;
+      }
+      entry.dayCount += 1;
+
+      // Gerçek çalışma verisi varsa ekle
+      const dayData = dayDataByDate.get(dateStr);
+      if (dayData && dayData.duration > 0) {
+        entry.totalMinutes += dayData.duration;
+      }
+
+      // 20:00 sonrası çalışma hesapla
+      if (dayData?.cikis) {
+        const [cH, cM] = dayData.cikis.split(':').map(Number);
+        const cikisMinutes = cH * 60 + cM;
+        if (cikisMinutes > EVENING_THRESHOLD) {
+          entry.eveningMinutes += (cikisMinutes - EVENING_THRESHOLD);
         }
       }
+
+      current.setDate(current.getDate() + 1);
     }
 
     const lang = language || 'tr';
@@ -519,10 +593,23 @@ export default function RecordsScreen() {
     }).sort((a, b) => b.key.localeCompare(a.key));
 
     return result;
-  }, [weeklyData, language]);
+  }, [weeklyData, language, workStartDate, workingDays, dailyWorkMinutes, eveningThresholdMinutes, summaries]);
 
-  // Son ayın bakiyesi
-  const lastMonthBalance = monthlyBalances.length > 0 ? monthlyBalances[0] : null;
+  // Tüm ayların toplam bakiyesi
+  const cumulativeBalance = useMemo(() => {
+    if (monthlyBalances.length === 0) return null;
+    const totalMinutes = monthlyBalances.reduce((sum, m) => sum + m.totalMinutes, 0);
+    const targetMinutes = monthlyBalances.reduce((sum, m) => sum + m.targetMinutes, 0);
+    const dayCount = monthlyBalances.reduce((sum, m) => sum + m.dayCount, 0);
+    const balance = totalMinutes - targetMinutes;
+    return {
+      totalMinutes,
+      targetMinutes,
+      dayCount,
+      balance,
+      balanceText: formatOvertime(balance),
+    };
+  }, [monthlyBalances]);
 
   const styles = createStyles(isDark);
 
@@ -597,7 +684,8 @@ export default function RecordsScreen() {
               style={[
                 styles.dayRow,
                 i < week.days.length - 1 && styles.dayRowBorder,
-                day.isHoliday && styles.holidayRow
+                day.isHoliday && styles.holidayRow,
+                day.isAnnualLeave && styles.annualLeaveRow
               ]}
               onPress={() => handleDayPress(day)}
               activeOpacity={0.7}
@@ -609,7 +697,12 @@ export default function RecordsScreen() {
                 </Text>
                 {day.isHoliday && (
                   <View style={styles.holidayTag}>
-                    <Ionicons name="sunny-outline" size={12} color="#10b981" />
+                    <Ionicons name="sunny" size={10} color="#10b981" />
+                  </View>
+                )}
+                {day.isAnnualLeave && (
+                  <View style={styles.annualLeaveTag}>
+                    <Ionicons name="airplane" size={10} color="#f59e0b" />
                   </View>
                 )}
               </View>
@@ -700,20 +793,14 @@ export default function RecordsScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Alt başlık */}
-      <View style={styles.subtitleContainer}>
-        <Text style={styles.subtitle}>
-          {summaries.length} {i18n.t('daysRecorded')}
-        </Text>
-      </View>
 
-      {/* Aylık Bakiye */}
-      {lastMonthBalance && (
+      {/* Güncel Bakiye */}
+      {cumulativeBalance && (
         <View style={styles.totalBalanceContainer}>
           <View style={styles.totalBalanceHeaderRow}>
             <View style={styles.totalBalanceHeader}>
-              <Text style={styles.totalBalanceTitle}>{i18n.t('monthlyBalance')}</Text>
-              <Text style={styles.totalBalanceDesc}>{lastMonthBalance.monthName} {lastMonthBalance.year}</Text>
+              <Text style={styles.totalBalanceTitle}>{i18n.t('totalBalance')}</Text>
+              <Text style={styles.totalBalanceDesc}>{i18n.t('totalBalanceDesc')}</Text>
             </View>
             <TouchableOpacity
               style={styles.detailsHeaderButton}
@@ -728,20 +815,30 @@ export default function RecordsScreen() {
             <View style={styles.totalBalanceValueContainer}>
               <Text style={[
                 styles.totalBalanceValue,
-                lastMonthBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
+                cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
               ]}>
-                {lastMonthBalance.balanceText} {i18n.t('minuteShort')}
+                {cumulativeBalance.balanceText} {i18n.t('minuteShort')}
               </Text>
               <Text style={styles.totalBalanceLabel}>
-                {lastMonthBalance.balance >= 0 ? i18n.t('inPlus') : i18n.t('inMinus')}
+                {cumulativeBalance.balance >= 0 ? i18n.t('inPlus') : i18n.t('inMinus')}
               </Text>
             </View>
+
             <View style={styles.totalBalanceDetails}>
               <Text style={styles.totalBalanceDetailText}>
-                {formatDuration(lastMonthBalance.totalMinutes)} / {formatDuration(lastMonthBalance.targetMinutes)}
+                {cumulativeBalance.dayCount} {i18n.t('day')}
               </Text>
               <Text style={styles.totalBalanceDetailSubtext}>
-                {lastMonthBalance.dayCount} {i18n.t('day')}
+                {i18n.t('workedDays')}
+              </Text>
+            </View>
+
+            <View style={[styles.totalBalanceDetails, { borderLeftWidth: 1, borderLeftColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', paddingLeft: 12 }]}>
+              <Text style={[styles.totalBalanceDetailText, { color: '#f59e0b' }]}>
+                {remainingAnnualLeave}
+              </Text>
+              <Text style={styles.totalBalanceDetailSubtext}>
+                {i18n.t('remainingAnnualLeave')}
               </Text>
             </View>
           </View>
@@ -853,6 +950,54 @@ export default function RecordsScreen() {
         </TouchableOpacity>
       </View>
 
+      {/* Export Format Modal */}
+      <Modal
+        visible={exportFormatModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setExportFormatModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.exportModalOverlay}
+          activeOpacity={1}
+          onPress={() => setExportFormatModalVisible(false)}
+        >
+          <View style={styles.exportModalContent}>
+            <Text style={styles.exportModalTitle}>{i18n.t('exportFormat')}</Text>
+            <TouchableOpacity
+              style={styles.exportFormatOption}
+              onPress={() => handleExportFormat('csv')}
+            >
+              <Ionicons name="document-text-outline" size={22} color={isDark ? '#4fc3f7' : '#1976d2'} />
+              <Text style={styles.exportFormatText}>{i18n.t('exportCSV')}</Text>
+              <Text style={styles.exportFormatDesc}>.csv</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exportFormatOption}
+              onPress={() => handleExportFormat('pdf')}
+            >
+              <Ionicons name="document-outline" size={22} color={isDark ? '#ef5350' : '#c62828'} />
+              <Text style={styles.exportFormatText}>{i18n.t('exportPDF')}</Text>
+              <Text style={styles.exportFormatDesc}>.pdf</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exportFormatOption}
+              onPress={() => handleExportFormat('excel')}
+            >
+              <Ionicons name="grid-outline" size={22} color={isDark ? '#66bb6a' : '#2e7d32'} />
+              <Text style={styles.exportFormatText}>{i18n.t('exportExcel')}</Text>
+              <Text style={styles.exportFormatDesc}>.xlsx</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.exportModalCancel}
+              onPress={() => setExportFormatModalVisible(false)}
+            >
+              <Text style={styles.exportModalCancelText}>{i18n.t('cancel')}</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
       {/* Haftalık Görünüm */}
       <ScrollView
         style={styles.weeklyContainer}
@@ -901,14 +1046,36 @@ export default function RecordsScreen() {
                   </View>
                   <Switch
                     value={editingIsHoliday}
-                    onValueChange={setEditingIsHoliday}
+                    onValueChange={(val) => {
+                      setEditingIsHoliday(val);
+                      if (val) setEditingIsAnnualLeave(false);
+                    }}
                     trackColor={{ false: isDark ? '#333' : '#ddd', true: '#10b981' }}
                     thumbColor={editingIsHoliday ? '#fff' : '#f4f3f4'}
                   />
                 </View>
               </View>
 
-              {!editingIsHoliday && (
+              {/* Yıllık İzin Toggle */}
+              <View style={styles.modalSection}>
+                <View style={styles.modalRow}>
+                  <View style={styles.modalRowContent}>
+                    <Text style={styles.modalLabel}>{i18n.t('annualLeave')}</Text>
+                    <Text style={styles.modalDesc}>{i18n.t('annualLeaveDesc')}</Text>
+                  </View>
+                  <Switch
+                    value={editingIsAnnualLeave}
+                    onValueChange={(val) => {
+                      setEditingIsAnnualLeave(val);
+                      if (val) setEditingIsHoliday(false);
+                    }}
+                    trackColor={{ false: isDark ? '#333' : '#ddd', true: '#f59e0b' }}
+                    thumbColor={editingIsAnnualLeave ? '#fff' : '#f4f3f4'}
+                  />
+                </View>
+              </View>
+
+              {!editingIsHoliday && !editingIsAnnualLeave && (
                 <>
                   {/* Giriş Saati */}
                   <View style={styles.modalSection}>
@@ -1019,9 +1186,15 @@ export default function RecordsScreen() {
                     if (editingIsHoliday) {
                       // Tatil olarak işaretle
                       await addHolidayRecord(editingDate);
+                    } else if (editingIsAnnualLeave) {
+                      // Yıllık izin olarak işaretle
+                      const { addAnnualLeaveRecord } = await import('@/services/storage');
+                      await addAnnualLeaveRecord(editingDate);
                     } else {
                       // Normal gün - tatil değilse tatil kaydını kaldır
                       await removeHolidayRecord(editingDate);
+                      const { removeAnnualLeaveRecord } = await import('@/services/storage');
+                      await removeAnnualLeaveRecord(editingDate);
 
                       // Giriş/çıkış kayıtlarını güncelle
                       if (editingGiris) {
@@ -1051,7 +1224,7 @@ export default function RecordsScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
 
@@ -1463,6 +1636,12 @@ const createStyles = (isDark: boolean) =>
       marginHorizontal: -4,
       paddingHorizontal: 8,
     },
+    annualLeaveRow: {
+      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.04)',
+      borderRadius: 8,
+      marginHorizontal: -4,
+      paddingHorizontal: 8,
+    },
     dayNameContainer: {
       width: 75,
       flexDirection: 'row',
@@ -1479,6 +1658,14 @@ const createStyles = (isDark: boolean) =>
       height: 18,
       borderRadius: 9,
       backgroundColor: isDark ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.15)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    annualLeaveTag: {
+      width: 18,
+      height: 18,
+      borderRadius: 9,
+      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.2)' : 'rgba(245, 158, 11, 0.15)',
       justifyContent: 'center',
       alignItems: 'center',
     },
@@ -1662,5 +1849,55 @@ const createStyles = (isDark: boolean) =>
       fontSize: 16,
       fontWeight: '600',
       color: '#fff',
+    },
+    exportModalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    exportModalContent: {
+      backgroundColor: isDark ? '#1e1e2e' : '#fff',
+      borderRadius: 16,
+      padding: 20,
+      width: '80%',
+      maxWidth: 320,
+    },
+    exportModalTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: isDark ? '#fff' : '#1a1a2e',
+      marginBottom: 16,
+      textAlign: 'center',
+    },
+    exportFormatOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      backgroundColor: isDark ? '#2a2a3e' : '#f5f5f7',
+      marginBottom: 8,
+    },
+    exportFormatText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: isDark ? '#fff' : '#1a1a2e',
+      marginLeft: 12,
+      flex: 1,
+    },
+    exportFormatDesc: {
+      fontSize: 13,
+      color: isDark ? '#888' : '#999',
+    },
+    exportModalCancel: {
+      marginTop: 8,
+      paddingVertical: 12,
+      alignItems: 'center',
+    },
+    exportModalCancelText: {
+      fontSize: 15,
+      color: isDark ? '#888' : '#666',
+      fontWeight: '500',
     },
   });

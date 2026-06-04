@@ -48,7 +48,7 @@ export const updateRecord = async (id: string, updates: Partial<WorkRecord>): Pr
 };
 
 // Tarih ve tip bazlı kayıt güncelle veya ekle
-export const upsertRecordByDateType = async (date: string, type: 'giris' | 'cikis', time: string): Promise<{ action: 'added' | 'updated' | 'unchanged' }> => {
+export const upsertRecordByDateType = async (date: string, type: 'giris' | 'cikis' | 'molagiris' | 'molacikis', time: string): Promise<{ action: 'added' | 'updated' | 'unchanged' }> => {
   try {
     const records = await getRecords();
     const existingIndex = records.findIndex(r => r.date === date && r.type === type);
@@ -133,6 +133,21 @@ export const getLastRecord = async (): Promise<WorkRecord | null> => {
   }
 };
 
+// Bugünün tüm giriş/çıkış kayıtlarını getir (en eskiden en yeniye)
+export const getTodayWorkRecords = async (): Promise<WorkRecord[]> => {
+  try {
+    const records = await getRecords();
+    const today = new Date().toISOString().split('T')[0];
+    const todayRecords = records.filter(r => r.date === today && (r.type === 'giris' || r.type === 'cikis'));
+    // Timestamp'e göre artan sırayla (en eski önce)
+    return todayRecords.sort((a, b) => a.timestamp - b.timestamp);
+  } catch (error) {
+    console.error('Bugün çalışma kayıtları alınırken hata:', error);
+    return [];
+  }
+};
+
+
 // Tatil günü ekle (otomatik 7 saat çalışma)
 export const addHolidayRecord = async (date: string): Promise<boolean> => {
   try {
@@ -193,6 +208,79 @@ export const isHolidayDate = async (date: string): Promise<boolean> => {
   try {
     const records = await getRecords();
     return records.some(r => r.date === date && r.isHoliday);
+  } catch (error) {
+    return false;
+  }
+};
+
+// Yıllık izin ekle (günlük çalışma süresi kadar çalışma)
+export const addAnnualLeaveRecord = async (date: string): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    const standards = await getAppStandards();
+
+    // Bu tarih için mevcut kayıtları sil
+    const filtered = records.filter(r => r.date !== date);
+
+    const workStartTime = '08:00';
+    const dailyMinutes = standards.dailyWorkMinutes;
+    const h = Math.floor(dailyMinutes / 60);
+    const m = dailyMinutes % 60;
+    const endH = 8 + h;
+    const endM = m;
+    const workEndTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+
+    // Giriş kaydı
+    const girisRecord: WorkRecord = {
+      id: `leave_${date}_giris_${Date.now()}`,
+      type: 'giris',
+      timestamp: new Date(`${date}T${workStartTime}:00`).getTime(),
+      date,
+      time: workStartTime,
+      synced: false,
+      isAnnualLeave: true,
+    };
+
+    // Çıkış kaydı
+    const cikisRecord: WorkRecord = {
+      id: `leave_${date}_cikis_${Date.now()}`,
+      type: 'cikis',
+      timestamp: new Date(`${date}T${workEndTime}:00`).getTime(),
+      date,
+      time: workEndTime,
+      synced: false,
+      isAnnualLeave: true,
+    };
+
+    filtered.unshift(cikisRecord);
+    filtered.unshift(girisRecord);
+
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    return true;
+  } catch (error) {
+    console.error('Yıllık izin kaydı eklenirken hata:', error);
+    return false;
+  }
+};
+
+// Yıllık izin kaydını kaldır
+export const removeAnnualLeaveRecord = async (date: string): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    const filtered = records.filter(r => !(r.date === date && r.isAnnualLeave));
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    return true;
+  } catch (error) {
+    console.error('Yıllık izin kaydı silinirken hata:', error);
+    return false;
+  }
+};
+
+// Bir günün yıllık izin olup olmadığını kontrol et
+export const isAnnualLeaveDate = async (date: string): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    return records.some(r => r.date === date && r.isAnnualLeave);
   } catch (error) {
     return false;
   }
@@ -301,6 +389,8 @@ export interface AppStandards {
   defaultBreakMinutes: number; // Varsayılan mola süresi (dk), varsayılan 30
   eveningThresholdMinutes: number; // Akşam mesai başlangıcı (gece yarısından dk), varsayılan 1200 (20:00)
   workingDays: number[]; // Çalışma günleri (JS getDay: 0=Pazar..6=Cumartesi), varsayılan [1,2,3,4,5]
+  workStartDate?: string; // İşe başlama tarihi (YYYY-MM-DD), opsiyonel
+  annualLeaveQuota: number; // Yıllık izin kotası, varsayılan 0
 }
 
 export const DEFAULT_STANDARDS: AppStandards = {
@@ -308,6 +398,8 @@ export const DEFAULT_STANDARDS: AppStandards = {
   defaultBreakMinutes: 30,
   eveningThresholdMinutes: 1200,
   workingDays: [1, 2, 3, 4, 5], // Pazartesi-Cuma
+  workStartDate: undefined,
+  annualLeaveQuota: 0,
 };
 
 export const getAppStandards = async (): Promise<AppStandards> => {

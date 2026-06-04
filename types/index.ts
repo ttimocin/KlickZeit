@@ -7,6 +7,7 @@ export interface WorkRecord {
   time: string; // HH:mm formatında
   synced: boolean; // Firebase'e yedeklendi mi?
   isHoliday?: boolean; // Tatil günü mü?
+  isAnnualLeave?: boolean; // Yıllık izin mi?
 }
 
 // Günlük özet tipi
@@ -16,6 +17,7 @@ export interface DailySummary {
   cikis?: string;
   calismaSuresi?: string;
   isHoliday?: boolean;
+  isAnnualLeave?: boolean; // Yıllık izin mi?
   breakCounted?: boolean; // Mola sayılıyor mu? (true ise mola düşülmez)
   molaGiris?: string; // İlk mola giriş saati
   molaCikis?: string; // Son mola çıkış saati

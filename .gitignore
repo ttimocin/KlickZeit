@@ -38,7 +38,9 @@ yarn-error.*
 # Firebase
 # google-services.json  # Geçici olarak commit edildi (EAS build için)
 firebase-debug.log
-firestore-debug.log
+fir*.keystore
+!debug.keystore
+android/key.properties
 
 # IDE
 .vscode/
@@ -50,8 +52,12 @@ firestore-debug.log
 # Build
 android/app/build/
 android/build/
+wear/app/build/
+wear/build/
+SHA1_output.txt
 ios/build/
 modules/wearable-data-layer/build/
+modules/wearable-data-layer/android/build/
 *.apk
 *.aab
 *.ipa

@@ -2,7 +2,9 @@ import i18n from '@/i18n';
 import { DailySummary, WorkRecord } from '@/types';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
+import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import * as XLSX from 'xlsx';
 import { getAppStandards, getBreakCounted, getBreakDuration, getRecords, setBreakCounted, setBreakDuration, upsertRecordByDateType } from './storage';
 
 // Kayıtları günlük özete dönüştür
@@ -32,6 +34,11 @@ const groupByDate = async (records: WorkRecord[]): Promise<DailySummary[]> => {
     // Tatil günü bilgisini aktar
     if (record.isHoliday) {
       grouped[record.date].isHoliday = true;
+    }
+
+    // Yıllık izin bilgisini aktar
+    if (record.isAnnualLeave) {
+      grouped[record.date].isAnnualLeave = true;
     }
   }
 
@@ -72,8 +79,8 @@ const toCSV = (summaries: DailySummary[], dailyTarget: number, defaultBreakMinut
 
   const DAILY_TARGET = dailyTarget;
 
-  // Header'ları ASCII karakterlerle yaz (Türkçe karakter sorunu önlemek için)
-  const header = `Tarih;Giris;Cikis;BrutSure;NetSure;Bakiye;Tatil;MolaSayiliyor;MolaSuresi;MolaGiris;MolaCikis\r\n`;
+  // Header'ları seçili dile göre yaz
+  const header = `${i18n.t('csvDate')};${i18n.t('csvEntry')};${i18n.t('csvExit')};${i18n.t('csvGrossDuration')};${i18n.t('csvNetDuration')};${i18n.t('csvBalance')};${i18n.t('csvHoliday')};${i18n.t('csvAnnualLeave')};${i18n.t('csvBreakCounted')};${i18n.t('csvBreakDuration')};${i18n.t('csvBreakEntry')};${i18n.t('csvBreakExit')}\r\n`;
 
   // Çalışma süresini de ASCII formatla
   const rows = summaries.map(s => {
@@ -93,7 +100,7 @@ const toCSV = (summaries: DailySummary[], dailyTarget: number, defaultBreakMinut
 
         // Net süreyi hesapla (mola düşülmüşse)
         const breakCounted = s.breakCounted || false;
-        const breakDuration = (s as any).breakDuration || defaultBreakMinutes;
+        const breakDuration = (s as any).breakDuration ?? 0;
         const netDiff = breakCounted ? diff : (diff - breakDuration);
 
         if (netDiff > 0) {
@@ -116,15 +123,24 @@ const toCSV = (summaries: DailySummary[], dailyTarget: number, defaultBreakMinut
           const bM = absBalance % 60;
           bakiye = `-${bH}:${String(bM).padStart(2, '0')}`;
         }
+
+        // Yıllık izin kontrolü
+        if (s.isAnnualLeave) {
+          const hours = Math.floor(DAILY_TARGET / 60);
+          const mins = DAILY_TARGET % 60;
+          netSure = `${hours}:${String(mins).padStart(2, '0')}`;
+          bakiye = '+0:00';
+        }
       }
     }
 
     const tatil = s.isHoliday ? '1' : '0';
+    const yillikIzin = s.isAnnualLeave ? '1' : '0';
     const breakCounted = s.breakCounted ? '1' : '0';
-    const breakDuration = (s as any).breakDuration || String(defaultBreakMinutes);
+    const breakDuration = (s as any).breakDuration ?? 0;
     const molaGiris = s.molaGiris || '-';
     const molaCikis = s.molaCikis || '-';
-    return `${s.date};${s.giris || '-'};${s.cikis || '-'};${brutSure};${netSure};${bakiye};${tatil};${breakCounted};${breakDuration};${molaGiris};${molaCikis}`;
+    return `${s.date};${s.giris || '-'};${s.cikis || '-'};${brutSure};${netSure};${bakiye};${tatil};${yillikIzin};${breakCounted};${breakDuration};${molaGiris};${molaCikis}`;
   }).join('\r\n');
 
   return BOM + header + rows;
@@ -160,6 +176,232 @@ export const exportToCSV = async (): Promise<boolean> => {
     return false;
   } catch (error) {
     console.error('Export hatası:', error);
+    return false;
+  }
+};
+
+// PDF olarak dışa aktar
+export const exportToPDF = async (): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    if (records.length === 0) return false;
+
+    const summaries = await groupByDate(records);
+    const standards = await getAppStandards();
+    const defaultBreakMinutes = standards.defaultBreakMinutes;
+    const DAILY_TARGET = standards.dailyWorkMinutes;
+
+    // HTML tablo oluştur
+    const rows = summaries.map(s => {
+      let brutSure = '-';
+      let netSure = '-';
+      let bakiye = '-';
+
+      if (s.giris && s.cikis) {
+        const [girisH, girisM] = s.giris.split(':').map(Number);
+        const [cikisH, cikisM] = s.cikis.split(':').map(Number);
+        const diff = (cikisH * 60 + cikisM) - (girisH * 60 + girisM);
+        if (diff > 0) {
+          brutSure = `${Math.floor(diff / 60)}:${String(diff % 60).padStart(2, '0')}`;
+          const breakCounted = s.breakCounted || false;
+          const breakDuration = (s as any).breakDuration ?? 0;
+          const netDiff = breakCounted ? diff : (diff - breakDuration);
+          if (netDiff > 0) {
+            netSure = `${Math.floor(netDiff / 60)}:${String(netDiff % 60).padStart(2, '0')}`;
+            const balanceMin = netDiff - DAILY_TARGET;
+            const absB = Math.abs(balanceMin);
+            bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+          } else {
+            netSure = '0:00';
+            const balanceMin = 0 - DAILY_TARGET;
+            const absB = Math.abs(balanceMin);
+            bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+          }
+        }
+      }
+
+      const tatil = s.isHoliday ? '✓' : '';
+      const yillikIzin = s.isAnnualLeave ? '✓' : '';
+      const rowBg = s.isHoliday ? '#e8f5e9' : s.isAnnualLeave ? '#fffbeb' : '#fff';
+      const balColor = bakiye.startsWith('+') ? '#2e7d32' : bakiye.startsWith('-') ? '#c62828' : '#333';
+
+      return `<tr style="background:${rowBg}">
+        <td>${s.date}</td>
+        <td>${s.giris || '-'}</td>
+        <td>${s.cikis || '-'}</td>
+        <td>${brutSure}</td>
+        <td>${netSure}</td>
+        <td style="color:${balColor};font-weight:600">${bakiye}</td>
+        <td style="text-align:center">${tatil}</td>
+        <td style="text-align:center">${yillikIzin}</td>
+        <td>${s.molaGiris || '-'}</td>
+        <td>${s.molaCikis || '-'}</td>
+      </tr>`;
+    }).join('');
+
+    const html = `
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: -apple-system, sans-serif; padding: 20px; font-size: 11px; }
+            h1 { font-size: 18px; color: #1a1a2e; margin-bottom: 4px; }
+            .subtitle { color: #666; font-size: 12px; margin-bottom: 16px; }
+            table { width: 100%; border-collapse: collapse; }
+            th { background: #1a1a2e; color: #fff; padding: 8px 6px; text-align: left; font-size: 10px; }
+            td { padding: 6px; border-bottom: 1px solid #eee; font-size: 10px; }
+            tr:hover { background: #f5f5f5; }
+          </style>
+        </head>
+        <body>
+          <h1>KlickZeit</h1>
+          <div class="subtitle">${summaries.length} ${i18n.t('records')} • ${new Date().toLocaleDateString()}</div>
+          <table>
+            <thead>
+              <tr>
+                <th>${i18n.t('csvDate')}</th>
+                <th>${i18n.t('csvEntry')}</th>
+                <th>${i18n.t('csvExit')}</th>
+                <th>${i18n.t('csvGrossDuration')}</th>
+                <th>${i18n.t('csvNetDuration')}</th>
+                <th>${i18n.t('csvBalance')}</th>
+                <th>${i18n.t('csvHoliday')}</th>
+                <th>${i18n.t('csvAnnualLeave')}</th>
+                <th>${i18n.t('csvBreakEntry')}</th>
+                <th>${i18n.t('csvBreakExit')}</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </body>
+      </html>
+    `;
+
+    const { uri } = await Print.printToFileAsync({ html });
+
+    // Dosyayı KlickZeit_ ismiyle taşı
+    const fileName = `KlickZeit_${new Date().toISOString().split('T')[0]}.pdf`;
+    const newUri = `${FileSystem.documentDirectory}${fileName}`;
+    await FileSystem.moveAsync({ from: uri, to: newUri });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(newUri, {
+        mimeType: 'application/pdf',
+        dialogTitle: 'KlickZeit PDF',
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('PDF Export hatası:', error);
+    return false;
+  }
+};
+
+// Excel olarak dışa aktar
+export const exportToExcel = async (): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    if (records.length === 0) return false;
+
+    const summaries = await groupByDate(records);
+    const standards = await getAppStandards();
+    const DAILY_TARGET = standards.dailyWorkMinutes;
+
+    // Satırları oluştur
+    const data = summaries.map(s => {
+      let brutSure = '-';
+      let netSure = '-';
+      let bakiye = '-';
+
+      if (s.giris && s.cikis) {
+        const [girisH, girisM] = s.giris.split(':').map(Number);
+        const [cikisH, cikisM] = s.cikis.split(':').map(Number);
+        const diff = (cikisH * 60 + cikisM) - (girisH * 60 + girisM);
+        if (diff > 0) {
+          brutSure = `${Math.floor(diff / 60)}:${String(diff % 60).padStart(2, '0')}`;
+          const breakCounted = s.breakCounted || false;
+          const breakDuration = (s as any).breakDuration ?? 0;
+          const netDiff = breakCounted ? diff : (diff - breakDuration);
+          if (netDiff > 0) {
+            netSure = `${Math.floor(netDiff / 60)}:${String(netDiff % 60).padStart(2, '0')}`;
+            const balanceMin = netDiff - DAILY_TARGET;
+            const absB = Math.abs(balanceMin);
+            bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+          } else {
+            netSure = '0:00';
+            const balanceMin = 0 - DAILY_TARGET;
+            const absB = Math.abs(balanceMin);
+            bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+          }
+
+          // Yıllık izin kontrolü
+          if (s.isAnnualLeave) {
+            const hours = Math.floor(DAILY_TARGET / 60);
+            const mins = DAILY_TARGET % 60;
+            netSure = `${hours}:${String(mins).padStart(2, '0')}`;
+            bakiye = '+0:00';
+          }
+        }
+      }
+
+      return {
+        [i18n.t('csvDate')]: s.date,
+        [i18n.t('csvEntry')]: s.giris || '-',
+        [i18n.t('csvExit')]: s.cikis || '-',
+        [i18n.t('csvGrossDuration')]: brutSure,
+        [i18n.t('csvNetDuration')]: netSure,
+        [i18n.t('csvBalance')]: bakiye,
+        [i18n.t('csvHoliday')]: s.isHoliday ? '1' : '0',
+        [i18n.t('csvAnnualLeave')]: s.isAnnualLeave ? '1' : '0',
+        [i18n.t('csvBreakCounted')]: s.breakCounted ? '1' : '0',
+        [i18n.t('csvBreakDuration')]: (s as any).breakDuration ?? 0,
+        [i18n.t('csvBreakEntry')]: s.molaGiris || '-',
+        [i18n.t('csvBreakExit')]: s.molaCikis || '-',
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    // Sütun genişliklerini ayarla
+    ws['!cols'] = [
+      { wch: 12 }, // Date
+      { wch: 8 },  // Entry
+      { wch: 8 },  // Exit
+      { wch: 12 }, // Gross
+      { wch: 10 }, // Net
+      { wch: 10 }, // Balance
+      { wch: 8 },  // Holiday
+      { wch: 12 }, // Annual Leave
+      { wch: 14 }, // BreakCounted
+      { wch: 12 }, // BreakDuration
+      { wch: 10 }, // BreakEntry
+      { wch: 10 }, // BreakExit
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'KlickZeit');
+
+    // Base64 olarak yaz
+    const wbout = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+
+    const fileName = `KlickZeit_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const filePath = `${FileSystem.documentDirectory}${fileName}`;
+
+    await FileSystem.writeAsStringAsync(filePath, wbout, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    if (await Sharing.isAvailableAsync()) {
+      await Sharing.shareAsync(filePath, {
+        mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        dialogTitle: 'KlickZeit Excel',
+      });
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Excel Export hatası:', error);
     return false;
   }
 };
@@ -251,16 +493,23 @@ export const importFromCSV = async (): Promise<{ success: boolean; imported: num
 
       if (parts.length < 2) continue;
 
-      const [rawDate, rawGiris, rawCikis, , , rawTatil, rawBreakCounted, rawBreakDuration] = parts;
+      // Sütunlar: Date;Entry;Exit;GrossDuration;NetDuration;Balance;Holiday;AnnualLeave;BreakCounted;BreakDuration;BreakEntry;BreakExit
+      const [rawDate, rawGiris, rawCikis, , , , rawTatil, rawYillikIzin, rawBreakCounted, rawBreakDuration, rawMolaGiris, rawMolaCikis] = parts;
 
       // Tarihi parse et
       const date = parseDate(rawDate);
       if (!date) continue;
 
-      // Önce tatil bilgisini kontrol et
-      const isTatil = rawTatil === '1' || rawTatil?.toLowerCase() === 'true' || rawTatil?.toLowerCase() === 'evet';
+      // Önce tatil ve yıllık izin bilgisini kontrol et
+      const isTatil = rawTatil === '1' || rawTatil?.toLowerCase() === 'true' || rawTatil?.toLowerCase() === 'evet' || rawTatil === '✓';
+      const isYillikIzin = rawYillikIzin === '1' || rawYillikIzin?.toLowerCase() === 'true' || rawYillikIzin?.toLowerCase() === 'evet' || rawYillikIzin === '✓';
 
-      if (isTatil) {
+      if (isYillikIzin) {
+        // Yıllık izin olarak işaretle
+        const { addAnnualLeaveRecord } = await import('./storage');
+        await addAnnualLeaveRecord(date);
+        imported++;
+      } else if (isTatil) {
         // Tatil günü olarak işaretle - mevcut kayıtları sil ve tatil kaydı ekle
         const { addHolidayRecord } = await import('./storage');
         await addHolidayRecord(date);
@@ -297,6 +546,21 @@ export const importFromCSV = async (): Promise<{ success: boolean; imported: num
         if (!isNaN(breakDuration) && breakDuration >= 0) {
           await setBreakDuration(date, breakDuration);
         }
+      }
+
+      // Mola giriş/çıkış bilgisini kaydet
+      const molaGiris = parseTime(rawMolaGiris);
+      if (molaGiris) {
+        const result = await upsertRecordByDateType(date, 'molagiris', molaGiris);
+        if (result.action === 'added') imported++;
+        else if (result.action === 'updated') updated++;
+      }
+
+      const molaCikis = parseTime(rawMolaCikis);
+      if (molaCikis) {
+        const result = await upsertRecordByDateType(date, 'molacikis', molaCikis);
+        if (result.action === 'added') imported++;
+        else if (result.action === 'updated') updated++;
       }
     }
 
