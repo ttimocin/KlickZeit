@@ -31,7 +31,8 @@ service cloud.firestore {
           && (!request.resource.data.keys().hasAny(['molaGirisTimestamp']) || (request.resource.data.molaGirisTimestamp is int && request.resource.data.molaGirisTimestamp > 1577836800000 && request.resource.data.molaGirisTimestamp < 1893456000000))
           && (!request.resource.data.keys().hasAny(['molaCikisTimestamp']) || (request.resource.data.molaCikisTimestamp is int && request.resource.data.molaCikisTimestamp > 1577836800000 && request.resource.data.molaCikisTimestamp < 1893456000000))
           && (!request.resource.data.keys().hasAny(['isHoliday']) || request.resource.data.isHoliday is bool)
-          && (!request.resource.data.keys().hasAny(['breakCounted']) || request.resource.data.breakCounted is bool);
+          && (!request.resource.data.keys().hasAny(['breakCounted']) || request.resource.data.breakCounted is bool)
+          && (!request.resource.data.keys().hasAny(['breakDuration']) || (request.resource.data.breakDuration is int && request.resource.data.breakDuration >= 0));
         
         allow update: if isOwner(userId)
           && resource.data.date == request.resource.data.date
@@ -47,6 +48,11 @@ service cloud.firestore {
           && (!request.resource.data.keys().hasAny(['molaCikisTimestamp']) || (request.resource.data.molaCikisTimestamp is int && request.resource.data.molaCikisTimestamp > 1577836800000 && request.resource.data.molaCikisTimestamp < 1893456000000))
           && (!request.resource.data.keys().hasAny(['isHoliday']) || request.resource.data.isHoliday is bool)
           && (!request.resource.data.keys().hasAny(['breakCounted']) || request.resource.data.breakCounted is bool);
+      }
+
+      // Ayarlar / standartlar — sadece hesap sahibi (alan doğrulaması istemci tarafında)
+      match /settings/{settingId} {
+        allow read, write: if isOwner(userId);
       }
     }
 

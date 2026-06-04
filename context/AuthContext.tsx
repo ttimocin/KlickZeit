@@ -37,22 +37,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (!currentUser) {
-        // Kullanıcı yoksa anonim giriş yap
-        try {
-          await signInAnonymously(auth);
-        } catch (error) {
-          Logger.error('Anonim giriş hatası:', error);
-          setIsLoading(false);
-        }
-      } else {
-        setUser(currentUser);
+    let loadingDone = false;
+    const stopLoading = () => {
+      if (!loadingDone) {
+        loadingDone = true;
         setIsLoading(false);
+      }
+    };
+
+    // İnternet yokken anonim giriş uzun sürebilir; en fazla 2.5 sn bekle
+    const maxWait = setTimeout(stopLoading, 2500);
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      stopLoading();
+      if (!currentUser) {
+        signInAnonymously(auth).catch((error) => {
+          Logger.error('Anonim giriş hatası (arka plan):', error);
+        });
       }
     });
 
-    return unsubscribe;
+    return () => {
+      clearTimeout(maxWait);
+      unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -119,8 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await signOut(auth);
-      // Çıkış sonrası anonim giriş yap (leaderboard vb. için UID gerekli)
-      await signInAnonymously(auth);
+      signInAnonymously(auth).catch((error) => {
+        Logger.error('Çıkış sonrası anonim giriş (arka plan):', error);
+      });
     } catch (error: unknown) {
       Logger.error('Çıkış yapılırken hata:', error);
     }

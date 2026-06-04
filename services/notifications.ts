@@ -1,7 +1,7 @@
 import i18n from '@/i18n';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
-import { getAppStandards } from './storage';
+import { getAppStandards, isFlexibleSchedule } from './storage';
 
 // Bildirim kanalı ID'si
 const CHANNEL_ID = 'klickzeit-alerts';
@@ -48,12 +48,13 @@ export const showCheckInNotification = async (time: string, timestamp: number): 
       trigger: null,
     });
 
-    // Ayarlardan çalışma süresini ve mola süresini al
     const standards = await getAppStandards();
-    const dailyWorkMinutes = standards.dailyWorkMinutes; // ör. 420 (7 saat)
-    const defaultBreakMinutes = standards.defaultBreakMinutes; // ör. 30
+    if (isFlexibleSchedule(standards)) {
+      return;
+    }
 
-    // Toplam süre = çalışma + mola (brüt gün süresi)
+    const dailyWorkMinutes = standards.dailyWorkMinutes;
+    const defaultBreakMinutes = standards.defaultBreakMinutes;
     const totalMinutes = dailyWorkMinutes + defaultBreakMinutes;
 
     // Yarım saat kala hatırlatma
@@ -103,6 +104,10 @@ export const rescheduleRemindersAfterBreak = async (
     await cancelWorkReminders();
 
     const standards = await getAppStandards();
+    if (isFlexibleSchedule(standards)) {
+      return;
+    }
+
     const dailyWorkMinutes = standards.dailyWorkMinutes;
 
     // Giriş'ten beri geçen dakika - toplam mola = net çalışma

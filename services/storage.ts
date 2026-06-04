@@ -17,6 +17,12 @@ export const getRecords = async (): Promise<WorkRecord[]> => {
   }
 };
 
+/** Yerelde en az bir giriş veya çıkış kaydı var mı */
+export const hasLocalWorkRecords = async (): Promise<boolean> => {
+  const records = await getRecords();
+  return records.some((r) => r.type === 'giris' || r.type === 'cikis');
+};
+
 // Yeni kayıt ekle
 export const addRecord = async (record: WorkRecord): Promise<boolean> => {
   try {
@@ -109,6 +115,38 @@ export const clearAllRecords = async (): Promise<boolean> => {
 };
 
 // Tüm kayıtları ayarla (Firebase'den yükleme için)
+/** İçe aktarma sonrası tüm kayıtların yeniden yedeklenmesi için */
+export const markAllRecordsUnsynced = async (): Promise<void> => {
+  try {
+    const records = await getRecords();
+    if (records.length === 0) return;
+    const updated = records.map((r) => ({ ...r, synced: false }));
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  } catch (error) {
+    console.error('Kayıtlar işaretlenirken hata:', error);
+  }
+};
+
+/** Mola vb. ayar değişince o günün kayıtlarını yeniden yedekleme kuyruğuna al */
+export const markDateRecordsUnsynced = async (date: string): Promise<void> => {
+  try {
+    const records = await getRecords();
+    let changed = false;
+    const updated = records.map((r) => {
+      if (r.date === date && r.synced) {
+        changed = true;
+        return { ...r, synced: false };
+      }
+      return r;
+    });
+    if (changed) {
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    }
+  } catch (error) {
+    console.error('Gün kayıtları işaretlenirken hata:', error);
+  }
+};
+
 export const setRecords = async (records: WorkRecord[]): Promise<boolean> => {
   try {
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(records));
@@ -213,7 +251,7 @@ export const isHolidayDate = async (date: string): Promise<boolean> => {
   }
 };
 
-// Yıllık izin ekle (günlük çalışma süresi kadar çalışma)
+// Yıllık izin ekle (günlük çalışma süresi kadar çalışma; esnek modda 8 saat sentetik)
 export const addAnnualLeaveRecord = async (date: string): Promise<boolean> => {
   try {
     const records = await getRecords();
@@ -223,7 +261,7 @@ export const addAnnualLeaveRecord = async (date: string): Promise<boolean> => {
     const filtered = records.filter(r => r.date !== date);
 
     const workStartTime = '08:00';
-    const dailyMinutes = standards.dailyWorkMinutes;
+    const dailyMinutes = isFlexibleSchedule(standards) ? 480 : standards.dailyWorkMinutes;
     const h = Math.floor(dailyMinutes / 60);
     const m = dailyMinutes % 60;
     const endH = 8 + h;
@@ -286,7 +324,7 @@ export const isAnnualLeaveDate = async (date: string): Promise<boolean> => {
   }
 };
 
-// Mola sayılıyor mu kaydet
+// breakCounted=true → mola çalışma sayılır (düşülmez); false/silinmiş → mola düşülür
 const BREAK_COUNTED_KEY = 'break_counted_dates';
 
 export const setBreakCounted = async (date: string, counted: boolean): Promise<boolean> => {
@@ -301,6 +339,7 @@ export const setBreakCounted = async (date: string, counted: boolean): Promise<b
     }
 
     await AsyncStorage.setItem(BREAK_COUNTED_KEY, JSON.stringify(dates));
+    await markDateRecordsUnsynced(date);
     return true;
   } catch (error) {
     console.error('Mola sayılıyor kaydedilirken hata:', error);
@@ -335,6 +374,7 @@ export const setBreakDuration = async (date: string, duration: number): Promise<
     }
 
     await AsyncStorage.setItem(BREAK_DURATION_KEY, JSON.stringify(dates));
+    await markDateRecordsUnsynced(date);
     return true;
   } catch (error) {
     console.error('Mola süresi kaydedilirken hata:', error);
@@ -383,23 +423,67 @@ export const getLastBreakRecord = async (): Promise<WorkRecord | null> => {
 
 // Uygulama standartları
 const APP_STANDARDS_KEY = 'app_standards';
+const SETTINGS_SYNC_FINGERPRINT_KEY = 'settings_cloud_fingerprint';
+
+/** Buluta son yazılan ayarlar (değişiklik kontrolü) */
+export const buildSettingsSyncFingerprint = (standards: AppStandards): string =>
+  JSON.stringify({
+    workStartDate: standards.workStartDate ?? null,
+    annualLeaveQuota: Math.round(standards.annualLeaveQuota ?? 0),
+    extendedPastWeeks: [...(standards.extendedPastWeeks ?? [])].sort(),
+    workScheduleMode: standards.workScheduleMode ?? 'fixed',
+    dailyWorkMinutes: standards.dailyWorkMinutes,
+    defaultBreakMinutes: standards.defaultBreakMinutes,
+    eveningThresholdMinutes: standards.eveningThresholdMinutes,
+    workingDays: [...(standards.workingDays ?? [])].sort((a, b) => a - b),
+  });
+
+export const getSettingsSyncFingerprint = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(SETTINGS_SYNC_FINGERPRINT_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const saveSettingsSyncFingerprint = async (standards: AppStandards): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(
+      SETTINGS_SYNC_FINGERPRINT_KEY,
+      buildSettingsSyncFingerprint(standards)
+    );
+  } catch (error) {
+    console.error('Ayar parmak izi kaydedilemedi:', error);
+  }
+};
+
+export type WorkScheduleMode = 'fixed' | 'flexible';
 
 export interface AppStandards {
+  /** fixed = hedef süreye göre bakiye; flexible = yalnızca kayıtlı süre */
+  workScheduleMode?: WorkScheduleMode;
   dailyWorkMinutes: number;    // Günlük çalışma süresi (dk), varsayılan 420 (7 saat)
   defaultBreakMinutes: number; // Varsayılan mola süresi (dk), varsayılan 30
   eveningThresholdMinutes: number; // Akşam mesai başlangıcı (gece yarısından dk), varsayılan 1200 (20:00)
   workingDays: number[]; // Çalışma günleri (JS getDay: 0=Pazar..6=Cumartesi), varsayılan [1,2,3,4,5]
   workStartDate?: string; // İşe başlama tarihi (YYYY-MM-DD), opsiyonel
   annualLeaveQuota: number; // Yıllık izin kotası, varsayılan 0
+  /** Geçmiş sayfasında manuel eklenen haftalar (Pazartesi YYYY-MM-DD) */
+  extendedPastWeeks?: string[];
 }
 
+export const isFlexibleSchedule = (standards: AppStandards): boolean =>
+  standards.workScheduleMode === 'flexible';
+
 export const DEFAULT_STANDARDS: AppStandards = {
+  workScheduleMode: 'fixed',
   dailyWorkMinutes: 420,
   defaultBreakMinutes: 30,
   eveningThresholdMinutes: 1200,
   workingDays: [1, 2, 3, 4, 5], // Pazartesi-Cuma
   workStartDate: undefined,
   annualLeaveQuota: 0,
+  extendedPastWeeks: [],
 };
 
 export const getAppStandards = async (): Promise<AppStandards> => {
@@ -415,10 +499,16 @@ export const getAppStandards = async (): Promise<AppStandards> => {
   }
 };
 
-export const setAppStandards = async (standards: Partial<AppStandards>): Promise<boolean> => {
+export const setAppStandards = async (
+  standards: Partial<AppStandards>,
+  options?: { replace?: boolean }
+): Promise<boolean> => {
   try {
-    const current = await getAppStandards();
-    const updated = { ...current, ...standards };
+    const base = options?.replace ? { ...DEFAULT_STANDARDS } : await getAppStandards();
+    const updated: AppStandards = { ...base, ...standards };
+    if ('workStartDate' in standards && standards.workStartDate === undefined) {
+      delete updated.workStartDate;
+    }
     await AsyncStorage.setItem(APP_STANDARDS_KEY, JSON.stringify(updated));
     return true;
   } catch (error) {

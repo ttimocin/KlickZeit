@@ -1,11 +1,25 @@
 import { auth, db } from '@/config/firebase';
 import { WorkRecord } from '@/types';
 import { Logger } from '@/utils/logger';
-import { collection, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
-import { getRecords, setBreakCounted, setRecords, updateRecord } from './storage';
+import { isOnline } from '@/utils/network';
+import { collection, deleteField, doc, getDoc, getDocs, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  AppStandards,
+  DEFAULT_STANDARDS,
+  getBreakCounted,
+  getBreakDuration,
+  getRecords,
+  setBreakCounted,
+  setBreakDuration,
+  setRecords,
+  updateRecord,
+} from './storage';
 
-// Kullanıcı giriş yapmış mı kontrol et
-const isUserLoggedIn = () => auth.currentUser !== null;
+// Yedekleme: yalnızca e-posta/Google ile giriş (anonim değil)
+const isUserLoggedIn = () => {
+  const user = auth.currentUser;
+  return user !== null && !user.isAnonymous;
+};
 const getUserId = () => auth.currentUser?.uid;
 
 // Tarih formatını belge adı için dönüştür (YYYY-MM-DD -> DD_MM_YYYY)
@@ -55,10 +69,132 @@ const getUserRecordsCollection = () => {
   return collection(db, 'users', userId, 'work_records');
 };
 
+const timestampToMillis = (value: unknown, date: string, time: string): number => {
+  if (typeof value === 'number' && value > 0) return value;
+  if (value && typeof value === 'object' && 'toMillis' in value && typeof (value as { toMillis: () => number }).toMillis === 'function') {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  const [y, m, d] = date.split('-').map(Number);
+  const [h, min] = time.split(':').map(Number);
+  return new Date(y, m - 1, d, h, min, 0, 0).getTime();
+};
+
+const parseFirestoreDocToRecords = (
+  docId: string,
+  data: Record<string, unknown>
+): WorkRecord[] => {
+  const dateRaw = data.date ?? docIdToDate(docId);
+  const date = typeof dateRaw === 'string' ? dateRaw : docIdToDate(docId);
+  if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) return [];
+
+  const isHoliday = data.isHoliday === true;
+  const isAnnualLeave = data.isAnnualLeave === true;
+  const records: WorkRecord[] = [];
+
+  if (data.giris) {
+    const time = String(data.giris);
+    records.push({
+      id: `firebase_${docId}_giris`,
+      type: 'giris',
+      timestamp: timestampToMillis(data.girisTimestamp, date, time),
+      date,
+      time,
+      synced: true,
+      isHoliday,
+      isAnnualLeave,
+    });
+  }
+  if (data.cikis) {
+    const time = String(data.cikis);
+    records.push({
+      id: `firebase_${docId}_cikis`,
+      type: 'cikis',
+      timestamp: timestampToMillis(data.cikisTimestamp, date, time),
+      date,
+      time,
+      synced: true,
+      isHoliday,
+      isAnnualLeave,
+    });
+  }
+  if (data.molaGiris) {
+    const time = String(data.molaGiris);
+    records.push({
+      id: `firebase_${docId}_molagiris`,
+      type: 'molagiris',
+      timestamp: timestampToMillis(data.molaGirisTimestamp, date, time),
+      date,
+      time,
+      synced: true,
+    });
+  }
+  if (data.molaCikis) {
+    const time = String(data.molaCikis);
+    records.push({
+      id: `firebase_${docId}_molacikis`,
+      type: 'molacikis',
+      timestamp: timestampToMillis(data.molaCikisTimestamp, date, time),
+      date,
+      time,
+      synced: true,
+    });
+  }
+  return records;
+};
+
+/** Bir günün tüm yerel kayıtlarını tek Firestore belgesine yazar */
+const syncDayDocumentToFirebase = async (
+  userId: string,
+  date: string,
+  dayRecords: WorkRecord[]
+): Promise<boolean> => {
+  if (!date.match(/^\d{4}-\d{2}-\d{2}$/)) return false;
+
+  const dateDocId = dateToDocId(date);
+  const dayDocRef = doc(db, 'users', userId, 'work_records', dateDocId);
+  const payload: Record<string, unknown> = {
+    date,
+    updatedAt: serverTimestamp(),
+  };
+
+  for (const record of dayRecords) {
+    if (record.type === 'giris') {
+      payload.giris = record.time;
+      payload.girisTimestamp = record.timestamp;
+      if (record.isHoliday) payload.isHoliday = true;
+      if (record.isAnnualLeave) payload.isAnnualLeave = true;
+    } else if (record.type === 'cikis') {
+      payload.cikis = record.time;
+      payload.cikisTimestamp = record.timestamp;
+      if (record.isHoliday) payload.isHoliday = true;
+      if (record.isAnnualLeave) payload.isAnnualLeave = true;
+    } else if (record.type === 'molagiris' && !payload.molaGiris) {
+      payload.molaGiris = record.time;
+      payload.molaGirisTimestamp = record.timestamp;
+    } else if (record.type === 'molacikis') {
+      payload.molaCikis = record.time;
+      payload.molaCikisTimestamp = record.timestamp;
+    }
+  }
+
+  const breakCounted = await getBreakCounted(date);
+  if (breakCounted) payload.breakCounted = true;
+
+  const breakDuration = await getBreakDuration(date);
+  if (breakDuration !== null && breakDuration > 0) {
+    payload.breakDuration = breakDuration;
+  }
+
+  await setDoc(dayDocRef, payload, { merge: true });
+  return true;
+};
+
 // Firebase'e kayıt ekle (gün bazlı)
 export const syncToFirebase = async (record: WorkRecord): Promise<boolean> => {
-  // Kullanıcı giriş yapmamışsa sync yapma
   if (!isUserLoggedIn()) {
+    return false;
+  }
+  if (!(await isOnline())) {
     return false;
   }
 
@@ -145,35 +281,98 @@ export const syncToFirebase = async (record: WorkRecord): Promise<boolean> => {
   }
 };
 
-// Senkronize edilmemiş kayıtları Firebase'e yükle
-export const syncAllPendingRecords = async (): Promise<{ success: number; failed: number; notLoggedIn?: boolean }> => {
-  // Kullanıcı giriş yapmamışsa
+export type SyncProgressCallback = (current: number, total: number) => void;
+
+export type SyncAllRecordsResult = {
+  success: number;
+  failed: number;
+  skipped: number;
+  totalDays: number;
+  nothingToSync?: boolean;
+  notLoggedIn?: boolean;
+  offline?: boolean;
+};
+
+// Değişmemiş (synced) günleri atlar; en az bir kaydı pending olan günleri yedekler
+export const syncAllPendingRecords = async (
+  onProgress?: SyncProgressCallback,
+  options?: { forceFull?: boolean }
+): Promise<SyncAllRecordsResult> => {
   if (!isUserLoggedIn()) {
-    return { success: 0, failed: 0, notLoggedIn: true };
+    return { success: 0, failed: 0, skipped: 0, totalDays: 0, notLoggedIn: true };
   }
+  if (!(await isOnline())) {
+    return { success: 0, failed: 0, skipped: 0, totalDays: 0, offline: true };
+  }
+
+  const userId = getUserId();
+  if (!userId) return { success: 0, failed: 0, skipped: 0, totalDays: 0, notLoggedIn: true };
 
   try {
     const records = await getRecords();
-    const pending = records.filter(r => !r.synced);
+    const byDate = new Map<string, WorkRecord[]>();
+
+    for (const record of records) {
+      if (!record.date?.match(/^\d{4}-\d{2}-\d{2}$/)) continue;
+      const list = byDate.get(record.date) ?? [];
+      list.push(record);
+      byDate.set(record.date, list);
+    }
+
+    const allDates = Array.from(byDate.entries());
+    const forceFull = options?.forceFull === true;
+    const dateEntries = forceFull
+      ? allDates
+      : allDates.filter(([, dayRecords]) => dayRecords.some((r) => !r.synced));
+
+    const skipped = allDates.length - dateEntries.length;
+
+    if (dateEntries.length === 0) {
+      onProgress?.(0, 0);
+      return {
+        success: 0,
+        failed: 0,
+        skipped,
+        totalDays: allDates.length,
+        nothingToSync: allDates.length > 0,
+      };
+    }
+
+    const total = dateEntries.length;
+    onProgress?.(0, total);
 
     let success = 0;
     let failed = 0;
 
-    for (const record of pending) {
-      const result = await syncToFirebase(record);
-      if (result) {
-        success++;
-      } else {
+    for (let i = 0; i < dateEntries.length; i++) {
+      const [date, dayRecords] = dateEntries[i];
+      try {
+        const ok = await syncDayDocumentToFirebase(userId, date, dayRecords);
+        if (ok) {
+          success++;
+          for (const r of dayRecords) {
+            await updateRecord(r.id, { synced: true });
+          }
+        } else {
+          failed++;
+        }
+      } catch (error) {
+        Logger.error('Gün yedekleme hatası:', date, error);
         failed++;
       }
+      onProgress?.(i + 1, total);
     }
 
-    return { success, failed };
+    return { success, failed, skipped, totalDays: allDates.length };
   } catch (error) {
     Logger.error('Toplu sync hatası:', error);
-    return { success: 0, failed: 0 };
+    return { success: 0, failed: 0, skipped: 0, totalDays: 0 };
   }
 };
+
+/** Tüm günleri yeniden buluta yazar (CSV sonrası veya onarım) */
+export const syncAllRecordsFull = async (onProgress?: SyncProgressCallback) =>
+  syncAllPendingRecords(onProgress, { forceFull: true });
 
 // Mola ayarlarını Firebase'e sync et
 export const syncBreakSettings = async (date: string, breakCounted: boolean): Promise<boolean> => {
@@ -203,10 +402,21 @@ export const syncBreakSettings = async (date: string, breakCounted: boolean): Pr
   }
 };
 
-// Firebase'den kullanıcının kayıtlarını getir ve yerel kayıtlarla birleştir
-export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?: boolean }> => {
+export type LoadFromFirebaseOptions = {
+  /** true: buluttaki veri yerel listeyi tamamen değiştirir (Ayarlar → Buluttan yükle) */
+  replaceLocal?: boolean;
+};
+
+// Firebase'den kullanıcının kayıtlarını getir
+export const loadFromFirebase = async (
+  options?: LoadFromFirebaseOptions,
+  onProgress?: SyncProgressCallback
+): Promise<{ loaded: number; notLoggedIn?: boolean; offline?: boolean }> => {
   if (!isUserLoggedIn()) {
     return { loaded: 0, notLoggedIn: true };
+  }
+  if (!(await isOnline())) {
+    return { loaded: 0, offline: true };
   }
 
   const userCollection = getUserRecordsCollection();
@@ -214,94 +424,44 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
 
   try {
     const snapshot = await getDocs(userCollection);
-
-    // Gün bazlı belgelerden kayıtları çıkar
     const firebaseRecords: WorkRecord[] = [];
+    const docs = snapshot.docs;
+    const total = docs.length;
+    onProgress?.(0, total);
 
-    for (const docSnap of snapshot.docs) {
+    for (let i = 0; i < docs.length; i++) {
+      const docSnap = docs[i];
       try {
-        const data = docSnap.data();
-        const date = data.date || docIdToDate(docSnap.id);
+        const data = docSnap.data() as Record<string, unknown>;
+        const dayRecords = parseFirestoreDocToRecords(docSnap.id, data);
+        firebaseRecords.push(...dayRecords);
 
-        // Tarih formatını doğrula
-        if (!date || !date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          console.warn('Geçersiz tarih formatı atlandı:', date, 'docId:', docSnap.id);
-          continue;
-        }
-
-        // Tatil ve yıllık izin bilgisini al
-        const isHoliday = data.isHoliday === true;
-        const isAnnualLeave = data.isAnnualLeave === true;
-
-        // Giriş kaydı
-        if (data.giris && data.girisTimestamp) {
-          firebaseRecords.push({
-            id: `firebase_${docSnap.id}_giris`,
-            type: 'giris',
-            timestamp: typeof data.girisTimestamp === 'number' ? data.girisTimestamp : Date.now(),
-            date,
-            time: String(data.giris),
-            synced: true,
-            isHoliday,
-            isAnnualLeave,
-          });
-        }
-
-        // Çıkış kaydı
-        if (data.cikis && data.cikisTimestamp) {
-          firebaseRecords.push({
-            id: `firebase_${docSnap.id}_cikis`,
-            type: 'cikis',
-            timestamp: typeof data.cikisTimestamp === 'number' ? data.cikisTimestamp : Date.now(),
-            date,
-            time: String(data.cikis),
-            synced: true,
-            isHoliday,
-            isAnnualLeave,
-          });
-        }
-
-        // Mola giriş kaydı
-        if (data.molaGiris && data.molaGirisTimestamp) {
-          firebaseRecords.push({
-            id: `firebase_${docSnap.id}_molagiris`,
-            type: 'molagiris',
-            timestamp: typeof data.molaGirisTimestamp === 'number' ? data.molaGirisTimestamp : Date.now(),
-            date,
-            time: String(data.molaGiris),
-            synced: true,
-          });
-        }
-
-        // Mola çıkış kaydı
-        if (data.molaCikis && data.molaCikisTimestamp) {
-          firebaseRecords.push({
-            id: `firebase_${docSnap.id}_molacikis`,
-            type: 'molacikis',
-            timestamp: typeof data.molaCikisTimestamp === 'number' ? data.molaCikisTimestamp : Date.now(),
-            date,
-            time: String(data.molaCikis),
-            synced: true,
-          });
-        }
-
-        // Mola ayarlarını geri yükle
-        if (typeof data.breakCounted === 'boolean') {
-          await setBreakCounted(date, data.breakCounted);
+        const date = (typeof data.date === 'string' ? data.date : docIdToDate(docSnap.id)) as string;
+        if (date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          if (typeof data.breakCounted === 'boolean') {
+            await setBreakCounted(date, data.breakCounted);
+          }
+          if (typeof data.breakDuration === 'number' && data.breakDuration >= 0) {
+            await setBreakDuration(date, data.breakDuration);
+          }
         }
       } catch (error) {
         Logger.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
-        // Hatalı belgeyi atla ve devam et
         continue;
       }
+      onProgress?.(i + 1, total);
     }
 
-    // Mevcut yerel kayıtları al
-    const localRecords = await getRecords();
+    const sortedFirebase = firebaseRecords.sort((a, b) => b.timestamp - a.timestamp);
 
-    // Firebase kayıtlarını yerel kayıtlarla birleştir (tekrarları önle)
-    const localKeys = new Set(localRecords.map(r => `${r.date}_${r.type}`));
-    const newRecords = firebaseRecords.filter(r => !localKeys.has(`${r.date}_${r.type}`));
+    if (options?.replaceLocal) {
+      await setRecords(sortedFirebase);
+      return { loaded: sortedFirebase.length };
+    }
+
+    const localRecords = await getRecords();
+    const localKeys = new Set(localRecords.map((r) => `${r.date}_${r.type}`));
+    const newRecords = sortedFirebase.filter((r) => !localKeys.has(`${r.date}_${r.type}`));
 
     if (newRecords.length > 0) {
       const mergedRecords = [...localRecords, ...newRecords].sort((a, b) => b.timestamp - a.timestamp);
@@ -312,6 +472,27 @@ export const loadFromFirebase = async (): Promise<{ loaded: number; notLoggedIn?
   } catch (error) {
     Logger.error('Firebase kayıtları alınırken hata:', error);
     return { loaded: 0 };
+  }
+};
+
+/** Bulutta yüklenebilir iş kaydı (giriş/çıkış) var mı */
+export const cloudHasWorkBackup = async (): Promise<boolean> => {
+  if (!isUserLoggedIn()) return false;
+  if (!(await isOnline())) return false;
+
+  const userCollection = getUserRecordsCollection();
+  if (!userCollection) return false;
+
+  try {
+    const snapshot = await getDocs(userCollection);
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data() as Record<string, unknown>;
+      if (data.giris || data.cikis) return true;
+    }
+    return false;
+  } catch (error) {
+    Logger.error('Bulut yedek kontrolü hatası:', error);
+    return false;
   }
 };
 
@@ -330,69 +511,10 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
 
     for (const docSnap of snapshot.docs) {
       try {
-        const data = docSnap.data();
-        const date = data.date || docIdToDate(docSnap.id);
-
-        // Tarih formatını doğrula
-        if (!date || !date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          console.warn('Geçersiz tarih formatı atlandı:', date, 'docId:', docSnap.id);
-          continue;
-        }
-
-        // Tatil bilgisi
-        const isHoliday = data.isHoliday === true;
-        const isAnnualLeave = data.isAnnualLeave === true;
-
-        if (data.giris && data.girisTimestamp) {
-          records.push({
-            id: `firebase_${docSnap.id}_giris`,
-            type: 'giris',
-            timestamp: typeof data.girisTimestamp === 'number' ? data.girisTimestamp : Date.now(),
-            date,
-            time: String(data.giris),
-            synced: true,
-            isHoliday,
-            isAnnualLeave,
-          });
-        }
-
-        if (data.cikis && data.cikisTimestamp) {
-          records.push({
-            id: `firebase_${docSnap.id}_cikis`,
-            type: 'cikis',
-            timestamp: typeof data.cikisTimestamp === 'number' ? data.cikisTimestamp : Date.now(),
-            date,
-            time: String(data.cikis),
-            synced: true,
-            isHoliday,
-            isAnnualLeave,
-          });
-        }
-
-        if (data.molaGiris && data.molaGirisTimestamp) {
-          records.push({
-            id: `firebase_${docSnap.id}_molagiris`,
-            type: 'molagiris',
-            timestamp: typeof data.molaGirisTimestamp === 'number' ? data.molaGirisTimestamp : Date.now(),
-            date,
-            time: String(data.molaGiris),
-            synced: true,
-          });
-        }
-
-        if (data.molaCikis && data.molaCikisTimestamp) {
-          records.push({
-            id: `firebase_${docSnap.id}_molacikis`,
-            type: 'molacikis',
-            timestamp: typeof data.molaCikisTimestamp === 'number' ? data.molaCikisTimestamp : Date.now(),
-            date,
-            time: String(data.molaCikis),
-            synced: true,
-          });
-        }
+        const data = docSnap.data() as Record<string, unknown>;
+        records.push(...parseFirestoreDocToRecords(docSnap.id, data));
       } catch (error) {
         Logger.error('Belge işlenirken hata:', error, 'docId:', docSnap.id);
-        // Hatalı belgeyi atla ve devam et
         continue;
       }
     }
@@ -404,48 +526,214 @@ export const getFirebaseRecords = async (): Promise<WorkRecord[]> => {
   }
 };
 
-// Standartları Firebase'e sync et
-export const syncStandards = async (): Promise<boolean> => {
-  if (!isUserLoggedIn()) return false;
-  const userId = getUserId();
-  if (!userId) return false;
+export type SyncStandardsOptions = { /** Buluttan doğrulamadan zorla yaz (manuel yedekleme) */ force?: boolean };
 
-  try {
-    const { getAppStandards } = await import('./storage');
-    const standards = await getAppStandards();
-    const standardsDocRef = doc(db, 'users', userId, 'settings', 'standards');
+export type SyncStandardsResult = { ok: boolean; skipped?: boolean; errorCode?: string };
 
-    await setDoc(standardsDocRef, {
-      ...standards,
-      updatedAt: serverTimestamp(),
-    });
+const readCloudAnnualLeave = (data: Record<string, unknown> | undefined): number | null =>
+  typeof data?.annualLeaveQuota === 'number' ? Math.round(data.annualLeaveQuota) : null;
 
-    return true;
-  } catch (error) {
-    Logger.error('Standartlar sync hatası:', error);
-    return false;
+const readCloudWorkStartDate = (data: Record<string, unknown> | undefined): string | null => {
+  const v = data?.workStartDate;
+  return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : null;
+};
+
+/** İşe başlama + yıllık izin bulutta yereldekiyle aynı mı? */
+const criticalSettingsMatchCloud = async (
+  userId: string,
+  standards: AppStandards
+): Promise<boolean> => {
+  const localQuota = Math.round(standards.annualLeaveQuota ?? 0);
+  const localDate = standards.workStartDate ?? null;
+
+  const refs = [
+    doc(db, 'users', userId, 'settings', 'profile'),
+    doc(db, 'users', userId, 'settings', 'standards'),
+    doc(db, 'users', userId),
+  ];
+
+  for (const ref of refs) {
+    const snap = await getDoc(ref);
+    if (!snap.exists()) continue;
+    const d = snap.data() as Record<string, unknown>;
+    if (readCloudAnnualLeave(d) === localQuota && readCloudWorkStartDate(d) === localDate) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const writeCriticalProfileDoc = async (userId: string, standards: AppStandards): Promise<void> => {
+  const profileRef = doc(db, 'users', userId, 'settings', 'profile');
+  const data: Record<string, unknown> = {
+    annualLeaveQuota: Math.max(0, Math.min(365, Math.round(standards.annualLeaveQuota ?? 0))),
+    updatedAt: Date.now(),
+  };
+  if (standards.workStartDate) {
+    data.workStartDate = standards.workStartDate;
+  }
+  await setDoc(profileRef, data, { merge: true });
+  if (!standards.workStartDate) {
+    await setDoc(profileRef, { workStartDate: deleteField() }, { merge: true });
   }
 };
 
-// Standartları Firebase'den yükle
+const verifyCriticalOnCloud = (
+  standards: AppStandards,
+  ...snaps: { exists: () => boolean; data: () => Record<string, unknown> | undefined }[]
+): boolean => {
+  const localQuota = Math.round(standards.annualLeaveQuota ?? 0);
+  const localDate = standards.workStartDate ?? null;
+
+  return snaps.some((snap) => {
+    if (!snap.exists()) return false;
+    const d = snap.data();
+    return readCloudAnnualLeave(d) === localQuota && readCloudWorkStartDate(d) === localDate;
+  });
+};
+
+/** Firestore'a yazılacak standartlar (işe başlama + yıllık izin dahil) */
+const parseWorkScheduleMode = (value: unknown): AppStandards['workScheduleMode'] =>
+  value === 'flexible' ? 'flexible' : 'fixed';
+
+const buildStandardsFirestorePayload = (standards: AppStandards): Record<string, unknown> => {
+  const payload: Record<string, unknown> = {
+    workScheduleMode: standards.workScheduleMode ?? 'fixed',
+    dailyWorkMinutes: standards.dailyWorkMinutes,
+    defaultBreakMinutes: standards.defaultBreakMinutes,
+    eveningThresholdMinutes: standards.eveningThresholdMinutes,
+    workingDays: standards.workingDays,
+    annualLeaveQuota: Math.max(0, Math.min(365, Math.round(standards.annualLeaveQuota ?? 0))),
+    extendedPastWeeks: (standards.extendedPastWeeks ?? []).filter((w) => /^\d{4}-\d{2}-\d{2}$/.test(w)),
+    updatedAt: Date.now(),
+  };
+  if (standards.workStartDate) {
+    payload.workStartDate = standards.workStartDate;
+  }
+  return payload;
+};
+
+const buildCriticalSettingsPayload = (standards: AppStandards): Record<string, unknown> => {
+  const payload: Record<string, unknown> = {
+    annualLeaveQuota: Math.max(0, Math.min(365, Math.round(standards.annualLeaveQuota ?? 0))),
+    settingsUpdatedAt: Date.now(),
+  };
+  if (standards.workStartDate) {
+    payload.workStartDate = standards.workStartDate;
+  }
+  return payload;
+};
+
+const parseStandardsFromFirestore = (data: Record<string, unknown>): AppStandards => {
+  const parsed: AppStandards = {
+    ...DEFAULT_STANDARDS,
+    workScheduleMode: parseWorkScheduleMode(data.workScheduleMode),
+    dailyWorkMinutes: typeof data.dailyWorkMinutes === 'number' ? data.dailyWorkMinutes : DEFAULT_STANDARDS.dailyWorkMinutes,
+    defaultBreakMinutes: typeof data.defaultBreakMinutes === 'number' ? data.defaultBreakMinutes : DEFAULT_STANDARDS.defaultBreakMinutes,
+    eveningThresholdMinutes: typeof data.eveningThresholdMinutes === 'number' ? data.eveningThresholdMinutes : DEFAULT_STANDARDS.eveningThresholdMinutes,
+    workingDays: Array.isArray(data.workingDays) ? (data.workingDays as number[]) : DEFAULT_STANDARDS.workingDays,
+    annualLeaveQuota: typeof data.annualLeaveQuota === 'number' ? Math.round(data.annualLeaveQuota) : 0,
+  };
+  if (typeof data.workStartDate === 'string' && data.workStartDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
+    parsed.workStartDate = data.workStartDate;
+  } else {
+    delete parsed.workStartDate;
+  }
+  if (Array.isArray(data.extendedPastWeeks)) {
+    parsed.extendedPastWeeks = data.extendedPastWeeks.filter(
+      (w): w is string => typeof w === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(w)
+    );
+  } else {
+    parsed.extendedPastWeeks = [];
+  }
+  return parsed;
+};
+
+// Standartları Firebase'e sync et (profile + settings/standards + users/{uid})
+export const syncStandards = async (options?: SyncStandardsOptions): Promise<SyncStandardsResult> => {
+  if (!isUserLoggedIn()) return { ok: false, errorCode: 'not-logged-in' };
+  if (!(await isOnline())) return { ok: false, errorCode: 'offline' };
+  const userId = getUserId();
+  if (!userId) return { ok: false, errorCode: 'no-user-id' };
+
+  try {
+    const { getAppStandards, saveSettingsSyncFingerprint } = await import('./storage');
+    const standards = await getAppStandards();
+
+    if (!options?.force && (await criticalSettingsMatchCloud(userId, standards))) {
+      return { ok: true, skipped: true };
+    }
+
+    const profileDocRef = doc(db, 'users', userId, 'settings', 'profile');
+    const standardsDocRef = doc(db, 'users', userId, 'settings', 'standards');
+    const userDocRef = doc(db, 'users', userId);
+    const payload = buildStandardsFirestorePayload(standards);
+    const critical = buildCriticalSettingsPayload(standards);
+
+    await writeCriticalProfileDoc(userId, standards);
+    await setDoc(standardsDocRef, payload, { merge: true });
+    await setDoc(userDocRef, critical, { merge: true });
+
+    if (!standards.workStartDate) {
+      await setDoc(standardsDocRef, { workStartDate: deleteField() }, { merge: true });
+      await setDoc(userDocRef, { workStartDate: deleteField() }, { merge: true });
+    }
+
+    const [profileSnap, standardsSnap, userSnap] = await Promise.all([
+      getDoc(profileDocRef),
+      getDoc(standardsDocRef),
+      getDoc(userDocRef),
+    ]);
+
+    if (verifyCriticalOnCloud(standards, profileSnap, standardsSnap, userSnap)) {
+      await saveSettingsSyncFingerprint(standards);
+      return { ok: true, skipped: false };
+    }
+
+    Logger.error('Kritik ayarlar bulutta doğrulanamadı:', {
+      localDate: standards.workStartDate,
+      localQuota: standards.annualLeaveQuota,
+      profile: profileSnap.data(),
+      standards: standardsSnap.data(),
+      user: userSnap.data(),
+    });
+    return { ok: false, errorCode: 'verify-failed' };
+  } catch (error) {
+    const errorCode = (error as { code?: string })?.code ?? 'unknown';
+    Logger.error('Standartlar sync hatası:', error);
+    return { ok: false, errorCode };
+  }
+};
+
+// Standartları Firebase'den yükle (settings/standards öncelikli, users/{uid} yedek)
 export const loadStandardsFromFirebase = async (): Promise<boolean> => {
   if (!isUserLoggedIn()) return false;
+  if (!(await isOnline())) return false;
   const userId = getUserId();
   if (!userId) return false;
 
   try {
     const standardsDocRef = doc(db, 'users', userId, 'settings', 'standards');
-    const docSnap = await getDoc(standardsDocRef);
+    const userDocRef = doc(db, 'users', userId);
+    const [standardsSnap, userSnap] = await Promise.all([getDoc(standardsDocRef), getDoc(userDocRef)]);
 
-    if (docSnap.exists()) {
-      const { setAppStandards } = await import('./storage');
-      const data = docSnap.data();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { updatedAt, ...standards } = data;
-      await setAppStandards(standards);
-      return true;
+    if (!standardsSnap.exists() && !userSnap.exists()) {
+      return false;
     }
-    return false;
+
+    const profileDocRef = doc(db, 'users', userId, 'settings', 'profile');
+    const profileSnap = await getDoc(profileDocRef);
+
+    const merged: Record<string, unknown> = {
+      ...(userSnap.exists() ? (userSnap.data() as Record<string, unknown>) : {}),
+      ...(standardsSnap.exists() ? (standardsSnap.data() as Record<string, unknown>) : {}),
+      ...(profileSnap.exists() ? (profileSnap.data() as Record<string, unknown>) : {}),
+    };
+
+    const { setAppStandards } = await import('./storage');
+    const parsed = parseStandardsFromFirestore(merged);
+    await setAppStandards(parsed, { replace: true });
+    return true;
   } catch (error) {
     Logger.error('Standartlar yükleme hatası:', error);
     return false;

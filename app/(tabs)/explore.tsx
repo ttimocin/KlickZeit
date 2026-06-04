@@ -1,9 +1,12 @@
 import { useModal } from '@/components/custom-modal';
+import { SyncProgressModal, SyncProgressState } from '@/components/sync-progress-modal';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { exportToCSV, exportToExcel, exportToPDF, getDailySummaries, importFromCSV } from '@/services/export';
-import { addHolidayRecord, getAppStandards, getBreakCounted, getBreakDuration, removeHolidayRecord, setBreakCounted, setBreakDuration, upsertRecordByDateType } from '@/services/storage';
+import { getWeekKeysFromWorkStart } from '@/services/extended-weeks';
+import { formatBackupCompleteMessage } from '@/utils/backup-message';
+import { addHolidayRecord, getAppStandards, getBreakCounted, getBreakDuration, isFlexibleSchedule, removeHolidayRecord, setBreakCounted, setBreakDuration, upsertRecordByDateType } from '@/services/storage';
 import { DailySummary } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -62,6 +65,7 @@ interface WeekData {
   totalOvertime: number;
   totalOvertimeText: string;
   isCurrentWeek: boolean;
+  isExtendedPast?: boolean;
 }
 
 // Haftanın başlangıç tarihini al (Pazartesi)
@@ -80,6 +84,12 @@ const formatDateStr = (date: Date): string => {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+};
+
+// YYYY-MM-DD → yerel gece yarısı (UTC parse bugünü gelecek sayabiliyordu)
+const parseLocalDate = (dateStr: string): Date => {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
 };
 
 // Süreyi dakikadan saat:dakika formatına çevir
@@ -113,6 +123,63 @@ const fullDayNames: Record<string, string[]> = {
 // JS getDay (0=Pazar..6=Cumartesi) -> Pazartesi bazlı indeks (0=Pzt..6=Paz)
 const jsDayToMondayIndex = (jsDay: number): number => jsDay === 0 ? 6 : jsDay - 1;
 
+const buildWeekData = (
+  weekStart: Date,
+  weekKey: string,
+  lang: string,
+  sortedWorkingDays: number[],
+  isCurrentWeek: boolean,
+  isExtendedPast: boolean
+): WeekData => {
+  const firstWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[0]);
+  const lastWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[sortedWorkingDays.length - 1]);
+  const weekDisplayStart = new Date(weekStart);
+  weekDisplayStart.setDate(weekDisplayStart.getDate() + firstWorkDayOffset);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + lastWorkDayOffset);
+
+  const dateRange = `${weekDisplayStart.getDate()}.${weekDisplayStart.getMonth() + 1} - ${weekEnd.getDate()}.${weekEnd.getMonth() + 1}`;
+  let weekLabel: string;
+  if (isCurrentWeek) {
+    weekLabel = `${i18n.t('thisWeek')} (${dateRange})`;
+  } else if (isExtendedPast) {
+    weekLabel = `${i18n.t('pastWeek')} (${dateRange})`;
+  } else {
+    weekLabel = dateRange;
+  }
+
+  return {
+    weekStart: weekKey,
+    weekEnd: formatDateStr(weekEnd),
+    weekLabel,
+    days: sortedWorkingDays.map((jsDay) => {
+      const mondayIdx = jsDayToMondayIndex(jsDay);
+      const dayDate = new Date(weekStart);
+      dayDate.setDate(dayDate.getDate() + mondayIdx);
+      return {
+        dayName: fullDayNames[lang]?.[mondayIdx] || fullDayNames.tr[mondayIdx],
+        shortName: shortDayNames[lang]?.[mondayIdx] || shortDayNames.tr[mondayIdx],
+        date: formatDateStr(dayDate),
+        giris: null,
+        cikis: null,
+        duration: 0,
+        durationText: '-',
+        overtime: 0,
+        overtimeText: '-',
+        isHoliday: false,
+        isAnnualLeave: false,
+        breakCounted: false,
+      };
+    }),
+    totalMinutes: 0,
+    totalText: '-',
+    totalOvertime: 0,
+    totalOvertimeText: '-',
+    isCurrentWeek,
+    isExtendedPast,
+  };
+};
+
 export default function RecordsScreen() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -122,6 +189,12 @@ export default function RecordsScreen() {
   const [summaries, setSummaries] = useState<DailySummary[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<SyncProgressState & { title: string }>({
+    visible: false,
+    current: 0,
+    total: 0,
+    title: '',
+  });
   const [breakCountedMap, setBreakCountedMap] = useState<Record<string, boolean>>({});
   const [breakDurationMap, setBreakDurationMap] = useState<Record<string, number>>({});
   const [editDayModalVisible, setEditDayModalVisible] = useState(false);
@@ -130,7 +203,8 @@ export default function RecordsScreen() {
   const [editingCikis, setEditingCikis] = useState<string>('');
   const [editingIsHoliday, setEditingIsHoliday] = useState(false);
   const [editingIsAnnualLeave, setEditingIsAnnualLeave] = useState(false);
-  const [editingBreakCounted, setEditingBreakCounted] = useState(false);
+  /** Açık = mola net çalışmadan düşülür (storage: breakCounted = false) */
+  const [editingDeductBreak, setEditingDeductBreak] = useState(true);
   const [editingBreakDuration, setEditingBreakDuration] = useState<string>('30');
   const [editingMolaGiris, setEditingMolaGiris] = useState<string>('');
   const [editingMolaCikis, setEditingMolaCikis] = useState<string>('');
@@ -144,13 +218,16 @@ export default function RecordsScreen() {
   const [workingDays, setWorkingDays] = useState<number[]>([1, 2, 3, 4, 5]);
   const [workStartDate, setWorkStartDate] = useState<string | undefined>(undefined);
   const [annualLeaveQuota, setAnnualLeaveQuota] = useState(0);
+  const [isFlexible, setIsFlexible] = useState(false);
 
   const loadSummaries = useCallback(async () => {
     // Standartları yükle
     const standards = await getAppStandards();
+    const flexible = isFlexibleSchedule(standards);
+    setIsFlexible(flexible);
     setDailyWorkMinutes(standards.dailyWorkMinutes);
     setWeeklyWorkMinutes(standards.dailyWorkMinutes * (standards.workingDays || [1, 2, 3, 4, 5]).length);
-    setBreakMinutes(standards.defaultBreakMinutes);
+    setBreakMinutes(flexible ? 0 : standards.defaultBreakMinutes);
     setEveningThresholdMinutes(standards.eveningThresholdMinutes);
     setWorkingDays(standards.workingDays || [1, 2, 3, 4, 5]);
     setWorkStartDate(standards.workStartDate);
@@ -197,12 +274,13 @@ export default function RecordsScreen() {
     // Tatil günlerinde veya mola sayılıyorsa mola düşme
     let netDuration = (isHoliday || breakCounted) ? grossDuration : grossDuration - breakDurationMinutes;
 
-    // Yıllık izin ise tam çalışma günü say
-    if (isAnnualLeave) {
+    // Yıllık izin: hedef süreli modda tam gün; esnek modda kayıtlı süre
+    if (isAnnualLeave && !isFlexible) {
       netDuration = dailyWorkMinutes;
     }
 
-    const overtime = isAnnualLeave ? 0 : netDuration - dailyWorkMinutes;
+    const overtime =
+      isFlexible || isAnnualLeave ? 0 : netDuration - dailyWorkMinutes;
 
     return { duration: grossDuration, netDuration: netDuration > 0 ? netDuration : 0, overtime };
   };
@@ -211,11 +289,9 @@ export default function RecordsScreen() {
   const handleDayPress = async (day: WeekDayData) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Gelecek tarihler için işlem yapma
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dayDate = new Date(day.date);
-    if (dayDate > today) {
+    // Gelecek tarihler için işlem yapma (bugün düzenlenebilir)
+    const todayStr = formatDateStr(new Date());
+    if (day.date > todayStr) {
       return;
     }
 
@@ -229,7 +305,7 @@ export default function RecordsScreen() {
     setEditingCikis(day.cikis || '');
     setEditingIsHoliday(day.isHoliday);
     setEditingIsAnnualLeave(day.isAnnualLeave);
-    setEditingBreakCounted(currentBreakCounted);
+    setEditingDeductBreak(!currentBreakCounted);
     setEditingBreakDuration(String(currentBreakDuration));
     setEditingMolaGiris(summary?.molaGiris || '');
     setEditingMolaCikis(summary?.molaCikis || '');
@@ -255,56 +331,16 @@ export default function RecordsScreen() {
 
     // Summaries'den haftalık veri oluştur
     for (const summary of summaries) {
-      const date = new Date(summary.date);
+      const date = parseLocalDate(summary.date);
       const weekStart = getWeekStart(date);
       const weekKey = formatDateStr(weekStart);
 
       if (!weeks.has(weekKey)) {
-        // Haftanın ilk ve son çalışma günlerini bul
-        const firstWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[0]);
-        const lastWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[sortedWorkingDays.length - 1]);
-        const weekDisplayStart = new Date(weekStart);
-        weekDisplayStart.setDate(weekDisplayStart.getDate() + firstWorkDayOffset);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + lastWorkDayOffset);
-
         const isCurrentWeek = weekKey === formatDateStr(currentWeekStart);
-
-        // Hafta etiketi oluştur
-        const dateRange = `${weekDisplayStart.getDate()}.${weekDisplayStart.getMonth() + 1} - ${weekEnd.getDate()}.${weekEnd.getMonth() + 1}`;
-        const weekLabel = isCurrentWeek
-          ? `${i18n.t('thisWeek')} (${dateRange})`
-          : dateRange;
-
-        weeks.set(weekKey, {
-          weekStart: weekKey,
-          weekEnd: formatDateStr(weekEnd),
-          weekLabel,
-          days: sortedWorkingDays.map((jsDay) => {
-            const mondayIdx = jsDayToMondayIndex(jsDay);
-            const dayDate = new Date(weekStart);
-            dayDate.setDate(dayDate.getDate() + mondayIdx);
-            return {
-              dayName: fullDayNames[lang]?.[mondayIdx] || fullDayNames.tr[mondayIdx],
-              shortName: shortDayNames[lang]?.[mondayIdx] || shortDayNames.tr[mondayIdx],
-              date: formatDateStr(dayDate),
-              giris: null,
-              cikis: null,
-              duration: 0,
-              durationText: '-',
-              overtime: 0,
-              overtimeText: '-',
-              isHoliday: false,
-              isAnnualLeave: false,
-              breakCounted: false,
-            };
-          }),
-          totalMinutes: 0,
-          totalText: '-',
-          totalOvertime: 0,
-          totalOvertimeText: '-',
-          isCurrentWeek,
-        });
+        weeks.set(
+          weekKey,
+          buildWeekData(weekStart, weekKey, lang, sortedWorkingDays, isCurrentWeek, false)
+        );
       }
 
       // Bu günün verilerini ekle
@@ -316,6 +352,7 @@ export default function RecordsScreen() {
         week.days[dayIndex].giris = summary.giris || null;
         week.days[dayIndex].cikis = summary.cikis || null;
         week.days[dayIndex].isHoliday = summary.isHoliday || false;
+        week.days[dayIndex].isAnnualLeave = summary.isAnnualLeave || false;
         week.days[dayIndex].breakCounted = breakCountedMap[summary.date] || false;
 
         const breakDur = breakDurationMap[summary.date] ?? 0;
@@ -341,57 +378,39 @@ export default function RecordsScreen() {
     for (const week of weeks.values()) {
       if (week.totalMinutes > 0) {
         week.totalText = formatDuration(week.totalMinutes);
-        week.totalOvertime = week.totalMinutes - weeklyWorkMinutes;
-        week.totalOvertimeText = formatOvertime(week.totalOvertime);
+        if (!isFlexible) {
+          week.totalOvertime = week.totalMinutes - weeklyWorkMinutes;
+          week.totalOvertimeText = formatOvertime(week.totalOvertime);
+        }
+      }
+    }
+
+    // İşe başlama tarihinden bugüne tüm haftalar (boş tablolarla doldurulabilir)
+    if (workStartDate) {
+      const weekKeysFromStart = getWeekKeysFromWorkStart(workStartDate, today);
+      for (const weekKey of weekKeysFromStart) {
+        if (!weeks.has(weekKey)) {
+          const weekStart = parseLocalDate(weekKey);
+          const isCurrentWeek = weekKey === formatDateStr(currentWeekStart);
+          weeks.set(
+            weekKey,
+            buildWeekData(weekStart, weekKey, lang, sortedWorkingDays, isCurrentWeek, false)
+          );
+        }
       }
     }
 
     // Güncel hafta yoksa ekle
     const currentWeekKey = formatDateStr(currentWeekStart);
     if (!weeks.has(currentWeekKey)) {
-      const firstWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[0]);
-      const lastWorkDayOffset = jsDayToMondayIndex(sortedWorkingDays[sortedWorkingDays.length - 1]);
-      const weekDisplayStart = new Date(currentWeekStart);
-      weekDisplayStart.setDate(weekDisplayStart.getDate() + firstWorkDayOffset);
-      const weekEnd = new Date(currentWeekStart);
-      weekEnd.setDate(weekEnd.getDate() + lastWorkDayOffset);
-
-      const dateRange = `${weekDisplayStart.getDate()}.${weekDisplayStart.getMonth() + 1} - ${weekEnd.getDate()}.${weekEnd.getMonth() + 1}`;
-      const weekLabel = `${i18n.t('thisWeek')} (${dateRange})`;
-
-      weeks.set(currentWeekKey, {
-        weekStart: currentWeekKey,
-        weekEnd: formatDateStr(weekEnd),
-        weekLabel,
-        days: sortedWorkingDays.map((jsDay) => {
-          const mondayIdx = jsDayToMondayIndex(jsDay);
-          const dayDate = new Date(currentWeekStart);
-          dayDate.setDate(dayDate.getDate() + mondayIdx);
-          return {
-            dayName: fullDayNames[lang]?.[mondayIdx] || fullDayNames.tr[mondayIdx],
-            shortName: shortDayNames[lang]?.[mondayIdx] || shortDayNames.tr[mondayIdx],
-            date: formatDateStr(dayDate),
-            giris: null,
-            cikis: null,
-            duration: 0,
-            durationText: '-',
-            overtime: 0,
-            overtimeText: '-',
-            isHoliday: false,
-            isAnnualLeave: false,
-            breakCounted: false,
-          };
-        }),
-        totalMinutes: 0,
-        totalText: '-',
-        totalOvertime: 0,
-        totalOvertimeText: '-',
-        isCurrentWeek: true,
-      });
+      weeks.set(
+        currentWeekKey,
+        buildWeekData(currentWeekStart, currentWeekKey, lang, sortedWorkingDays, true, false)
+      );
     }
 
     return Array.from(weeks.values()).sort((a, b) => b.weekStart.localeCompare(a.weekStart));
-  }, [summaries, language, breakCountedMap, breakDurationMap, workingDays, dailyWorkMinutes, weeklyWorkMinutes, breakMinutes]);
+  }, [summaries, language, breakCountedMap, breakDurationMap, workingDays, dailyWorkMinutes, weeklyWorkMinutes, breakMinutes, workStartDate, isFlexible]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -467,26 +486,56 @@ export default function RecordsScreen() {
 
   const handleSync = async () => {
     setSyncing(true);
+    setSyncProgress({
+      visible: true,
+      current: 0,
+      total: 0,
+      title: i18n.t('backupInProgress'),
+    });
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
-    const result = await syncAllPendingRecords();
-    await syncStandards();
-
-    if (result.notLoggedIn) {
-      showInfo(i18n.t('info'), i18n.t('loginToSync'));
-    } else if (result.success > 0 || result.failed > 0) {
-      showModal({
-        title: i18n.t('syncComplete'),
-        message: `${i18n.t('successful')}: ${result.success}\n${i18n.t('failed')}: ${result.failed}`,
-        icon: result.failed > 0 ? '⚠️' : '☁️',
-        buttons: [{ text: 'Tamam', style: 'default' }],
+    try {
+      const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
+      const result = await syncAllPendingRecords((current, total) => {
+        setSyncProgress({
+          visible: true,
+          current,
+          total,
+          title: i18n.t('backupInProgress'),
+        });
       });
-    } else {
-      showInfo(i18n.t('info'), i18n.t('noRecordsToSync'));
-    }
 
-    setSyncing(false);
+      if (result.notLoggedIn) {
+        showInfo(i18n.t('info'), i18n.t('loginToSync'));
+        return;
+      }
+      if (result.offline) {
+        showInfo(i18n.t('info'), i18n.t('noInternetConnection'));
+        return;
+      }
+
+      if (result.nothingToSync) {
+        setSyncProgress({ visible: true, current: 1, total: 1, title: i18n.t('backupInProgress') });
+      }
+      const standardsResult = await syncStandards({ force: true });
+      const { title, message, isWarning } = formatBackupCompleteMessage(result, standardsResult);
+
+      if (result.nothingToSync && standardsResult.ok && standardsResult.skipped) {
+        showInfo(title, message);
+      } else if (result.success > 0 || result.failed > 0 || !standardsResult.skipped) {
+        showModal({
+          title,
+          message,
+          icon: isWarning ? '⚠️' : '☁️',
+          buttons: [{ text: 'Tamam', style: 'default' }],
+        });
+      } else {
+        showInfo(i18n.t('info'), i18n.t('noRecordsToSync'));
+      }
+    } finally {
+      setSyncProgress((prev) => ({ ...prev, visible: false }));
+      setSyncing(false);
+    }
   };
 
   // Ay adları
@@ -502,8 +551,57 @@ export default function RecordsScreen() {
     uk: ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'],
   };
 
-  // Aylık bakiye hesapla (20:00 sonrası mesai dahil)
+  // Aylık bakiye / çalışma süresi hesapla (20:00 sonrası mesai dahil)
   const monthlyBalances = useMemo(() => {
+    const lang = language || 'tr';
+    const names = monthNames[lang] || monthNames.tr;
+
+    if (isFlexible) {
+      const monthsMap = new Map<string, { totalMinutes: number; dayCount: number; year: number; month: number; eveningMinutes: number }>();
+      const EVENING_THRESHOLD = eveningThresholdMinutes;
+
+      for (const week of weeklyData) {
+        for (const day of week.days) {
+          if (day.duration <= 0) continue;
+          const date = parseLocalDate(day.date);
+          const year = date.getFullYear();
+          const month = date.getMonth();
+          const key = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+          if (!monthsMap.has(key)) {
+            monthsMap.set(key, { totalMinutes: 0, dayCount: 0, year, month, eveningMinutes: 0 });
+          }
+          const entry = monthsMap.get(key)!;
+          entry.totalMinutes += day.duration;
+          entry.dayCount += 1;
+
+          if (day.cikis) {
+            const [cH, cM] = day.cikis.split(':').map(Number);
+            const cikisMinutes = cH * 60 + cM;
+            if (cikisMinutes > EVENING_THRESHOLD) {
+              entry.eveningMinutes += cikisMinutes - EVENING_THRESHOLD;
+            }
+          }
+        }
+      }
+
+      return Array.from(monthsMap.entries())
+        .map(([key, data]) => ({
+          key,
+          monthName: names[data.month],
+          year: data.year,
+          month: data.month,
+          totalMinutes: data.totalMinutes,
+          targetMinutes: 0,
+          dayCount: data.dayCount,
+          balance: 0,
+          balanceText: '-',
+          eveningMinutes: data.eveningMinutes,
+          eveningText: formatDuration(data.eveningMinutes),
+        }))
+        .sort((a, b) => b.key.localeCompare(a.key));
+    }
+
     const monthsMap = new Map<string, { totalMinutes: number; targetMinutes: number; dayCount: number; year: number; month: number; eveningMinutes: number }>();
 
     const today = new Date();
@@ -530,7 +628,7 @@ export default function RecordsScreen() {
     if (!effectiveStartStr) return [];
 
     // workStartDate'ten dünkü güne kadar tüm günleri gez
-    let current = new Date(effectiveStartStr);
+    let current = parseLocalDate(effectiveStartStr);
     current.setHours(0, 0, 0, 0);
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -572,9 +670,6 @@ export default function RecordsScreen() {
       current.setDate(current.getDate() + 1);
     }
 
-    const lang = language || 'tr';
-    const names = monthNames[lang] || monthNames.tr;
-
     const result = Array.from(monthsMap.entries()).map(([key, data]) => {
       const balance = data.totalMinutes - data.targetMinutes;
       return {
@@ -593,14 +688,23 @@ export default function RecordsScreen() {
     }).sort((a, b) => b.key.localeCompare(a.key));
 
     return result;
-  }, [weeklyData, language, workStartDate, workingDays, dailyWorkMinutes, eveningThresholdMinutes, summaries]);
+  }, [weeklyData, language, workStartDate, workingDays, dailyWorkMinutes, eveningThresholdMinutes, summaries, isFlexible]);
 
-  // Tüm ayların toplam bakiyesi
+  // Tüm ayların toplam bakiyesi veya toplam çalışma
   const cumulativeBalance = useMemo(() => {
     if (monthlyBalances.length === 0) return null;
     const totalMinutes = monthlyBalances.reduce((sum, m) => sum + m.totalMinutes, 0);
-    const targetMinutes = monthlyBalances.reduce((sum, m) => sum + m.targetMinutes, 0);
     const dayCount = monthlyBalances.reduce((sum, m) => sum + m.dayCount, 0);
+    if (isFlexible) {
+      return {
+        totalMinutes,
+        targetMinutes: 0,
+        dayCount,
+        balance: 0,
+        balanceText: formatDuration(totalMinutes),
+      };
+    }
+    const targetMinutes = monthlyBalances.reduce((sum, m) => sum + m.targetMinutes, 0);
     const balance = totalMinutes - targetMinutes;
     return {
       totalMinutes,
@@ -609,12 +713,36 @@ export default function RecordsScreen() {
       balance,
       balanceText: formatOvertime(balance),
     };
-  }, [monthlyBalances]);
+  }, [monthlyBalances, isFlexible]);
+
+  // Esnek mod: bu ayın özeti (üst kart)
+  const currentMonthFlexible = useMemo(() => {
+    if (!isFlexible) return null;
+    const now = new Date();
+    const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const lang = language || 'tr';
+    const names = monthNames[lang] || monthNames.tr;
+    const entry = monthlyBalances.find((m) => m.key === key);
+    const minutes = entry?.totalMinutes ?? 0;
+    return {
+      title: `${names[now.getMonth()]} ${now.getFullYear()}`,
+      minutes,
+      display: formatDuration(minutes),
+      dayCount: entry?.dayCount ?? 0,
+    };
+  }, [monthlyBalances, isFlexible, language]);
+
+  const flexibleTotalWorkText = useMemo(() => {
+    if (!isFlexible) return null;
+    const totalMinutes = monthlyBalances.reduce((sum, m) => sum + m.totalMinutes, 0);
+    return formatDuration(totalMinutes);
+  }, [monthlyBalances, isFlexible]);
 
   const styles = createStyles(isDark);
 
-  // Saat renklendirmesi - geç kalma veya erken çıkış kontrolü
+  // Saat renklendirmesi - geç kalma veya erken çıkış kontrolü (esnek modda nötr)
   const getTimeColor = (time: string | null, type: 'giris' | 'cikis'): string => {
+    if (isFlexible) return isDark ? '#e5e5e5' : '#1a1a1a';
     if (!time) return isDark ? '#999' : '#ccc';
 
     const [hours, minutes] = time.split(':').map(Number);
@@ -639,10 +767,12 @@ export default function RecordsScreen() {
   const renderWeekCard = (week: WeekData) => (
     <View key={week.weekStart} style={[styles.weekCard, week.isCurrentWeek && styles.currentWeekCard]}>
       <View style={styles.weekHeader}>
-        <Text style={styles.weekLabel}>{week.weekLabel}</Text>
+        <View style={styles.weekLabelRow}>
+          <Text style={styles.weekLabel}>{week.weekLabel}</Text>
+        </View>
         <View style={styles.weekTotalContainer}>
           <Text style={styles.weekTotalValue}>{week.totalText}</Text>
-          {week.totalMinutes > 0 && (
+          {!isFlexible && week.totalMinutes > 0 && (
             <Text style={[
               styles.weekTotalOvertime,
               week.totalOvertime >= 0 ? styles.weekOvertimePositive : styles.weekOvertimeNegative
@@ -667,16 +797,18 @@ export default function RecordsScreen() {
         <View style={styles.headerDurationCell}>
           <Text style={styles.headerText} numberOfLines={1}>{i18n.t('duration')}</Text>
         </View>
-        <View style={styles.headerOvertimeCell}>
-          <Text style={styles.headerText} numberOfLines={1}>±</Text>
-        </View>
+        {!isFlexible && (
+          <View style={styles.headerOvertimeCell}>
+            <Text style={styles.headerText} numberOfLines={1}>±</Text>
+          </View>
+        )}
       </View>
 
       {/* Günler - Satır bazlı görünüm */}
       <View style={styles.daysContainer}>
         {week.days.slice().reverse().map((day, i) => {
-          const isLateEntry = day.giris && getTimeColor(day.giris, 'giris') === '#ef4444';
-          const isEarlyExit = day.cikis && getTimeColor(day.cikis, 'cikis') === '#ef4444';
+          const isLateEntry = !isFlexible && day.giris && getTimeColor(day.giris, 'giris') === '#ef4444';
+          const isEarlyExit = !isFlexible && day.cikis && getTimeColor(day.cikis, 'cikis') === '#ef4444';
 
           return (
             <TouchableOpacity
@@ -693,7 +825,7 @@ export default function RecordsScreen() {
               {/* Gün adı - Sol */}
               <View style={styles.dayNameContainer}>
                 <Text style={styles.dayName}>
-                  {new Date(day.date).toLocaleDateString(i18n.locale, { day: 'numeric', month: 'short' })} {day.shortName}
+                  {parseLocalDate(day.date).toLocaleDateString(i18n.locale, { day: 'numeric', month: 'short' })} {day.shortName}
                 </Text>
                 {day.isHoliday && (
                   <View style={styles.holidayTag}>
@@ -712,13 +844,13 @@ export default function RecordsScreen() {
                 {day.giris ? (
                   <View style={[
                     styles.timeBadge,
-                    isLateEntry && styles.timeBadgeError,
-                    !isLateEntry && styles.timeBadgeSuccess
+                    !isFlexible && isLateEntry && styles.timeBadgeError,
+                    !isFlexible && !isLateEntry && styles.timeBadgeSuccess
                   ]}>
                     <Text style={[
                       styles.timeText,
-                      isLateEntry && styles.timeTextError,
-                      !isLateEntry && styles.timeTextSuccess
+                      !isFlexible && isLateEntry && styles.timeTextError,
+                      !isFlexible && !isLateEntry && styles.timeTextSuccess
                     ]}>
                       {day.giris}
                     </Text>
@@ -733,13 +865,13 @@ export default function RecordsScreen() {
                 {day.cikis ? (
                   <View style={[
                     styles.timeBadge,
-                    isEarlyExit && styles.timeBadgeError,
-                    !isEarlyExit && styles.timeBadgeSuccess
+                    !isFlexible && isEarlyExit && styles.timeBadgeError,
+                    !isFlexible && !isEarlyExit && styles.timeBadgeSuccess
                   ]}>
                     <Text style={[
                       styles.timeText,
-                      isEarlyExit && styles.timeTextError,
-                      !isEarlyExit && styles.timeTextSuccess
+                      !isFlexible && isEarlyExit && styles.timeTextError,
+                      !isFlexible && !isEarlyExit && styles.timeTextSuccess
                     ]}>
                       {day.cikis}
                     </Text>
@@ -760,19 +892,21 @@ export default function RecordsScreen() {
               </View>
 
               {/* Fazla/Eksik */}
-              <View style={styles.overtimeCell}>
-                {day.duration > 0 ? (
-                  <Text style={[
-                    styles.overtimeText,
-                    day.overtime > 0 && styles.overtimeTextPositive,
-                    day.overtime < 0 && styles.overtimeTextNegative
-                  ]}>
-                    {day.overtimeText}
-                  </Text>
-                ) : (
-                  <Text style={styles.overtimeEmpty}>-</Text>
-                )}
-              </View>
+              {!isFlexible && (
+                <View style={styles.overtimeCell}>
+                  {day.duration > 0 ? (
+                    <Text style={[
+                      styles.overtimeText,
+                      day.overtime > 0 && styles.overtimeTextPositive,
+                      day.overtime < 0 && styles.overtimeTextNegative
+                    ]}>
+                      {day.overtimeText}
+                    </Text>
+                  ) : (
+                    <Text style={styles.overtimeEmpty}>-</Text>
+                  )}
+                </View>
+              )}
             </TouchableOpacity>
           );
         })}
@@ -794,13 +928,19 @@ export default function RecordsScreen() {
       </View>
 
 
-      {/* Güncel Bakiye */}
-      {cumulativeBalance && (
+      {/* Güncel Bakiye / Bu ayki çalışma (esnek) */}
+      {(isFlexible ? currentMonthFlexible : cumulativeBalance) && (
         <View style={styles.totalBalanceContainer}>
           <View style={styles.totalBalanceHeaderRow}>
             <View style={styles.totalBalanceHeader}>
-              <Text style={styles.totalBalanceTitle}>{i18n.t('totalBalance')}</Text>
-              <Text style={styles.totalBalanceDesc}>{i18n.t('totalBalanceDesc')}</Text>
+              <Text style={styles.totalBalanceTitle}>
+                {isFlexible && currentMonthFlexible
+                  ? currentMonthFlexible.title
+                  : i18n.t('totalBalance')}
+              </Text>
+              <Text style={styles.totalBalanceDesc}>
+                {isFlexible ? i18n.t('thisMonthWorkTimeDesc') : i18n.t('totalBalanceDesc')}
+              </Text>
             </View>
             <TouchableOpacity
               style={styles.detailsHeaderButton}
@@ -815,18 +955,28 @@ export default function RecordsScreen() {
             <View style={styles.totalBalanceValueContainer}>
               <Text style={[
                 styles.totalBalanceValue,
-                cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
+                isFlexible
+                  ? { color: isDark ? '#e5e5e5' : '#1a1a1a' }
+                  : cumulativeBalance.balance >= 0
+                    ? styles.totalBalancePositive
+                    : styles.totalBalanceNegative
               ]}>
-                {cumulativeBalance.balanceText} {i18n.t('minuteShort')}
+                {isFlexible && currentMonthFlexible
+                  ? currentMonthFlexible.display
+                  : `${cumulativeBalance!.balanceText} ${i18n.t('minuteShort')}`}
               </Text>
-              <Text style={styles.totalBalanceLabel}>
-                {cumulativeBalance.balance >= 0 ? i18n.t('inPlus') : i18n.t('inMinus')}
-              </Text>
+              {!isFlexible && cumulativeBalance && (
+                <Text style={styles.totalBalanceLabel}>
+                  {cumulativeBalance.balance >= 0 ? i18n.t('inPlus') : i18n.t('inMinus')}
+                </Text>
+              )}
             </View>
 
             <View style={styles.totalBalanceDetails}>
               <Text style={styles.totalBalanceDetailText}>
-                {cumulativeBalance.dayCount} {i18n.t('day')}
+                {isFlexible && currentMonthFlexible
+                  ? `${currentMonthFlexible.dayCount} ${i18n.t('day')}`
+                  : `${cumulativeBalance!.dayCount} ${i18n.t('day')}`}
               </Text>
               <Text style={styles.totalBalanceDetailSubtext}>
                 {i18n.t('workedDays')}
@@ -856,7 +1006,9 @@ export default function RecordsScreen() {
           <View style={styles.detailsModalContainer}>
             {/* Modal Header */}
             <View style={styles.detailsModalHeader}>
-              <Text style={styles.detailsModalTitle}>{i18n.t('monthlyDetails')}</Text>
+              <Text style={styles.detailsModalTitle}>
+                {isFlexible ? i18n.t('monthlyWorkTime') : i18n.t('monthlyDetails')}
+              </Text>
               <TouchableOpacity
                 onPress={() => setDetailsModalVisible(false)}
                 style={styles.detailsModalClose}
@@ -875,15 +1027,22 @@ export default function RecordsScreen() {
                   {/* Ay başlığı */}
                   <View style={styles.detailsMonthHeader}>
                     <Text style={styles.detailsMonthTitle}>{m.monthName} {m.year}</Text>
-                    <Text style={[
-                      styles.detailsMonthBalance,
-                      m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
-                    ]}>
-                      {m.balanceText} {i18n.t('minuteShort')}
-                    </Text>
+                    {isFlexible ? (
+                      <Text style={[styles.detailsMonthBalance, { color: isDark ? '#e5e5e5' : '#1a1a1a' }]}>
+                        {formatDuration(m.totalMinutes)}
+                      </Text>
+                    ) : (
+                      <Text style={[
+                        styles.detailsMonthBalance,
+                        m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
+                      ]}>
+                        {m.balanceText} {i18n.t('minuteShort')}
+                      </Text>
+                    )}
                   </View>
 
                   {/* Ay detayları */}
+                  {!isFlexible && (
                   <View style={styles.detailsMonthBody}>
                     <View style={styles.detailsMonthStat}>
                       <Text style={styles.detailsMonthStatLabel}>{i18n.t('worked')}</Text>
@@ -898,6 +1057,7 @@ export default function RecordsScreen() {
                       <Text style={styles.detailsMonthStatValue}>{m.dayCount}</Text>
                     </View>
                   </View>
+                  )}
 
                   {/* 20:00 sonrası çalışma */}
                   {m.eveningMinutes > 0 && (
@@ -911,6 +1071,16 @@ export default function RecordsScreen() {
                   )}
                 </View>
               ))}
+              {isFlexible && (
+                <View style={[styles.detailsMonthCard, styles.detailsTotalCard]}>
+                  <View style={styles.detailsMonthHeader}>
+                    <Text style={styles.detailsMonthTitle}>{i18n.t('totalWorkTime')}</Text>
+                    <Text style={[styles.detailsMonthBalance, { color: isDark ? '#e5e5e5' : '#1a1a1a' }]}>
+                      {flexibleTotalWorkText}
+                    </Text>
+                  </View>
+                </View>
+              )}
             </ScrollView>
           </View>
         </View>
@@ -1023,6 +1193,12 @@ export default function RecordsScreen() {
       </ScrollView>
 
       {/* Custom Modal */}
+      <SyncProgressModal
+        visible={syncProgress.visible}
+        title={syncProgress.title}
+        current={syncProgress.current}
+        total={syncProgress.total}
+      />
       <ModalComponent />
 
       {/* Day Edit Modal */}
@@ -1103,7 +1279,7 @@ export default function RecordsScreen() {
                     />
                   </View>
 
-                  {/* Mola Sayılıyor Toggle */}
+                  {/* Mola düşümü */}
                   <View style={styles.modalSection}>
                     <View style={styles.modalRow}>
                       <View style={styles.modalRowContent}>
@@ -1111,16 +1287,16 @@ export default function RecordsScreen() {
                         <Text style={styles.modalDesc}>{i18n.t('breakCountedDesc')}</Text>
                       </View>
                       <Switch
-                        value={editingBreakCounted}
-                        onValueChange={setEditingBreakCounted}
+                        value={editingDeductBreak}
+                        onValueChange={setEditingDeductBreak}
                         trackColor={{ false: isDark ? '#333' : '#ddd', true: '#10b981' }}
-                        thumbColor={editingBreakCounted ? '#fff' : '#f4f3f4'}
+                        thumbColor={editingDeductBreak ? '#fff' : '#f4f3f4'}
                       />
                     </View>
                   </View>
 
                   {/* Mola Süresi */}
-                  <View style={styles.modalSection}>
+                  <View style={[styles.modalSection, !editingDeductBreak && { opacity: 0.45 }]}>
                     <Text style={styles.modalLabel}>{i18n.t('breakDuration')}</Text>
                     <View style={styles.durationInputContainer}>
                       <TextInput
@@ -1137,6 +1313,7 @@ export default function RecordsScreen() {
                         keyboardType="numeric"
                         placeholder="30"
                         placeholderTextColor={isDark ? '#666' : '#999'}
+                        editable={editingDeductBreak}
                       />
                       <Text style={styles.durationUnit}>{i18n.t('breakDurationMinutes')}</Text>
                     </View>
@@ -1206,7 +1383,7 @@ export default function RecordsScreen() {
 
                       // Mola bilgilerini kaydet
                       const duration = parseInt(editingBreakDuration, 10) || breakMinutes;
-                      await setBreakCounted(editingDate, editingBreakCounted);
+                      await setBreakCounted(editingDate, !editingDeductBreak);
                       await setBreakDuration(editingDate, duration);
 
                       // Mola kayıtlarını güncelle (eğer varsa)
@@ -1393,6 +1570,12 @@ const createStyles = (isDark: boolean) =>
       padding: 14,
       marginBottom: 10,
     },
+    detailsTotalCard: {
+      marginTop: 8,
+      marginBottom: 24,
+      borderWidth: 1,
+      borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+    },
     detailsMonthHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
@@ -1558,7 +1741,15 @@ const createStyles = (isDark: boolean) =>
       alignItems: 'flex-start',
       marginBottom: 24,
     },
+    weekLabelRow: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingRight: 8,
+    },
     weekLabel: {
+      flex: 1,
       fontSize: 16,
       fontWeight: '800',
       color: isDark ? '#fff' : '#1a1a1a',

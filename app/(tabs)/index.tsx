@@ -1,4 +1,4 @@
-﻿import SnakeGame from '@/components/SnakeGame';
+import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
 import TetrisGame from '@/components/TetrisGame';
 import { useAuth } from '@/context/AuthContext';
@@ -199,7 +199,9 @@ export default function HomeScreen() {
 
     const success = await addRecord(record);
     if (success) {
-      await syncToFirebase(record);
+      if (user && !user.isAnonymous) {
+        await syncToFirebase(record);
+      }
       await loadRecords();
     }
 
@@ -230,7 +232,9 @@ export default function HomeScreen() {
 
     const success = await addRecord(record);
     if (success) {
-      await syncToFirebase(record);
+      if (user && !user.isAnonymous) {
+        await syncToFirebase(record);
+      }
 
       // Mola süresini hesapla ve kaydet
       if (lastBreakRecord) {
@@ -282,8 +286,9 @@ export default function HomeScreen() {
     const success = await addRecord(record);
 
     if (success) {
-      // Firebase'e senkronize et
-      await syncToFirebase(record);
+      if (user && !user.isAnonymous) {
+        await syncToFirebase(record);
+      }
 
       // Bildirim gönder (sadece telefon/saat bildirimi, popup yok)
       if (isCheckIn) {

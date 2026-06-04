@@ -1,9 +1,11 @@
 import { useModal } from '@/components/custom-modal';
+import { SyncProgressModal, SyncProgressState } from '@/components/sync-progress-modal';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { AppStandards, DEFAULT_STANDARDS, getAppStandards, setAppStandards } from '@/services/storage';
+import { formatBackupCompleteMessage } from '@/utils/backup-message';
 import { getUserCode } from '@/services/user-code';
 import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -48,6 +50,12 @@ export default function SettingsScreen() {
   const userCode = getUserCode();
 
   const [isSyncing, setIsSyncing] = useState(false);
+  const [syncProgress, setSyncProgress] = useState<SyncProgressState & { title: string }>({
+    visible: false,
+    current: 0,
+    total: 0,
+    title: '',
+  });
 
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -60,13 +68,18 @@ export default function SettingsScreen() {
   }, []);
 
   const updateStandard = async (key: keyof AppStandards, value: number | string | undefined) => {
-    const updated = { ...standards, [key]: value };
+    const current = await getAppStandards();
+    const updated: AppStandards = { ...current, [key]: value } as AppStandards;
+    if (key === 'workStartDate' && value === undefined) {
+      delete updated.workStartDate;
+    }
     setStandards(updated);
     await setAppStandards(updated);
 
-    // Firebase'e yedekle
     const { syncStandards } = await import('@/services/firebase-sync');
-    await syncStandards();
+    const forceCloud =
+      key === 'workStartDate' || key === 'annualLeaveQuota';
+    await syncStandards({ force: forceCloud });
   };
 
   const handleLogout = async () => {
@@ -83,40 +96,117 @@ export default function SettingsScreen() {
 
   const handleSyncToCloud = async () => {
     setIsSyncing(true);
-    const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
-    const result = await syncAllPendingRecords();
-    await syncStandards();
-    setIsSyncing(false);
-
-    showModal({
-      title: i18n.t('syncComplete'),
-      message: `${i18n.t('successful')}: ${result.success}\n${i18n.t('failed')}: ${result.failed}`,
-      icon: result.failed > 0 ? '⚠️' : '☁️',
-      buttons: [{ text: 'OK', style: 'default' }],
+    setSyncProgress({
+      visible: true,
+      current: 0,
+      total: 0,
+      title: i18n.t('backupInProgress'),
     });
+    try {
+      const { syncAllPendingRecords, syncStandards } = await import('@/services/firebase-sync');
+      const result = await syncAllPendingRecords((current, total) => {
+        setSyncProgress({
+          visible: true,
+          current,
+          total,
+          title: i18n.t('backupInProgress'),
+        });
+      });
+
+      if (result.notLoggedIn) {
+        showModal({
+          title: i18n.t('info'),
+          message: i18n.t('loginToSync'),
+          icon: 'ℹ️',
+          buttons: [{ text: 'OK', style: 'default' }],
+        });
+        return;
+      }
+      if (result.offline) {
+        showModal({
+          title: i18n.t('info'),
+          message: i18n.t('noInternetConnection'),
+          icon: '📡',
+          buttons: [{ text: 'OK', style: 'default' }],
+        });
+        return;
+      }
+
+      if (result.nothingToSync) {
+        setSyncProgress({ visible: true, current: 1, total: 1, title: i18n.t('backupInProgress') });
+      }
+      const standardsResult = await syncStandards({ force: true });
+      const { title, message, isWarning } = formatBackupCompleteMessage(result, standardsResult);
+      showModal({
+        title,
+        message,
+        icon: isWarning ? '⚠️' : '☁️',
+        buttons: [{ text: 'OK', style: 'default' }],
+      });
+    } finally {
+      setSyncProgress((prev) => ({ ...prev, visible: false }));
+      setIsSyncing(false);
+    }
   };
 
   const handleLoadFromCloud = async () => {
     setIsSyncing(true);
-    const { loadFromFirebase, loadStandardsFromFirebase } = await import('@/services/firebase-sync');
-    const result = await loadFromFirebase();
-    const standardsLoaded = await loadStandardsFromFirebase();
-    setIsSyncing(false);
-
-    if (standardsLoaded) {
-      const { getAppStandards } = await import('@/services/storage');
-      const updated = await getAppStandards();
-      setStandards(updated);
-    }
-
-    showModal({
-      title: i18n.t('info'),
-      message: result.loaded > 0 || standardsLoaded
-        ? `${result.loaded} ${i18n.t('recordsLoaded')}${standardsLoaded ? ` & ${i18n.t('settingsRestored')}` : ''}`
-        : i18n.t('noNewRecords'),
-      icon: result.loaded > 0 || standardsLoaded ? '✅' : 'ℹ️',
-      buttons: [{ text: 'OK', style: 'default' }],
+    setSyncProgress({
+      visible: true,
+      current: 0,
+      total: 0,
+      title: i18n.t('restoreInProgress'),
     });
+    try {
+      const { loadFromFirebase, loadStandardsFromFirebase } = await import('@/services/firebase-sync');
+      const result = await loadFromFirebase({ replaceLocal: true }, (current, total) => {
+        setSyncProgress({
+          visible: true,
+          current,
+          total,
+          title: i18n.t('restoreInProgress'),
+        });
+      });
+
+      if (result.notLoggedIn) {
+        showModal({
+          title: i18n.t('info'),
+          message: i18n.t('loginToSync'),
+          icon: 'ℹ️',
+          buttons: [{ text: 'OK', style: 'default' }],
+        });
+        return;
+      }
+      if (result.offline) {
+        showModal({
+          title: i18n.t('info'),
+          message: i18n.t('noInternetConnection'),
+          icon: '📡',
+          buttons: [{ text: 'OK', style: 'default' }],
+        });
+        return;
+      }
+
+      const standardsLoaded = await loadStandardsFromFirebase();
+
+      if (standardsLoaded) {
+        const { getAppStandards } = await import('@/services/storage');
+        const updated = await getAppStandards();
+        setStandards(updated);
+      }
+
+      showModal({
+        title: i18n.t('info'),
+        message: result.loaded > 0 || standardsLoaded
+          ? `${result.loaded} ${i18n.t('recordsLoaded')}${standardsLoaded ? ` & ${i18n.t('settingsRestored')}` : ''}`
+          : i18n.t('noNewRecords'),
+        icon: result.loaded > 0 || standardsLoaded ? '✅' : 'ℹ️',
+        buttons: [{ text: 'OK', style: 'default' }],
+      });
+    } finally {
+      setSyncProgress((prev) => ({ ...prev, visible: false }));
+      setIsSyncing(false);
+    }
   };
 
   const handleLanguageChange = async (langCode: 'tr' | 'en' | 'de' | 'fr' | 'pt' | 'ar' | 'zh' | 'ru' | 'uk') => {
@@ -232,7 +322,36 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{i18n.t('standards')}</Text>
 
+          {/* Çalışma modu */}
+          <View style={[styles.standardRow, { borderBottomWidth: 0, flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
+            <View style={styles.standardInfo}>
+              <Ionicons name="options-outline" size={20} color={isDark ? '#60a5fa' : '#2563eb'} />
+              <View style={styles.standardTextGroup}>
+                <Text style={styles.standardLabel}>{i18n.t('workScheduleMode')}</Text>
+                <Text style={styles.standardHint}>{i18n.t('workScheduleModeHint')}</Text>
+              </View>
+            </View>
+            <View style={styles.dayToggleRow}>
+              {(['fixed', 'flexible'] as const).map((mode) => {
+                const isActive = (standards.workScheduleMode ?? 'fixed') === mode;
+                return (
+                  <TouchableOpacity
+                    key={mode}
+                    style={[styles.dayToggleButton, isActive && styles.dayToggleButtonActive, { flex: 1 }]}
+                    onPress={() => updateStandard('workScheduleMode', mode)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.dayToggleText, isActive && styles.dayToggleTextActive]}>
+                      {mode === 'fixed' ? i18n.t('workScheduleFixed') : i18n.t('workScheduleFlexible')}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+
           {/* Günlük Çalışma Süresi */}
+          {(standards.workScheduleMode ?? 'fixed') !== 'flexible' && (
           <View style={styles.standardRow}>
             <View style={styles.standardInfo}>
               <Ionicons name="time-outline" size={20} color={isDark ? '#4CAF50' : '#388E3C'} />
@@ -263,8 +382,10 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
           </View>
+          )}
 
           {/* Varsayılan Mola Süresi */}
+          {(standards.workScheduleMode ?? 'fixed') !== 'flexible' && (
           <View style={styles.standardRow}>
             <View style={styles.standardInfo}>
               <Ionicons name="cafe-outline" size={20} color={isDark ? '#f59e0b' : '#e67e22'} />
@@ -293,6 +414,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
             </View>
           </View>
+          )}
 
           {/* Akşam Mesai Saati */}
           <View style={styles.standardRow}>
@@ -480,7 +602,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('about')}</Text>
           <View style={styles.aboutCard}>
             <Text style={styles.appName}>KlickZeit</Text>
-            <Text style={styles.appVersion}>v1.0.1</Text>
+            <Text style={styles.appVersion}>v1.0.2</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
 
@@ -587,8 +709,13 @@ export default function SettingsScreen() {
         </View>
       </ScrollView >
 
-      {/* Custom Modal */}
-      < ModalComponent />
+      <SyncProgressModal
+        visible={syncProgress.visible}
+        title={syncProgress.title}
+        current={syncProgress.current}
+        total={syncProgress.total}
+      />
+      <ModalComponent />
     </View >
   );
 }

@@ -43,6 +43,9 @@ firebase-debug.log
 fir*.keystore
 !debug.keystore
 android/key.properties
+android/app/upload-keystore.jks
+*.jks
+!android/app/debug.keystore
 
 # IDE
 .vscode/

@@ -18,7 +18,7 @@ export interface DailySummary {
   calismaSuresi?: string;
   isHoliday?: boolean;
   isAnnualLeave?: boolean; // Yıllık izin mi?
-  breakCounted?: boolean; // Mola sayılıyor mu? (true ise mola düşülmez)
+  breakCounted?: boolean; // true = mola çalışma sayılır (düşülmez); false/eksik = mola düşülür
   molaGiris?: string; // İlk mola giriş saati
   molaCikis?: string; // Son mola çıkış saati
 }

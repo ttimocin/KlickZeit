@@ -5,7 +5,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import * as XLSX from 'xlsx';
-import { getAppStandards, getBreakCounted, getBreakDuration, getRecords, setBreakCounted, setBreakDuration, upsertRecordByDateType } from './storage';
+import { getAppStandards, getBreakCounted, getBreakDuration, getRecords, isFlexibleSchedule, markAllRecordsUnsynced, setBreakCounted, setBreakDuration, upsertRecordByDateType } from './storage';
 
 // Kayıtları günlük özete dönüştür
 const groupByDate = async (records: WorkRecord[]): Promise<DailySummary[]> => {
@@ -73,7 +73,12 @@ const groupByDate = async (records: WorkRecord[]): Promise<DailySummary[]> => {
 };
 
 // CSV formatına dönüştür (Excel uyumlu)
-const toCSV = (summaries: DailySummary[], dailyTarget: number, defaultBreakMinutes: number): string => {
+const toCSV = (
+  summaries: DailySummary[],
+  dailyTarget: number,
+  defaultBreakMinutes: number,
+  skipBalance = false
+): string => {
   // BOM (Byte Order Mark) - Excel'in UTF-8 karakterleri doğru göstermesi için
   const BOM = '\uFEFF';
 
@@ -108,24 +113,26 @@ const toCSV = (summaries: DailySummary[], dailyTarget: number, defaultBreakMinut
           const netMinutes = netDiff % 60;
           netSure = `${netHours}:${String(netMinutes).padStart(2, '0')}`;
 
-          // Bakiye hesapla (net - hedef)
-          const balanceMin = netDiff - DAILY_TARGET;
-          const absBalance = Math.abs(balanceMin);
-          const bH = Math.floor(absBalance / 60);
-          const bM = absBalance % 60;
-          const sign = balanceMin >= 0 ? '+' : '-';
-          bakiye = `${sign}${bH}:${String(bM).padStart(2, '0')}`;
+          if (!skipBalance) {
+            const balanceMin = netDiff - DAILY_TARGET;
+            const absBalance = Math.abs(balanceMin);
+            const bH = Math.floor(absBalance / 60);
+            const bM = absBalance % 60;
+            const sign = balanceMin >= 0 ? '+' : '-';
+            bakiye = `${sign}${bH}:${String(bM).padStart(2, '0')}`;
+          }
         } else {
           netSure = '0:00';
-          const balanceMin = 0 - DAILY_TARGET;
-          const absBalance = Math.abs(balanceMin);
-          const bH = Math.floor(absBalance / 60);
-          const bM = absBalance % 60;
-          bakiye = `-${bH}:${String(bM).padStart(2, '0')}`;
+          if (!skipBalance) {
+            const balanceMin = 0 - DAILY_TARGET;
+            const absBalance = Math.abs(balanceMin);
+            const bH = Math.floor(absBalance / 60);
+            const bM = absBalance % 60;
+            bakiye = `-${bH}:${String(bM).padStart(2, '0')}`;
+          }
         }
 
-        // Yıllık izin kontrolü
-        if (s.isAnnualLeave) {
+        if (!skipBalance && s.isAnnualLeave) {
           const hours = Math.floor(DAILY_TARGET / 60);
           const mins = DAILY_TARGET % 60;
           netSure = `${hours}:${String(mins).padStart(2, '0')}`;
@@ -157,7 +164,12 @@ export const exportToCSV = async (): Promise<boolean> => {
 
     const summaries = await groupByDate(records);
     const standards = await getAppStandards();
-    const csv = toCSV(summaries, standards.dailyWorkMinutes, standards.defaultBreakMinutes);
+    const csv = toCSV(
+      summaries,
+      standards.dailyWorkMinutes,
+      standards.defaultBreakMinutes,
+      isFlexibleSchedule(standards)
+    );
 
     const fileName = `KlickZeit_${new Date().toISOString().split('T')[0]}.csv`;
     const filePath = `${FileSystem.documentDirectory}${fileName}`;
@@ -190,6 +202,7 @@ export const exportToPDF = async (): Promise<boolean> => {
     const standards = await getAppStandards();
     const defaultBreakMinutes = standards.defaultBreakMinutes;
     const DAILY_TARGET = standards.dailyWorkMinutes;
+    const skipBalance = isFlexibleSchedule(standards);
 
     // HTML tablo oluştur
     const rows = summaries.map(s => {
@@ -208,14 +221,18 @@ export const exportToPDF = async (): Promise<boolean> => {
           const netDiff = breakCounted ? diff : (diff - breakDuration);
           if (netDiff > 0) {
             netSure = `${Math.floor(netDiff / 60)}:${String(netDiff % 60).padStart(2, '0')}`;
-            const balanceMin = netDiff - DAILY_TARGET;
-            const absB = Math.abs(balanceMin);
-            bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            if (!skipBalance) {
+              const balanceMin = netDiff - DAILY_TARGET;
+              const absB = Math.abs(balanceMin);
+              bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            }
           } else {
             netSure = '0:00';
-            const balanceMin = 0 - DAILY_TARGET;
-            const absB = Math.abs(balanceMin);
-            bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            if (!skipBalance) {
+              const balanceMin = 0 - DAILY_TARGET;
+              const absB = Math.abs(balanceMin);
+              bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            }
           }
         }
       }
@@ -307,6 +324,7 @@ export const exportToExcel = async (): Promise<boolean> => {
     const summaries = await groupByDate(records);
     const standards = await getAppStandards();
     const DAILY_TARGET = standards.dailyWorkMinutes;
+    const skipBalance = isFlexibleSchedule(standards);
 
     // Satırları oluştur
     const data = summaries.map(s => {
@@ -325,18 +343,21 @@ export const exportToExcel = async (): Promise<boolean> => {
           const netDiff = breakCounted ? diff : (diff - breakDuration);
           if (netDiff > 0) {
             netSure = `${Math.floor(netDiff / 60)}:${String(netDiff % 60).padStart(2, '0')}`;
-            const balanceMin = netDiff - DAILY_TARGET;
-            const absB = Math.abs(balanceMin);
-            bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            if (!skipBalance) {
+              const balanceMin = netDiff - DAILY_TARGET;
+              const absB = Math.abs(balanceMin);
+              bakiye = `${balanceMin >= 0 ? '+' : '-'}${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            }
           } else {
             netSure = '0:00';
-            const balanceMin = 0 - DAILY_TARGET;
-            const absB = Math.abs(balanceMin);
-            bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            if (!skipBalance) {
+              const balanceMin = 0 - DAILY_TARGET;
+              const absB = Math.abs(balanceMin);
+              bakiye = `-${Math.floor(absB / 60)}:${String(absB % 60).padStart(2, '0')}`;
+            }
           }
 
-          // Yıllık izin kontrolü
-          if (s.isAnnualLeave) {
+          if (!skipBalance && s.isAnnualLeave) {
             const hours = Math.floor(DAILY_TARGET / 60);
             const mins = DAILY_TARGET % 60;
             netSure = `${hours}:${String(mins).padStart(2, '0')}`;
@@ -563,6 +584,8 @@ export const importFromCSV = async (): Promise<{ success: boolean; imported: num
         else if (result.action === 'updated') updated++;
       }
     }
+
+    await markAllRecordsUnsynced();
 
     return { success: true, imported, updated };
   } catch (error) {

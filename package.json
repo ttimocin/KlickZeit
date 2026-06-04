@@ -1,6 +1,6 @@
 {
   "name": "klickzeit",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Ücretsiz ve reklamsız iş takip uygulaması - Tek tuşla giriş/çıkış kaydı",
   "main": "expo-router/entry",
   "repository": {

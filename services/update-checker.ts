@@ -3,7 +3,7 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import { Alert, BackHandler, Linking } from 'react-native';
 
 // Mevcut uygulama versiyonu (app.json'dan alınmalı)
-const CURRENT_VERSION = '1.0.0';
+const CURRENT_VERSION = '1.0.2';
 
 // Versiyon karşılaştırma (1.0.0 formatı)
 const compareVersions = (v1: string, v2: string): number => {
