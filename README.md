@@ -124,7 +124,7 @@ KlickZeit, işe giriş-çıkış saatlerinizi kolayca takip etmenizi sağlayan, 
 
 4. **Google Sign-In Yapılandırması (Opsiyonel)**
    
-   Android için `google-services.json` dosyasını Firebase Console'dan indirip proje kök dizinine ekleyin.
+   Android için `google-services.json` dosyasını Firebase Console'dan indirip proje **kök dizinine** ekleyin (`google-services.json.example` şablonuna bakın). Bu dosya Git'e dahil değildir; `app.config.js` build sırasında `android/app/` ve `wear/app/` altına kopyalar. EAS Build için `GOOGLE_SERVICES_JSON` secret'ı kullanılabilir.
 
 5. **Uygulamayı başlatın**
    ```bash

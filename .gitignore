@@ -35,8 +35,10 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# Firebase
-# google-services.json  # Geçici olarak commit edildi (EAS build için)
+# Firebase (yerel / EAS secret — repoya eklemeyin)
+google-services.json
+android/app/google-services.json
+wear/app/google-services.json
 firebase-debug.log
 fir*.keystore
 !debug.keystore
