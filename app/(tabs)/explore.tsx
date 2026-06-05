@@ -6,7 +6,7 @@ import i18n from '@/i18n';
 import { exportToCSV, exportToExcel, exportToPDF, getDailySummaries, importFromCSV } from '@/services/export';
 import { getWeekKeysFromWorkStart } from '@/services/extended-weeks';
 import { formatBackupCompleteMessage } from '@/utils/backup-message';
-import { addHolidayRecord, getAppStandards, getBreakCounted, getBreakDuration, isFlexibleSchedule, removeHolidayRecord, setBreakCounted, setBreakDuration, upsertRecordByDateType } from '@/services/storage';
+import { addHolidayRecord, addAnnualLeaveRecord, clearDayRecords, deleteRecordByDateType, getAppStandards, getAverageWorkMinutes, getBreakCounted, getBreakDuration, isFlexibleSchedule, removeAnnualLeaveRecord, removeHolidayRecord, setBreakCounted, setBreakDuration, upsertRecordByDateType } from '@/services/storage';
 import { DailySummary } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -14,6 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import React, { useCallback, useMemo, useState } from 'react';
 import {
+  Alert,
   Modal,
   Platform,
   RefreshControl,
@@ -218,6 +219,7 @@ export default function RecordsScreen() {
   const [workingDays, setWorkingDays] = useState<number[]>([1, 2, 3, 4, 5]);
   const [workStartDate, setWorkStartDate] = useState<string | undefined>(undefined);
   const [annualLeaveQuota, setAnnualLeaveQuota] = useState(0);
+  const [averageWorkMinutes, setAverageWorkMinutes] = useState(480);
   const [isFlexible, setIsFlexible] = useState(false);
 
   const loadSummaries = useCallback(async () => {
@@ -232,6 +234,7 @@ export default function RecordsScreen() {
     setWorkingDays(standards.workingDays || [1, 2, 3, 4, 5]);
     setWorkStartDate(standards.workStartDate);
     setAnnualLeaveQuota(standards.annualLeaveQuota || 0);
+    setAverageWorkMinutes(getAverageWorkMinutes(standards));
     const data = await getDailySummaries();
     setSummaries(data);
 
@@ -274,9 +277,11 @@ export default function RecordsScreen() {
     // Tatil günlerinde veya mola sayılıyorsa mola düşme
     let netDuration = (isHoliday || breakCounted) ? grossDuration : grossDuration - breakDurationMinutes;
 
-    // Yıllık izin: hedef süreli modda tam gün; esnek modda kayıtlı süre
+    // Yıllık izin: sabit modda günlük hedef; esnek modda ortalama çalışma süresi
     if (isAnnualLeave && !isFlexible) {
       netDuration = dailyWorkMinutes;
+    } else if (isAnnualLeave && isFlexible) {
+      netDuration = averageWorkMinutes;
     }
 
     const overtime =
@@ -312,12 +317,78 @@ export default function RecordsScreen() {
     setEditDayModalVisible(true);
   };
 
-  // Kullanılan yıllık izin sayısı
-  const usedAnnualLeave = useMemo(() => {
-    return summaries.filter(s => s.isAnnualLeave).length;
-  }, [summaries]);
+  const handleClearDay = () => {
+    if (!editingDate) return;
+    Alert.alert(i18n.t('clearDay'), i18n.t('clearDayConfirm'), [
+      { text: i18n.t('cancel'), style: 'cancel' },
+      {
+        text: i18n.t('remove'),
+        style: 'destructive',
+        onPress: async () => {
+          await clearDayRecords(editingDate);
+          await loadSummaries();
+          setEditDayModalVisible(false);
+        },
+      },
+    ]);
+  };
 
-  const remainingAnnualLeave = annualLeaveQuota - usedAnnualLeave;
+  const saveEditedDay = async () => {
+    if (!editingDate) return;
+
+    if (editingIsHoliday) {
+      await addHolidayRecord(editingDate);
+    } else if (editingIsAnnualLeave) {
+      await addAnnualLeaveRecord(editingDate);
+    } else {
+      await removeHolidayRecord(editingDate);
+      await removeAnnualLeaveRecord(editingDate);
+
+      const giris = editingGiris.trim();
+      const cikis = editingCikis.trim();
+      const molaGiris = editingMolaGiris.trim();
+      const molaCikis = editingMolaCikis.trim();
+      const hasWorkData = giris || cikis || molaGiris || molaCikis;
+
+      if (!hasWorkData) {
+        await clearDayRecords(editingDate);
+      } else {
+        if (giris) {
+          await upsertRecordByDateType(editingDate, 'giris', giris);
+        } else {
+          await deleteRecordByDateType(editingDate, 'giris');
+        }
+        if (cikis) {
+          await upsertRecordByDateType(editingDate, 'cikis', cikis);
+        } else {
+          await deleteRecordByDateType(editingDate, 'cikis');
+        }
+        if (molaGiris) {
+          await upsertRecordByDateType(editingDate, 'molagiris', molaGiris);
+        } else {
+          await deleteRecordByDateType(editingDate, 'molagiris');
+        }
+        if (molaCikis) {
+          await upsertRecordByDateType(editingDate, 'molacikis', molaCikis);
+        } else {
+          await deleteRecordByDateType(editingDate, 'molacikis');
+        }
+
+        const duration = parseInt(editingBreakDuration, 10) || breakMinutes;
+        await setBreakCounted(editingDate, !editingDeductBreak);
+        await setBreakDuration(editingDate, duration);
+      }
+    }
+
+    await loadSummaries();
+    setEditDayModalVisible(false);
+  };
+
+  const usedAnnualLeave = useMemo(
+    () => summaries.filter((s) => s.isAnnualLeave).length,
+    [summaries]
+  );
+  const remainingAnnualLeave = Math.max(0, annualLeaveQuota - usedAnnualLeave);
 
   // Haftalık verileri hesapla
   const weeklyData = useMemo((): WeekData[] => {
@@ -410,7 +481,7 @@ export default function RecordsScreen() {
     }
 
     return Array.from(weeks.values()).sort((a, b) => b.weekStart.localeCompare(a.weekStart));
-  }, [summaries, language, breakCountedMap, breakDurationMap, workingDays, dailyWorkMinutes, weeklyWorkMinutes, breakMinutes, workStartDate, isFlexible]);
+  }, [summaries, language, breakCountedMap, breakDurationMap, workingDays, dailyWorkMinutes, averageWorkMinutes, weeklyWorkMinutes, breakMinutes, workStartDate, isFlexible]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -594,6 +665,7 @@ export default function RecordsScreen() {
           totalMinutes: data.totalMinutes,
           targetMinutes: 0,
           dayCount: data.dayCount,
+          workedDayCount: data.dayCount,
           balance: 0,
           balanceText: '-',
           eveningMinutes: data.eveningMinutes,
@@ -602,7 +674,7 @@ export default function RecordsScreen() {
         .sort((a, b) => b.key.localeCompare(a.key));
     }
 
-    const monthsMap = new Map<string, { totalMinutes: number; targetMinutes: number; dayCount: number; year: number; month: number; eveningMinutes: number }>();
+    const monthsMap = new Map<string, { totalMinutes: number; targetMinutes: number; dayCount: number; workedDayCount: number; year: number; month: number; eveningMinutes: number }>();
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -642,7 +714,7 @@ export default function RecordsScreen() {
       const isWorkingDay = workingDays.includes(dayOfWeek);
 
       if (!monthsMap.has(key)) {
-        monthsMap.set(key, { totalMinutes: 0, targetMinutes: 0, dayCount: 0, year, month, eveningMinutes: 0 });
+        monthsMap.set(key, { totalMinutes: 0, targetMinutes: 0, dayCount: 0, workedDayCount: 0, year, month, eveningMinutes: 0 });
       }
 
       const entry = monthsMap.get(key)!;
@@ -656,6 +728,7 @@ export default function RecordsScreen() {
       const dayData = dayDataByDate.get(dateStr);
       if (dayData && dayData.duration > 0) {
         entry.totalMinutes += dayData.duration;
+        entry.workedDayCount += 1;
       }
 
       // 20:00 sonrası çalışma hesapla
@@ -680,6 +753,7 @@ export default function RecordsScreen() {
         totalMinutes: data.totalMinutes,
         targetMinutes: data.targetMinutes,
         dayCount: data.dayCount,
+        workedDayCount: data.workedDayCount,
         balance,
         balanceText: formatOvertime(balance),
         eveningMinutes: data.eveningMinutes,
@@ -715,9 +789,8 @@ export default function RecordsScreen() {
     };
   }, [monthlyBalances, isFlexible]);
 
-  // Esnek mod: bu ayın özeti (üst kart)
-  const currentMonthFlexible = useMemo(() => {
-    if (!isFlexible) return null;
+  // Bu ayın özeti (üst kart — her iki mod)
+  const currentMonthSummary = useMemo(() => {
     const now = new Date();
     const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const lang = language || 'tr';
@@ -728,15 +801,24 @@ export default function RecordsScreen() {
       title: `${names[now.getMonth()]} ${now.getFullYear()}`,
       minutes,
       display: formatDuration(minutes),
-      dayCount: entry?.dayCount ?? 0,
+      workedDayCount: entry?.workedDayCount ?? entry?.dayCount ?? 0,
     };
-  }, [monthlyBalances, isFlexible, language]);
+  }, [monthlyBalances, language]);
 
   const flexibleTotalWorkText = useMemo(() => {
     if (!isFlexible) return null;
     const totalMinutes = monthlyBalances.reduce((sum, m) => sum + m.totalMinutes, 0);
     return formatDuration(totalMinutes);
   }, [monthlyBalances, isFlexible]);
+
+  const flexibleTotalDayCount = useMemo(() => {
+    if (!isFlexible) return 0;
+    return monthlyBalances.reduce((sum, m) => sum + m.dayCount, 0);
+  }, [monthlyBalances, isFlexible]);
+
+  const detailsTotalWorkedDays = useMemo(() => {
+    return monthlyBalances.reduce((sum, m) => sum + (m.workedDayCount ?? m.dayCount), 0);
+  }, [monthlyBalances]);
 
   const styles = createStyles(isDark);
 
@@ -844,6 +926,7 @@ export default function RecordsScreen() {
                 {day.giris ? (
                   <View style={[
                     styles.timeBadge,
+                    isFlexible && styles.timeBadgeNeutral,
                     !isFlexible && isLateEntry && styles.timeBadgeError,
                     !isFlexible && !isLateEntry && styles.timeBadgeSuccess
                   ]}>
@@ -865,6 +948,7 @@ export default function RecordsScreen() {
                 {day.cikis ? (
                   <View style={[
                     styles.timeBadge,
+                    isFlexible && styles.timeBadgeNeutral,
                     !isFlexible && isEarlyExit && styles.timeBadgeError,
                     !isFlexible && !isEarlyExit && styles.timeBadgeSuccess
                   ]}>
@@ -928,72 +1012,46 @@ export default function RecordsScreen() {
       </View>
 
 
-      {/* Güncel Bakiye / Bu ayki çalışma (esnek) */}
-      {(isFlexible ? currentMonthFlexible : cumulativeBalance) && (
-        <View style={styles.totalBalanceContainer}>
-          <View style={styles.totalBalanceHeaderRow}>
-            <View style={styles.totalBalanceHeader}>
-              <Text style={styles.totalBalanceTitle}>
-                {isFlexible && currentMonthFlexible
-                  ? currentMonthFlexible.title
-                  : i18n.t('totalBalance')}
-              </Text>
-              <Text style={styles.totalBalanceDesc}>
-                {isFlexible ? i18n.t('thisMonthWorkTimeDesc') : i18n.t('totalBalanceDesc')}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={styles.detailsHeaderButton}
-              onPress={() => setDetailsModalVisible(true)}
-              activeOpacity={0.7}
-            >
-              <Text style={styles.detailsHeaderButtonText}>{i18n.t('details')}</Text>
-              <Ionicons name="chevron-forward" size={14} color={isDark ? '#888' : '#666'} />
-            </TouchableOpacity>
+      {/* Bu ay özeti */}
+      <View style={styles.monthSummaryCard}>
+        <View style={styles.monthSummaryHeader}>
+          <Text style={styles.monthSummaryTitle}>{currentMonthSummary.title}</Text>
+          <TouchableOpacity
+            style={styles.detailsHeaderButton}
+            onPress={() => setDetailsModalVisible(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.detailsHeaderButtonText}>{i18n.t('details')}</Text>
+            <Ionicons name="chevron-forward" size={14} color={isDark ? '#888' : '#666'} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.monthSummaryTable}>
+          <View style={styles.monthSummaryTableHeader}>
+            <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
+              {i18n.t('workedTotal')}
+            </Text>
+            <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
+              {i18n.t('workedDays')}
+            </Text>
           </View>
-          <View style={styles.totalBalanceContent}>
-            <View style={styles.totalBalanceValueContainer}>
-              <Text style={[
-                styles.totalBalanceValue,
-                isFlexible
-                  ? { color: isDark ? '#e5e5e5' : '#1a1a1a' }
-                  : cumulativeBalance.balance >= 0
-                    ? styles.totalBalancePositive
-                    : styles.totalBalanceNegative
-              ]}>
-                {isFlexible && currentMonthFlexible
-                  ? currentMonthFlexible.display
-                  : `${cumulativeBalance!.balanceText} ${i18n.t('minuteShort')}`}
-              </Text>
-              {!isFlexible && cumulativeBalance && (
-                <Text style={styles.totalBalanceLabel}>
-                  {cumulativeBalance.balance >= 0 ? i18n.t('inPlus') : i18n.t('inMinus')}
-                </Text>
-              )}
-            </View>
-
-            <View style={styles.totalBalanceDetails}>
-              <Text style={styles.totalBalanceDetailText}>
-                {isFlexible && currentMonthFlexible
-                  ? `${currentMonthFlexible.dayCount} ${i18n.t('day')}`
-                  : `${cumulativeBalance!.dayCount} ${i18n.t('day')}`}
-              </Text>
-              <Text style={styles.totalBalanceDetailSubtext}>
-                {i18n.t('workedDays')}
-              </Text>
-            </View>
-
-            <View style={[styles.totalBalanceDetails, { borderLeftWidth: 1, borderLeftColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', paddingLeft: 12 }]}>
-              <Text style={[styles.totalBalanceDetailText, { color: '#f59e0b' }]}>
-                {remainingAnnualLeave}
-              </Text>
-              <Text style={styles.totalBalanceDetailSubtext}>
-                {i18n.t('remainingAnnualLeave')}
-              </Text>
-            </View>
+          <View style={styles.monthSummaryTableRow}>
+            <Text style={styles.monthSummaryColValue}>{currentMonthSummary.display}</Text>
+            <Text style={styles.monthSummaryColValue}>{currentMonthSummary.workedDayCount}</Text>
           </View>
         </View>
-      )}
+        {annualLeaveQuota > 0 && (
+          <View style={styles.monthSummaryLeaveRow}>
+            <View style={styles.monthSummaryLeaveLeft}>
+              <Ionicons name="airplane-outline" size={15} color="#f59e0b" />
+              <Text style={styles.monthSummaryLeaveLabel}>{i18n.t('remainingAnnualLeave')}</Text>
+            </View>
+            <Text style={styles.monthSummaryLeaveValue}>
+              {remainingAnnualLeave}
+              <Text style={styles.monthSummaryLeaveQuota}> / {annualLeaveQuota}</Text>
+            </Text>
+          </View>
+        )}
+      </View>
 
       {/* Aylık Detaylar Modal */}
       <Modal
@@ -1017,70 +1075,101 @@ export default function RecordsScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Modal Content */}
+            {/* Modal Content — tablo */}
             <ScrollView
               style={styles.detailsModalScroll}
               showsVerticalScrollIndicator={false}
             >
-              {monthlyBalances.map((m) => (
-                <View key={m.key} style={styles.detailsMonthCard}>
-                  {/* Ay başlığı */}
-                  <View style={styles.detailsMonthHeader}>
-                    <Text style={styles.detailsMonthTitle}>{m.monthName} {m.year}</Text>
-                    {isFlexible ? (
-                      <Text style={[styles.detailsMonthBalance, { color: isDark ? '#e5e5e5' : '#1a1a1a' }]}>
+              <View style={styles.detailsTable}>
+                <View style={styles.detailsTableHeader}>
+                  <Text style={[styles.detailsTableHeaderText, styles.detailsTableColMonth]} numberOfLines={2}>
+                    {i18n.t('tableMonth')}
+                  </Text>
+                  <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
+                    {i18n.t('workedDays')}
+                  </Text>
+                  <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
+                    {i18n.t('workedTotal')}
+                  </Text>
+                  {!isFlexible && (
+                    <>
+                      <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
+                        {i18n.t('target')}
+                      </Text>
+                      <Text style={styles.detailsTableHeaderText}>±</Text>
+                    </>
+                  )}
+                </View>
+
+                {monthlyBalances.map((m, index) => (
+                  <View key={m.key}>
+                    <View style={[
+                      styles.detailsTableRow,
+                      index % 2 === 1 && styles.detailsTableRowAlt,
+                    ]}>
+                      <Text style={[styles.detailsTableCell, styles.detailsTableColMonth]} numberOfLines={1}>
+                        {m.monthName} {m.year}
+                      </Text>
+                      <Text style={styles.detailsTableCell}>
+                        {m.workedDayCount ?? m.dayCount}
+                      </Text>
+                      <Text style={[styles.detailsTableCell, styles.detailsTableCellBold]}>
                         {formatDuration(m.totalMinutes)}
                       </Text>
-                    ) : (
-                      <Text style={[
-                        styles.detailsMonthBalance,
-                        m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative
-                      ]}>
-                        {m.balanceText} {i18n.t('minuteShort')}
-                      </Text>
+                      {!isFlexible && (
+                        <>
+                          <Text style={styles.detailsTableCell}>
+                            {formatDuration(m.targetMinutes)}
+                          </Text>
+                          <Text style={[
+                            styles.detailsTableCell,
+                            styles.detailsTableCellBold,
+                            m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
+                          ]}>
+                            {m.balanceText}
+                          </Text>
+                        </>
+                      )}
+                    </View>
+                    {m.eveningMinutes > 0 && (
+                      <View style={styles.detailsTableEveningRow}>
+                        <Ionicons name="moon-outline" size={12} color="#f59e0b" />
+                        <Text style={styles.detailsTableEveningText}>
+                          {Math.floor(eveningThresholdMinutes / 60)}:{String(eveningThresholdMinutes % 60).padStart(2, '0')} {i18n.t('eveningWork')}: {m.eveningText}
+                        </Text>
+                      </View>
                     )}
                   </View>
+                ))}
 
-                  {/* Ay detayları */}
-                  {!isFlexible && (
-                  <View style={styles.detailsMonthBody}>
-                    <View style={styles.detailsMonthStat}>
-                      <Text style={styles.detailsMonthStatLabel}>{i18n.t('worked')}</Text>
-                      <Text style={styles.detailsMonthStatValue}>{formatDuration(m.totalMinutes)}</Text>
-                    </View>
-                    <View style={styles.detailsMonthStat}>
-                      <Text style={styles.detailsMonthStatLabel}>{i18n.t('target')}</Text>
-                      <Text style={styles.detailsMonthStatValue}>{formatDuration(m.targetMinutes)}</Text>
-                    </View>
-                    <View style={styles.detailsMonthStat}>
-                      <Text style={styles.detailsMonthStatLabel}>{i18n.t('day')}</Text>
-                      <Text style={styles.detailsMonthStatValue}>{m.dayCount}</Text>
-                    </View>
-                  </View>
-                  )}
-
-                  {/* 20:00 sonrası çalışma */}
-                  {m.eveningMinutes > 0 && (
-                    <View style={styles.detailsEveningRow}>
-                      <View style={styles.detailsEveningIcon}>
-                        <Ionicons name="moon-outline" size={14} color="#f59e0b" />
-                      </View>
-                      <Text style={styles.detailsEveningLabel}>{Math.floor(eveningThresholdMinutes / 60)}:{String(eveningThresholdMinutes % 60).padStart(2, '0')} {i18n.t('eveningWork')}</Text>
-                      <Text style={styles.detailsEveningValue}>{m.eveningText}</Text>
-                    </View>
-                  )}
-                </View>
-              ))}
-              {isFlexible && (
-                <View style={[styles.detailsMonthCard, styles.detailsTotalCard]}>
-                  <View style={styles.detailsMonthHeader}>
-                    <Text style={styles.detailsMonthTitle}>{i18n.t('totalWorkTime')}</Text>
-                    <Text style={[styles.detailsMonthBalance, { color: isDark ? '#e5e5e5' : '#1a1a1a' }]}>
-                      {flexibleTotalWorkText}
+                {monthlyBalances.length > 0 && (
+                  <View style={[styles.detailsTableRow, styles.detailsTableTotalRow]}>
+                    <Text style={[styles.detailsTableCell, styles.detailsTableColMonth, styles.detailsTableTotalText]}>
+                      {i18n.t('total')}
                     </Text>
+                    <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
+                      {isFlexible ? flexibleTotalDayCount : detailsTotalWorkedDays}
+                    </Text>
+                    <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
+                      {isFlexible ? flexibleTotalWorkText : formatDuration(cumulativeBalance?.totalMinutes ?? 0)}
+                    </Text>
+                    {!isFlexible && cumulativeBalance && (
+                      <>
+                        <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
+                          {formatDuration(cumulativeBalance.targetMinutes)}
+                        </Text>
+                        <Text style={[
+                          styles.detailsTableCell,
+                          styles.detailsTableTotalText,
+                          cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
+                        ]}>
+                          {cumulativeBalance.balanceText}
+                        </Text>
+                      </>
+                    )}
                   </View>
-                </View>
-              )}
+                )}
+              </View>
             </ScrollView>
           </View>
         </View>
@@ -1348,6 +1437,15 @@ export default function RecordsScreen() {
               )}
             </ScrollView>
 
+            <TouchableOpacity
+              style={styles.modalClearButton}
+              onPress={handleClearDay}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="trash-outline" size={18} color="#ef4444" />
+              <Text style={styles.modalClearButtonText}>{i18n.t('clearDay')}</Text>
+            </TouchableOpacity>
+
             {/* Modal Buttons */}
             <View style={styles.modalButtons}>
               <TouchableOpacity
@@ -1358,42 +1456,7 @@ export default function RecordsScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonSave]}
-                onPress={async () => {
-                  if (editingDate) {
-                    if (editingIsHoliday) {
-                      // Tatil olarak işaretle
-                      await addHolidayRecord(editingDate);
-                    } else if (editingIsAnnualLeave) {
-                      // Yıllık izin olarak işaretle
-                      const { addAnnualLeaveRecord } = await import('@/services/storage');
-                      await addAnnualLeaveRecord(editingDate);
-                    } else {
-                      // Normal gün - tatil değilse tatil kaydını kaldır
-                      await removeHolidayRecord(editingDate);
-                      const { removeAnnualLeaveRecord } = await import('@/services/storage');
-                      await removeAnnualLeaveRecord(editingDate);
-
-                      // Giriş/çıkış kayıtlarını güncelle
-                      if (editingGiris) {
-                        await upsertRecordByDateType(editingDate, 'giris', editingGiris);
-                      }
-                      if (editingCikis) {
-                        await upsertRecordByDateType(editingDate, 'cikis', editingCikis);
-                      }
-
-                      // Mola bilgilerini kaydet
-                      const duration = parseInt(editingBreakDuration, 10) || breakMinutes;
-                      await setBreakCounted(editingDate, !editingDeductBreak);
-                      await setBreakDuration(editingDate, duration);
-
-                      // Mola kayıtlarını güncelle (eğer varsa)
-                      // Not: Şu an mola kayıtlarını düzenleme özelliği yok, sadece gösteriliyor
-                    }
-
-                    await loadSummaries();
-                    setEditDayModalVisible(false);
-                  }
-                }}
+                onPress={saveEditedDay}
               >
                 <Text style={styles.modalButtonSaveText}>{i18n.t('save')}</Text>
               </TouchableOpacity>
@@ -1435,35 +1498,92 @@ const createStyles = (isDark: boolean) =>
       fontSize: 14,
       color: isDark ? '#888' : '#999',
     },
-    totalBalanceContainer: {
+    monthSummaryCard: {
       marginHorizontal: 16,
       marginBottom: 16,
-      padding: 16,
-      borderRadius: 16,
+      padding: 14,
+      borderRadius: 14,
       backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
       borderWidth: 1,
       borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
     },
-    totalBalanceHeader: {
-      marginBottom: 12,
-    },
-    totalBalanceTitle: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: isDark ? '#fff' : '#1a1a1a',
-      marginBottom: 4,
-    },
-    totalBalanceDesc: {
-      fontSize: 12,
-      color: isDark ? '#888' : '#999',
-    },
-    totalBalanceContent: {
+    monthSummaryHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      marginBottom: 12,
     },
-    totalBalanceValueContainer: {
-      alignItems: 'flex-start',
+    monthSummaryTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: isDark ? '#fff' : '#1a1a1a',
+    },
+    monthSummaryTable: {
+      borderRadius: 10,
+      overflow: 'hidden',
+      borderWidth: 1,
+      borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+      backgroundColor: isDark ? '#222' : '#f8f8f8',
+    },
+    monthSummaryTableHeader: {
+      flexDirection: 'row',
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      backgroundColor: isDark ? '#2a2a2a' : '#ececec',
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+    },
+    monthSummaryTableRow: {
+      flexDirection: 'row',
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+    },
+    monthSummaryColLabel: {
+      flex: 1,
+      fontSize: 10,
+      fontWeight: '700',
+      color: isDark ? '#888' : '#777',
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      letterSpacing: 0.3,
+    },
+    monthSummaryColValue: {
+      flex: 1,
+      fontSize: 20,
+      fontWeight: '700',
+      color: isDark ? '#e5e5e5' : '#1a1a1a',
+      textAlign: 'center',
+    },
+    monthSummaryLeaveRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 10,
+      paddingTop: 10,
+      paddingHorizontal: 4,
+      borderTopWidth: 1,
+      borderTopColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+    },
+    monthSummaryLeaveLeft: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      flex: 1,
+    },
+    monthSummaryLeaveLabel: {
+      fontSize: 13,
+      fontWeight: '500',
+      color: isDark ? '#aaa' : '#666',
+    },
+    monthSummaryLeaveValue: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: '#f59e0b',
+    },
+    monthSummaryLeaveQuota: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: isDark ? '#888' : '#999',
     },
     totalBalanceValue: {
       fontSize: 24,
@@ -1563,53 +1683,81 @@ const createStyles = (isDark: boolean) =>
     detailsModalScroll: {
       paddingHorizontal: 16,
       paddingTop: 12,
+      paddingBottom: 24,
     },
-    detailsMonthCard: {
-      backgroundColor: isDark ? '#222' : '#f8f8f8',
+    detailsTable: {
       borderRadius: 12,
-      padding: 14,
-      marginBottom: 10,
-    },
-    detailsTotalCard: {
-      marginTop: 8,
-      marginBottom: 24,
+      overflow: 'hidden',
       borderWidth: 1,
-      borderColor: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+      borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
+      backgroundColor: isDark ? '#222' : '#fafafa',
     },
-    detailsMonthHeader: {
+    detailsTableHeader: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 8,
+      backgroundColor: isDark ? '#2d2d2d' : '#ececec',
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
     },
-    detailsMonthTitle: {
-      fontSize: 15,
+    detailsTableHeaderText: {
+      flex: 1,
+      fontSize: 9,
+      fontWeight: '700',
+      color: isDark ? '#aaa' : '#666',
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      letterSpacing: 0.2,
+    },
+    detailsTableColMonth: {
+      flex: 1.35,
+      textAlign: 'left',
+      paddingLeft: 4,
+    },
+    detailsTableRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 11,
+      paddingHorizontal: 8,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)',
+    },
+    detailsTableRowAlt: {
+      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.02)',
+    },
+    detailsTableTotalRow: {
+      borderBottomWidth: 0,
+      backgroundColor: isDark ? '#2a2a2a' : '#e8e8e8',
+    },
+    detailsTableCell: {
+      flex: 1,
+      fontSize: 13,
+      color: isDark ? '#ccc' : '#444',
+      textAlign: 'center',
+    },
+    detailsTableCellBold: {
+      fontWeight: '600',
+      color: isDark ? '#e5e5e5' : '#1a1a1a',
+    },
+    detailsTableTotalText: {
       fontWeight: '700',
       color: isDark ? '#fff' : '#1a1a1a',
     },
-    detailsMonthBalance: {
-      fontSize: 14,
-      fontWeight: '700',
-    },
-    detailsMonthBody: {
+    detailsTableEveningRow: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-    detailsMonthStat: {
       alignItems: 'center',
+      gap: 6,
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.06)' : 'rgba(245, 158, 11, 0.05)',
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.05)',
+    },
+    detailsTableEveningText: {
       flex: 1,
-    },
-    detailsMonthStatLabel: {
       fontSize: 11,
-      color: isDark ? '#888' : '#999',
-      marginBottom: 3,
-      textTransform: 'uppercase',
-      letterSpacing: 0.3,
-    },
-    detailsMonthStatValue: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: isDark ? '#e5e5e5' : '#1a1a1a',
+      color: isDark ? '#d4a574' : '#92400e',
     },
     detailsEveningRow: {
       flexDirection: 'row',
@@ -1864,13 +2012,19 @@ const createStyles = (isDark: boolean) =>
       flex: 1,
       alignItems: 'center',
       justifyContent: 'center',
+      paddingHorizontal: 4,
     },
     timeBadge: {
-      paddingHorizontal: 10,
-      paddingVertical: 6,
+      paddingHorizontal: 8,
+      paddingVertical: 5,
       borderRadius: 8,
-      minWidth: 60,
+      minWidth: 52,
       alignItems: 'center',
+      marginHorizontal: 3,
+      alignSelf: 'center',
+    },
+    timeBadgeNeutral: {
+      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.06)',
     },
     timeBadgeSuccess: {
       backgroundColor: isDark ? 'rgba(16, 185, 129, 0.15)' : 'rgba(16, 185, 129, 0.1)',
@@ -1881,6 +2035,7 @@ const createStyles = (isDark: boolean) =>
     timeText: {
       fontSize: 13,
       fontWeight: '600',
+      color: isDark ? '#e5e5e5' : '#1a1a1a',
     },
     timeTextSuccess: {
       color: '#10b981',
@@ -1998,6 +2153,23 @@ const createStyles = (isDark: boolean) =>
       fontSize: 14,
       color: isDark ? '#aaa' : '#666',
       fontWeight: '500',
+    },
+    modalClearButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      paddingVertical: 12,
+      marginBottom: 12,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: isDark ? 'rgba(239, 68, 68, 0.35)' : 'rgba(239, 68, 68, 0.25)',
+      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.08)' : 'rgba(239, 68, 68, 0.05)',
+    },
+    modalClearButtonText: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: '#ef4444',
     },
     modalButtons: {
       flexDirection: 'row',

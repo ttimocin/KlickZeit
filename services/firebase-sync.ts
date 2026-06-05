@@ -603,6 +603,7 @@ const buildStandardsFirestorePayload = (standards: AppStandards): Record<string,
     defaultBreakMinutes: standards.defaultBreakMinutes,
     eveningThresholdMinutes: standards.eveningThresholdMinutes,
     workingDays: standards.workingDays,
+    averageWorkMinutes: standards.averageWorkMinutes ?? 480,
     annualLeaveQuota: Math.max(0, Math.min(365, Math.round(standards.annualLeaveQuota ?? 0))),
     extendedPastWeeks: (standards.extendedPastWeeks ?? []).filter((w) => /^\d{4}-\d{2}-\d{2}$/.test(w)),
     updatedAt: Date.now(),
@@ -633,6 +634,8 @@ const parseStandardsFromFirestore = (data: Record<string, unknown>): AppStandard
     eveningThresholdMinutes: typeof data.eveningThresholdMinutes === 'number' ? data.eveningThresholdMinutes : DEFAULT_STANDARDS.eveningThresholdMinutes,
     workingDays: Array.isArray(data.workingDays) ? (data.workingDays as number[]) : DEFAULT_STANDARDS.workingDays,
     annualLeaveQuota: typeof data.annualLeaveQuota === 'number' ? Math.round(data.annualLeaveQuota) : 0,
+    averageWorkMinutes:
+      typeof data.averageWorkMinutes === 'number' ? data.averageWorkMinutes : DEFAULT_STANDARDS.averageWorkMinutes,
   };
   if (typeof data.workStartDate === 'string' && data.workStartDate.match(/^\d{4}-\d{2}-\d{2}$/)) {
     parsed.workStartDate = data.workStartDate;

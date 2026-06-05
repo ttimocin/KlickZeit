@@ -90,6 +90,24 @@ export const upsertRecordByDateType = async (date: string, type: 'giris' | 'ciki
   }
 };
 
+// Tarih ve tip bazlı kayıt sil
+export const deleteRecordByDateType = async (
+  date: string,
+  type: WorkRecord['type']
+): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    const filtered = records.filter((r) => !(r.date === date && r.type === type));
+    if (filtered.length === records.length) return true;
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+    await markDateRecordsUnsynced(date);
+    return true;
+  } catch (error) {
+    console.error('Kayıt silinirken hata:', error);
+    return false;
+  }
+};
+
 // Kayıt sil
 export const deleteRecord = async (id: string): Promise<boolean> => {
   try {
@@ -261,7 +279,9 @@ export const addAnnualLeaveRecord = async (date: string): Promise<boolean> => {
     const filtered = records.filter(r => r.date !== date);
 
     const workStartTime = '08:00';
-    const dailyMinutes = isFlexibleSchedule(standards) ? 480 : standards.dailyWorkMinutes;
+    const dailyMinutes = isFlexibleSchedule(standards)
+      ? getAverageWorkMinutes(standards)
+      : standards.dailyWorkMinutes;
     const h = Math.floor(dailyMinutes / 60);
     const m = dailyMinutes % 60;
     const endH = 8 + h;
@@ -394,6 +414,34 @@ export const getBreakDuration = async (date: string): Promise<number | null> => 
   }
 };
 
+/** Günün tüm kayıtlarını ve mola ayarlarını kaldırır */
+export const clearDayRecords = async (date: string): Promise<boolean> => {
+  try {
+    const records = await getRecords();
+    const filtered = records.filter((r) => r.date !== date);
+    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+
+    const breakCountedData = await AsyncStorage.getItem(BREAK_COUNTED_KEY);
+    if (breakCountedData) {
+      const dates: Record<string, boolean> = JSON.parse(breakCountedData);
+      delete dates[date];
+      await AsyncStorage.setItem(BREAK_COUNTED_KEY, JSON.stringify(dates));
+    }
+
+    const breakDurationData = await AsyncStorage.getItem(BREAK_DURATION_KEY);
+    if (breakDurationData) {
+      const dates: Record<string, number> = JSON.parse(breakDurationData);
+      delete dates[date];
+      await AsyncStorage.setItem(BREAK_DURATION_KEY, JSON.stringify(dates));
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Gün kayıtları temizlenirken hata:', error);
+    return false;
+  }
+};
+
 // Bugünün mola kayıtlarını getir
 export const getTodayBreakRecords = async (): Promise<WorkRecord[]> => {
   try {
@@ -436,6 +484,7 @@ export const buildSettingsSyncFingerprint = (standards: AppStandards): string =>
     defaultBreakMinutes: standards.defaultBreakMinutes,
     eveningThresholdMinutes: standards.eveningThresholdMinutes,
     workingDays: [...(standards.workingDays ?? [])].sort((a, b) => a - b),
+    averageWorkMinutes: getAverageWorkMinutes(standards),
   });
 
 export const getSettingsSyncFingerprint = async (): Promise<string | null> => {
@@ -468,9 +517,17 @@ export interface AppStandards {
   workingDays: number[]; // Çalışma günleri (JS getDay: 0=Pazar..6=Cumartesi), varsayılan [1,2,3,4,5]
   workStartDate?: string; // İşe başlama tarihi (YYYY-MM-DD), opsiyonel
   annualLeaveQuota: number; // Yıllık izin kotası, varsayılan 0
+  /** Esnek mod: yıllık izin günü başına sayılacak süre (dk), varsayılan 480 */
+  averageWorkMinutes?: number;
   /** Geçmiş sayfasında manuel eklenen haftalar (Pazartesi YYYY-MM-DD) */
   extendedPastWeeks?: string[];
 }
+
+/** Esnek modda yıllık izin / ortalama günlük süre (dk) */
+export const getAverageWorkMinutes = (standards: AppStandards): number => {
+  const m = standards.averageWorkMinutes ?? 480;
+  return Math.max(30, Math.min(720, Math.round(m)));
+};
 
 export const isFlexibleSchedule = (standards: AppStandards): boolean =>
   standards.workScheduleMode === 'flexible';
@@ -483,6 +540,7 @@ export const DEFAULT_STANDARDS: AppStandards = {
   workingDays: [1, 2, 3, 4, 5], // Pazartesi-Cuma
   workStartDate: undefined,
   annualLeaveQuota: 0,
+  averageWorkMinutes: 480,
   extendedPastWeeks: [],
 };
 

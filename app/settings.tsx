@@ -350,6 +350,42 @@ export default function SettingsScreen() {
             </View>
           </View>
 
+          {/* Ortalama çalışma süresi (esnek mod — yıllık izin günü) */}
+          {(standards.workScheduleMode ?? 'fixed') === 'flexible' && (
+          <View style={styles.standardRow}>
+            <View style={styles.standardInfo}>
+              <Ionicons name="stats-chart-outline" size={20} color={isDark ? '#60a5fa' : '#2563eb'} />
+              <View style={styles.standardTextGroup}>
+                <Text style={styles.standardLabel}>{i18n.t('averageWorkDuration')}</Text>
+                <Text style={styles.standardHint}>{i18n.t('averageWorkDurationHint')}</Text>
+              </View>
+            </View>
+            <View style={styles.stepperContainer}>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                onPress={() => {
+                  const current = standards.averageWorkMinutes ?? 480;
+                  if (current > 30) updateStandard('averageWorkMinutes', current - 30);
+                }}
+              >
+                <Ionicons name="remove" size={18} color={isDark ? '#fff' : '#333'} />
+              </TouchableOpacity>
+              <Text style={styles.stepperValue}>
+                {Math.floor((standards.averageWorkMinutes ?? 480) / 60)}:{String((standards.averageWorkMinutes ?? 480) % 60).padStart(2, '0')}
+              </Text>
+              <TouchableOpacity
+                style={styles.stepperButton}
+                onPress={() => {
+                  const current = standards.averageWorkMinutes ?? 480;
+                  if (current < 720) updateStandard('averageWorkMinutes', current + 30);
+                }}
+              >
+                <Ionicons name="add" size={18} color={isDark ? '#fff' : '#333'} />
+              </TouchableOpacity>
+            </View>
+          </View>
+          )}
+
           {/* Günlük Çalışma Süresi */}
           {(standards.workScheduleMode ?? 'fixed') !== 'flexible' && (
           <View style={styles.standardRow}>
