@@ -789,7 +789,7 @@ export default function RecordsScreen() {
     };
   }, [monthlyBalances, isFlexible]);
 
-  // Bu ayın özeti (üst kart — her iki mod)
+  // Bu ayın özeti (üst kart — esnek mod)
   const currentMonthSummary = useMemo(() => {
     const now = new Date();
     const key = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -821,6 +821,34 @@ export default function RecordsScreen() {
   }, [monthlyBalances]);
 
   const styles = createStyles(isDark);
+
+  const renderDetailsDays = (count: number, extraStyle?: object) => (
+    <Text style={[styles.detailsTableCell, extraStyle]}>
+      {count}
+      <Text style={styles.detailsTableCellUnit}> {i18n.t('dayCount')}</Text>
+    </Text>
+  );
+
+  const renderDetailsHours = (minutes: number, extraStyle?: object) => {
+    const text = formatDuration(minutes);
+    return (
+      <Text style={[styles.detailsTableCell, extraStyle]}>
+        {text}
+        {text !== '-' && minutes > 0 && (
+          <Text style={styles.detailsTableCellUnit}> {i18n.t('hours')}</Text>
+        )}
+      </Text>
+    );
+  };
+
+  const renderDetailsBalance = (balanceText: string, balance: number, extraStyle?: object) => (
+    <Text style={[styles.detailsTableCell, extraStyle]}>
+      {balanceText}
+      {balance !== 0 && (
+        <Text style={styles.detailsTableCellUnit}> {i18n.t('minuteShort')}</Text>
+      )}
+    </Text>
+  );
 
   // Saat renklendirmesi - geç kalma veya erken çıkış kontrolü (esnek modda nötr)
   const getTimeColor = (time: string | null, type: 'giris' | 'cikis'): string => {
@@ -1012,10 +1040,12 @@ export default function RecordsScreen() {
       </View>
 
 
-      {/* Bu ay özeti */}
+      {/* Özet kartı: sabit modda toplam bakiye, esnek modda bu ay */}
       <View style={styles.monthSummaryCard}>
         <View style={styles.monthSummaryHeader}>
-          <Text style={styles.monthSummaryTitle}>{currentMonthSummary.title}</Text>
+          <Text style={styles.monthSummaryTitle}>
+            {isFlexible ? currentMonthSummary.title : i18n.t('totalBalance')}
+          </Text>
           <TouchableOpacity
             style={styles.detailsHeaderButton}
             onPress={() => setDetailsModalVisible(true)}
@@ -1028,15 +1058,46 @@ export default function RecordsScreen() {
         <View style={styles.monthSummaryTable}>
           <View style={styles.monthSummaryTableHeader}>
             <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
-              {i18n.t('workedTotal')}
+              {i18n.t('hours')}
             </Text>
             <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
-              {i18n.t('workedDays')}
+              {isFlexible ? i18n.t('dayCount') : `± ${i18n.t('minuteShort')}`}
             </Text>
           </View>
           <View style={styles.monthSummaryTableRow}>
-            <Text style={styles.monthSummaryColValue}>{currentMonthSummary.display}</Text>
-            <Text style={styles.monthSummaryColValue}>{currentMonthSummary.workedDayCount}</Text>
+            {isFlexible ? (
+              <>
+                <Text style={styles.monthSummaryColValue}>
+                  {currentMonthSummary.display}
+                  {currentMonthSummary.display !== '-' && (
+                    <Text style={styles.monthSummaryColUnit}> {i18n.t('hours')}</Text>
+                  )}
+                </Text>
+                <Text style={styles.monthSummaryColValue}>
+                  {currentMonthSummary.workedDayCount}
+                  <Text style={styles.monthSummaryColUnit}> {i18n.t('dayCount')}</Text>
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.monthSummaryColValue}>
+                  {formatDuration(cumulativeBalance?.totalMinutes ?? 0)}
+                  {(cumulativeBalance?.totalMinutes ?? 0) > 0 && (
+                    <Text style={styles.monthSummaryColUnit}> {i18n.t('hours')}</Text>
+                  )}
+                </Text>
+                <Text style={[
+                  styles.monthSummaryColValue,
+                  cumulativeBalance && cumulativeBalance.balance > 0 && styles.totalBalancePositive,
+                  cumulativeBalance && cumulativeBalance.balance < 0 && styles.totalBalanceNegative,
+                ]}>
+                  {cumulativeBalance?.balanceText ?? '-'}
+                  {cumulativeBalance && cumulativeBalance.balance !== 0 && (
+                    <Text style={styles.monthSummaryColUnit}> {i18n.t('minuteShort')}</Text>
+                  )}
+                </Text>
+              </>
+            )}
           </View>
         </View>
         {annualLeaveQuota > 0 && (
@@ -1086,17 +1147,19 @@ export default function RecordsScreen() {
                     {i18n.t('tableMonth')}
                   </Text>
                   <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
-                    {i18n.t('workedDays')}
+                    {i18n.t('dayCount')}
                   </Text>
                   <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
-                    {i18n.t('workedTotal')}
+                    {i18n.t('hours')}
                   </Text>
                   {!isFlexible && (
                     <>
                       <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
                         {i18n.t('target')}
                       </Text>
-                      <Text style={styles.detailsTableHeaderText}>±</Text>
+                      <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
+                        {`± ${i18n.t('minuteShort')}`}
+                      </Text>
                     </>
                   )}
                 </View>
@@ -1110,24 +1173,19 @@ export default function RecordsScreen() {
                       <Text style={[styles.detailsTableCell, styles.detailsTableColMonth]} numberOfLines={1}>
                         {m.monthName} {m.year}
                       </Text>
-                      <Text style={styles.detailsTableCell}>
-                        {m.workedDayCount ?? m.dayCount}
-                      </Text>
-                      <Text style={[styles.detailsTableCell, styles.detailsTableCellBold]}>
-                        {formatDuration(m.totalMinutes)}
-                      </Text>
+                      {renderDetailsDays(m.workedDayCount ?? m.dayCount)}
+                      {renderDetailsHours(m.totalMinutes, styles.detailsTableCellBold)}
                       {!isFlexible && (
                         <>
-                          <Text style={styles.detailsTableCell}>
-                            {formatDuration(m.targetMinutes)}
-                          </Text>
-                          <Text style={[
-                            styles.detailsTableCell,
-                            styles.detailsTableCellBold,
-                            m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
-                          ]}>
-                            {m.balanceText}
-                          </Text>
+                          {renderDetailsHours(m.targetMinutes)}
+                          {renderDetailsBalance(
+                            m.balanceText,
+                            m.balance,
+                            [
+                              styles.detailsTableCellBold,
+                              m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
+                            ]
+                          )}
                         </>
                       )}
                     </View>
@@ -1147,24 +1205,27 @@ export default function RecordsScreen() {
                     <Text style={[styles.detailsTableCell, styles.detailsTableColMonth, styles.detailsTableTotalText]}>
                       {i18n.t('total')}
                     </Text>
-                    <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
-                      {isFlexible ? flexibleTotalDayCount : detailsTotalWorkedDays}
-                    </Text>
-                    <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
-                      {isFlexible ? flexibleTotalWorkText : formatDuration(cumulativeBalance?.totalMinutes ?? 0)}
-                    </Text>
+                    {renderDetailsDays(
+                      isFlexible ? flexibleTotalDayCount : detailsTotalWorkedDays,
+                      styles.detailsTableTotalText
+                    )}
+                    {renderDetailsHours(
+                      isFlexible
+                        ? monthlyBalances.reduce((sum, m) => sum + m.totalMinutes, 0)
+                        : (cumulativeBalance?.totalMinutes ?? 0),
+                      styles.detailsTableTotalText
+                    )}
                     {!isFlexible && cumulativeBalance && (
                       <>
-                        <Text style={[styles.detailsTableCell, styles.detailsTableTotalText]}>
-                          {formatDuration(cumulativeBalance.targetMinutes)}
-                        </Text>
-                        <Text style={[
-                          styles.detailsTableCell,
-                          styles.detailsTableTotalText,
-                          cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
-                        ]}>
-                          {cumulativeBalance.balanceText}
-                        </Text>
+                        {renderDetailsHours(cumulativeBalance.targetMinutes, styles.detailsTableTotalText)}
+                        {renderDetailsBalance(
+                          cumulativeBalance.balanceText,
+                          cumulativeBalance.balance,
+                          [
+                            styles.detailsTableTotalText,
+                            cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
+                          ]
+                        )}
                       </>
                     )}
                   </View>
@@ -1554,6 +1615,11 @@ const createStyles = (isDark: boolean) =>
       color: isDark ? '#e5e5e5' : '#1a1a1a',
       textAlign: 'center',
     },
+    monthSummaryColUnit: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: isDark ? '#888' : '#777',
+    },
     monthSummaryLeaveRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -1739,6 +1805,11 @@ const createStyles = (isDark: boolean) =>
     detailsTableCellBold: {
       fontWeight: '600',
       color: isDark ? '#e5e5e5' : '#1a1a1a',
+    },
+    detailsTableCellUnit: {
+      fontSize: 10,
+      fontWeight: '600',
+      color: isDark ? '#888' : '#888',
     },
     detailsTableTotalText: {
       fontWeight: '700',
