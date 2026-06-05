@@ -204,32 +204,32 @@ export const getTodayWorkRecords = async (): Promise<WorkRecord[]> => {
 };
 
 
-// Tatil günü ekle (otomatik 7 saat çalışma)
+// Tatil günü ekle (günlük / ortalama çalışma süresi kadar)
 export const addHolidayRecord = async (date: string): Promise<boolean> => {
   try {
     const records = await getRecords();
+    const standards = await getAppStandards();
+    const { workStartTime, workEndTime } = buildSyntheticWorkTimes(standards);
 
     // Bu tarih için mevcut kayıtları sil
     const filtered = records.filter(r => r.date !== date);
 
-    // Giriş kaydı (08:00)
     const girisRecord: WorkRecord = {
       id: `holiday_${date}_giris_${Date.now()}`,
       type: 'giris',
-      timestamp: new Date(`${date}T08:00:00`).getTime(),
+      timestamp: new Date(`${date}T${workStartTime}:00`).getTime(),
       date,
-      time: '08:00',
+      time: workStartTime,
       synced: false,
       isHoliday: true,
     };
 
-    // Çıkış kaydı (15:00 - 7 saat sonra)
     const cikisRecord: WorkRecord = {
       id: `holiday_${date}_cikis_${Date.now()}`,
       type: 'cikis',
-      timestamp: new Date(`${date}T15:00:00`).getTime(),
+      timestamp: new Date(`${date}T${workEndTime}:00`).getTime(),
       date,
-      time: '15:00',
+      time: workEndTime,
       synced: false,
       isHoliday: true,
     };
@@ -278,17 +278,8 @@ export const addAnnualLeaveRecord = async (date: string): Promise<boolean> => {
     // Bu tarih için mevcut kayıtları sil
     const filtered = records.filter(r => r.date !== date);
 
-    const workStartTime = '08:00';
-    const dailyMinutes = isFlexibleSchedule(standards)
-      ? getAverageWorkMinutes(standards)
-      : standards.dailyWorkMinutes;
-    const h = Math.floor(dailyMinutes / 60);
-    const m = dailyMinutes % 60;
-    const endH = 8 + h;
-    const endM = m;
-    const workEndTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+    const { workStartTime, workEndTime } = buildSyntheticWorkTimes(standards);
 
-    // Giriş kaydı
     const girisRecord: WorkRecord = {
       id: `leave_${date}_giris_${Date.now()}`,
       type: 'giris',
@@ -517,16 +508,28 @@ export interface AppStandards {
   workingDays: number[]; // Çalışma günleri (JS getDay: 0=Pazar..6=Cumartesi), varsayılan [1,2,3,4,5]
   workStartDate?: string; // İşe başlama tarihi (YYYY-MM-DD), opsiyonel
   annualLeaveQuota: number; // Yıllık izin kotası, varsayılan 0
-  /** Esnek mod: yıllık izin günü başına sayılacak süre (dk), varsayılan 480 */
+  /** Esnek mod: yıllık izin ve resmi tatil günü başına sayılacak süre (dk), varsayılan 480 */
   averageWorkMinutes?: number;
   /** Geçmiş sayfasında manuel eklenen haftalar (Pazartesi YYYY-MM-DD) */
   extendedPastWeeks?: string[];
 }
 
-/** Esnek modda yıllık izin / ortalama günlük süre (dk) */
+/** Esnek modda yıllık izin / resmi tatil için ortalama günlük süre (dk) */
 export const getAverageWorkMinutes = (standards: AppStandards): number => {
   const m = standards.averageWorkMinutes ?? 480;
   return Math.max(30, Math.min(720, Math.round(m)));
+};
+
+/** Tatil veya yıllık izin için sentetik giriş-çıkış saatleri */
+const buildSyntheticWorkTimes = (standards: AppStandards) => {
+  const workStartTime = '08:00';
+  const dailyMinutes = isFlexibleSchedule(standards)
+    ? getAverageWorkMinutes(standards)
+    : standards.dailyWorkMinutes;
+  const h = Math.floor(dailyMinutes / 60);
+  const m = dailyMinutes % 60;
+  const workEndTime = `${String(8 + h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  return { workStartTime, workEndTime, dailyMinutes };
 };
 
 export const isFlexibleSchedule = (standards: AppStandards): boolean =>

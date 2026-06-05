@@ -99,7 +99,7 @@ export const translations = {
     workedTotal: 'Çalışılan',
     dailyWorkHours: 'Günlük Çalışma Süresi',
     averageWorkDuration: 'Ortalama Çalışma Süresi',
-    averageWorkDurationHint: 'Yıllık izin günü bu süre kadar çalışılmış sayılır',
+    averageWorkDurationHint: 'Yıllık izin ve resmi tatil günleri bu süre kadar çalışılmış sayılır',
     defaultBreak: 'Varsayılan Mola Süresi',
     eveningThreshold: 'Akşam Mesai Başlangıcı',
     workingDays: 'Çalışma Günleri',
@@ -184,7 +184,7 @@ export const translations = {
 
     // Tatil
     addHoliday: 'Tatil Ekle',
-    addHolidayConfirm: 'Bu günü tatil olarak işaretlemek ister misiniz? (7 saat çalışma eklenecek)',
+    addHolidayConfirm: 'Bu günü resmi tatil olarak işaretlemek ister misiniz?',
     addHolidayBtn: 'Tatil Ekle',
     removeHoliday: 'Tatil Kaldır',
     removeHolidayConfirm: 'Bu günün tatil kaydını kaldırmak ister misiniz?',
@@ -396,7 +396,7 @@ export const translations = {
     workedTotal: 'Worked',
     dailyWorkHours: 'Daily Work Hours',
     averageWorkDuration: 'Average Work Duration',
-    averageWorkDurationHint: 'Annual leave days count as this much work time',
+    averageWorkDurationHint: 'Annual leave and public holidays count as this much work time',
     defaultBreak: 'Default Break Duration',
     eveningThreshold: 'Evening Overtime Start',
     workingDays: 'Working Days',
@@ -481,7 +481,7 @@ export const translations = {
 
     // Holiday
     addHoliday: 'Add Holiday',
-    addHolidayConfirm: 'Do you want to mark this day as holiday? (7 hours of work will be added)',
+    addHolidayConfirm: 'Do you want to mark this day as a public holiday?',
     addHolidayBtn: 'Add Holiday',
     removeHoliday: 'Remove Holiday',
     removeHolidayConfirm: 'Do you want to remove the holiday record for this day?',
@@ -692,7 +692,7 @@ export const translations = {
     workedTotal: 'Gearbeitet',
     dailyWorkHours: 'Tägliche Arbeitszeit',
     averageWorkDuration: 'Durchschnittliche Arbeitszeit',
-    averageWorkDurationHint: 'Urlaubstage werden mit dieser Arbeitszeit gezählt',
+    averageWorkDurationHint: 'Urlaubstage und Feiertage werden mit dieser Arbeitszeit gezählt',
     defaultBreak: 'Standard-Pausendauer',
     eveningThreshold: 'Abendüberstunden ab',
     workingDays: 'Arbeitstage',
@@ -777,7 +777,7 @@ export const translations = {
 
     // Urlaub
     addHoliday: 'Urlaub hinzufügen',
-    addHolidayConfirm: 'Möchten Sie diesen Tag als Urlaub markieren? (7 Stunden Arbeit werden hinzugefügt)',
+    addHolidayConfirm: 'Möchten Sie diesen Tag als Feiertag markieren?',
     addHolidayBtn: 'Urlaub hinzufügen',
     removeHoliday: 'Urlaub entfernen',
     removeHolidayConfirm: 'Möchten Sie den Urlaubseintrag für diesen Tag entfernen?',
@@ -988,7 +988,7 @@ export const translations = {
     workedTotal: 'Travaillé',
     dailyWorkHours: 'Heures de travail quotidiennes',
     averageWorkDuration: 'Durée de travail moyenne',
-    averageWorkDurationHint: 'Les jours de congé annuel comptent pour cette durée',
+    averageWorkDurationHint: 'Congés annuels et jours fériés comptent pour cette durée',
     defaultBreak: 'Durée de pause par défaut',
     eveningThreshold: 'Début des heures supplémentaires du soir',
     workingDays: 'Jours de travail',
@@ -1073,7 +1073,7 @@ export const translations = {
 
     // Vacances
     addHoliday: 'Ajouter vacances',
-    addHolidayConfirm: 'Voulez-vous marquer ce jour comme vacances? (7 heures de travail seront ajoutées)',
+    addHolidayConfirm: 'Voulez-vous marquer ce jour comme jour férié?',
     addHolidayBtn: 'Ajouter vacances',
     removeHoliday: 'Supprimer vacances',
     removeHolidayConfirm: "Voulez-vous supprimer l'enregistrement de vacances pour ce jour?",
@@ -1285,7 +1285,7 @@ export const translations = {
     workedTotal: 'Trabalhado',
     dailyWorkHours: 'Horas de trabalho diárias',
     averageWorkDuration: 'Duração média de trabalho',
-    averageWorkDurationHint: 'Dias de férias anuais contam como este tempo de trabalho',
+    averageWorkDurationHint: 'Férias anuais e feriados contam como este tempo de trabalho',
     defaultBreak: 'Duração padrão da pausa',
     eveningThreshold: 'Início das horas extras noturnas',
     workingDays: 'Dias de trabalho',
@@ -1370,7 +1370,7 @@ export const translations = {
 
     // Feriado
     addHoliday: 'Adicionar feriado',
-    addHolidayConfirm: 'Deseja marcar este dia como feriado? (7 horas de trabalho serão adicionadas)',
+    addHolidayConfirm: 'Deseja marcar este dia como feriado oficial?',
     addHolidayBtn: 'Adicionar feriado',
     removeHoliday: 'Remover feriado',
     removeHolidayConfirm: 'Deseja remover o registro de feriado para este dia?',
@@ -1582,7 +1582,7 @@ export const translations = {
     workedTotal: 'عمل',
     dailyWorkHours: 'ساعات العمل اليومية',
     averageWorkDuration: 'متوسط مدة العمل',
-    averageWorkDurationHint: 'تُحسب أيام الإجازة السنوية بهذا القدر من وقت العمل',
+    averageWorkDurationHint: 'تُحسب الإجازة السنوية والعطل الرسمية بهذا القدر من وقت العمل',
     defaultBreak: 'مدة الاستراحة الافتراضية',
     eveningThreshold: 'بداية العمل الإضافي المسائي',
     workingDays: 'أيام العمل',
@@ -1667,7 +1667,7 @@ export const translations = {
 
     // العطلة
     addHoliday: 'إضافة عطلة',
-    addHolidayConfirm: 'هل تريد وضع علامة على هذا اليوم كعطلة؟ (سيتم إضافة 7 ساعات عمل)',
+    addHolidayConfirm: 'هل تريد وضع علامة على هذا اليوم كعطلة رسمية؟',
     addHolidayBtn: 'إضافة عطلة',
     removeHoliday: 'إزالة العطلة',
     removeHolidayConfirm: 'هل تريد إزالة سجل العطلة لهذا اليوم؟',
@@ -1880,7 +1880,7 @@ export const translations = {
     workedTotal: '已工作',
     dailyWorkHours: '每日工作时间',
     averageWorkDuration: '平均工作时长',
-    averageWorkDurationHint: '年假按此时长计入工作时间',
+    averageWorkDurationHint: '年假和法定节假日均按此时长计入工作时间',
     defaultBreak: '默认休息时长',
     eveningThreshold: '晚间加班开始',
     workingDays: '工作日',
@@ -1965,7 +1965,7 @@ export const translations = {
 
     // 假期
     addHoliday: '添加假期',
-    addHolidayConfirm: '您想将这一天标记为假期吗？（将添加7小时工作）',
+    addHolidayConfirm: '您想将这一天标记为法定节假日吗？',
     addHolidayBtn: '添加假期',
     removeHoliday: '删除假期',
     removeHolidayConfirm: '您想删除这一天的假期记录吗？',
@@ -2177,7 +2177,7 @@ export const translations = {
     workedTotal: 'Отработано',
     dailyWorkHours: 'Ежедневное рабочее время',
     averageWorkDuration: 'Средняя продолжительность работы',
-    averageWorkDurationHint: 'Дни ежегодного отпуска засчитываются на это время',
+    averageWorkDurationHint: 'Отпуск и праздничные дни засчитываются на это время',
     defaultBreak: 'Стандартная пауза',
     eveningThreshold: 'Начало вечерних сверхурочных',
     workingDays: 'Рабочие дни',
@@ -2262,7 +2262,7 @@ export const translations = {
 
     // Праздник
     addHoliday: 'Добавить праздник',
-    addHolidayConfirm: 'Вы хотите отметить этот день как праздник? (Будет добавлено 7 часов работы)',
+    addHolidayConfirm: 'Вы хотите отметить этот день как официальный праздник?',
     addHolidayBtn: 'Добавить праздник',
     removeHoliday: 'Удалить праздник',
     removeHolidayConfirm: 'Вы хотите удалить запись о празднике для этого дня?',
@@ -2474,7 +2474,7 @@ export const translations = {
     workedTotal: 'Відпрацьовано',
     dailyWorkHours: 'Щоденний робочий час',
     averageWorkDuration: 'Середня тривалість роботи',
-    averageWorkDurationHint: 'Дні щорічної відпустки зараховуються на цей час',
+    averageWorkDurationHint: 'Відпустка та святкові дні зараховуються на цей час',
     defaultBreak: 'Стандартна перерва',
     eveningThreshold: 'Початок вечірніх наднормових',
     workingDays: 'Робочі дні',
@@ -2559,7 +2559,7 @@ export const translations = {
 
     // Свято
     addHoliday: 'Додати свято',
-    addHolidayConfirm: 'Ви хочете позначити цей день як свято? (Буде додано 7 годин роботи)',
+    addHolidayConfirm: 'Ви хочете позначити цей день як офіційне свято?',
     addHolidayBtn: 'Додати свято',
     removeHoliday: 'Видалити свято',
     removeHolidayConfirm: 'Ви хочете видалити запис про свято для цього дня?',

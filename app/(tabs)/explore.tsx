@@ -277,15 +277,15 @@ export default function RecordsScreen() {
     // Tatil günlerinde veya mola sayılıyorsa mola düşme
     let netDuration = (isHoliday || breakCounted) ? grossDuration : grossDuration - breakDurationMinutes;
 
-    // Yıllık izin: sabit modda günlük hedef; esnek modda ortalama çalışma süresi
-    if (isAnnualLeave && !isFlexible) {
+    // Yıllık izin / resmi tatil: sabit modda günlük hedef; esnek modda ortalama süre
+    if ((isAnnualLeave || isHoliday) && !isFlexible) {
       netDuration = dailyWorkMinutes;
-    } else if (isAnnualLeave && isFlexible) {
+    } else if ((isAnnualLeave || isHoliday) && isFlexible) {
       netDuration = averageWorkMinutes;
     }
 
     const overtime =
-      isFlexible || isAnnualLeave ? 0 : netDuration - dailyWorkMinutes;
+      isFlexible || isAnnualLeave || isHoliday ? 0 : netDuration - dailyWorkMinutes;
 
     return { duration: grossDuration, netDuration: netDuration > 0 ? netDuration : 0, overtime };
   };
