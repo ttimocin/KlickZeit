@@ -450,7 +450,7 @@ export default function RecordsScreen() {
       if (week.totalMinutes > 0) {
         week.totalText = formatDuration(week.totalMinutes);
         if (!isFlexible) {
-          week.totalOvertime = week.totalMinutes - weeklyWorkMinutes;
+          week.totalOvertime = week.days.reduce((sum, d) => sum + d.overtime, 0);
           week.totalOvertimeText = formatOvertime(week.totalOvertime);
         }
       }
@@ -710,8 +710,6 @@ export default function RecordsScreen() {
       const year = current.getFullYear();
       const month = current.getMonth();
       const key = `${year}-${String(month + 1).padStart(2, '0')}`;
-      const dayOfWeek = current.getDay();
-      const isWorkingDay = workingDays.includes(dayOfWeek);
 
       if (!monthsMap.has(key)) {
         monthsMap.set(key, { totalMinutes: 0, targetMinutes: 0, dayCount: 0, workedDayCount: 0, year, month, eveningMinutes: 0 });
@@ -719,16 +717,12 @@ export default function RecordsScreen() {
 
       const entry = monthsMap.get(key)!;
 
-      if (isWorkingDay) {
-        entry.targetMinutes += dailyWorkMinutes;
-      }
-      entry.dayCount += 1;
-
-      // Gerçek çalışma verisi varsa ekle
+      // Gerçek çalışma verisi varsa ekle; hedef yalnızca çalışılan günler için
       const dayData = dayDataByDate.get(dateStr);
       if (dayData && dayData.duration > 0) {
         entry.totalMinutes += dayData.duration;
         entry.workedDayCount += 1;
+        entry.targetMinutes += dailyWorkMinutes;
       }
 
       // 20:00 sonrası çalışma hesapla
@@ -823,31 +817,15 @@ export default function RecordsScreen() {
   const styles = createStyles(isDark);
 
   const renderDetailsDays = (count: number, extraStyle?: object) => (
-    <Text style={[styles.detailsTableCell, extraStyle]}>
-      {count}
-      <Text style={styles.detailsTableCellUnit}> {i18n.t('dayCount')}</Text>
-    </Text>
+    <Text style={[styles.detailsTableCell, extraStyle]}>{count}</Text>
   );
 
-  const renderDetailsHours = (minutes: number, extraStyle?: object) => {
-    const text = formatDuration(minutes);
-    return (
-      <Text style={[styles.detailsTableCell, extraStyle]}>
-        {text}
-        {text !== '-' && minutes > 0 && (
-          <Text style={styles.detailsTableCellUnit}> {i18n.t('hours')}</Text>
-        )}
-      </Text>
-    );
-  };
+  const renderDetailsHours = (minutes: number, extraStyle?: object) => (
+    <Text style={[styles.detailsTableCell, extraStyle]}>{formatDuration(minutes)}</Text>
+  );
 
-  const renderDetailsBalance = (balanceText: string, balance: number, extraStyle?: object) => (
-    <Text style={[styles.detailsTableCell, extraStyle]}>
-      {balanceText}
-      {balance !== 0 && (
-        <Text style={styles.detailsTableCellUnit}> {i18n.t('minuteShort')}</Text>
-      )}
-    </Text>
+  const renderDetailsBalance = (balanceText: string, extraStyle?: object) => (
+    <Text style={[styles.detailsTableCell, extraStyle]}>{balanceText}</Text>
   );
 
   // Saat renklendirmesi - geç kalma veya erken çıkış kontrolü (esnek modda nötr)
@@ -887,7 +865,7 @@ export default function RecordsScreen() {
               styles.weekTotalOvertime,
               week.totalOvertime >= 0 ? styles.weekOvertimePositive : styles.weekOvertimeNegative
             ]}>
-              {week.totalOvertimeText} {i18n.t('minuteShort')}
+              {week.totalOvertimeText}
             </Text>
           )}
         </View>
@@ -896,7 +874,7 @@ export default function RecordsScreen() {
       {/* Tablo Başlıkları */}
       <View style={styles.tableHeader}>
         <View style={styles.headerDayName}>
-          <Text style={styles.headerText} numberOfLines={1}>{i18n.t('day')}</Text>
+          <Text style={styles.headerText} numberOfLines={1}>{i18n.t('tableDate')}</Text>
         </View>
         <View style={styles.headerTimeCell}>
           <Text style={styles.headerText} numberOfLines={1}>{i18n.t('entry')}</Text>
@@ -905,7 +883,7 @@ export default function RecordsScreen() {
           <Text style={styles.headerText} numberOfLines={1}>{i18n.t('exit')}</Text>
         </View>
         <View style={styles.headerDurationCell}>
-          <Text style={styles.headerText} numberOfLines={1}>{i18n.t('duration')}</Text>
+          <Text style={styles.headerText} numberOfLines={1}>{i18n.t('workedHoursCol')}</Text>
         </View>
         {!isFlexible && (
           <View style={styles.headerOvertimeCell}>
@@ -1058,33 +1036,26 @@ export default function RecordsScreen() {
         <View style={styles.monthSummaryTable}>
           <View style={styles.monthSummaryTableHeader}>
             <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
-              {i18n.t('hours')}
+              {isFlexible ? i18n.t('workedDaysCol') : i18n.t('workedHoursCol')}
             </Text>
             <Text style={styles.monthSummaryColLabel} numberOfLines={2}>
-              {isFlexible ? i18n.t('dayCount') : `± ${i18n.t('minuteShort')}`}
+              {isFlexible ? i18n.t('workedHoursCol') : i18n.t('balanceCol')}
             </Text>
           </View>
           <View style={styles.monthSummaryTableRow}>
             {isFlexible ? (
               <>
                 <Text style={styles.monthSummaryColValue}>
-                  {currentMonthSummary.display}
-                  {currentMonthSummary.display !== '-' && (
-                    <Text style={styles.monthSummaryColUnit}> {i18n.t('hours')}</Text>
-                  )}
+                  {currentMonthSummary.workedDayCount}
                 </Text>
                 <Text style={styles.monthSummaryColValue}>
-                  {currentMonthSummary.workedDayCount}
-                  <Text style={styles.monthSummaryColUnit}> {i18n.t('dayCount')}</Text>
+                  {currentMonthSummary.display}
                 </Text>
               </>
             ) : (
               <>
                 <Text style={styles.monthSummaryColValue}>
                   {formatDuration(cumulativeBalance?.totalMinutes ?? 0)}
-                  {(cumulativeBalance?.totalMinutes ?? 0) > 0 && (
-                    <Text style={styles.monthSummaryColUnit}> {i18n.t('hours')}</Text>
-                  )}
                 </Text>
                 <Text style={[
                   styles.monthSummaryColValue,
@@ -1092,9 +1063,6 @@ export default function RecordsScreen() {
                   cumulativeBalance && cumulativeBalance.balance < 0 && styles.totalBalanceNegative,
                 ]}>
                   {cumulativeBalance?.balanceText ?? '-'}
-                  {cumulativeBalance && cumulativeBalance.balance !== 0 && (
-                    <Text style={styles.monthSummaryColUnit}> {i18n.t('minuteShort')}</Text>
-                  )}
                 </Text>
               </>
             )}
@@ -1108,7 +1076,8 @@ export default function RecordsScreen() {
             </View>
             <Text style={styles.monthSummaryLeaveValue}>
               {remainingAnnualLeave}
-              <Text style={styles.monthSummaryLeaveQuota}> / {annualLeaveQuota}</Text>
+              <Text style={styles.monthSummaryLeaveSlash}> / </Text>
+              {annualLeaveQuota}
             </Text>
           </View>
         )}
@@ -1147,10 +1116,10 @@ export default function RecordsScreen() {
                     {i18n.t('tableMonth')}
                   </Text>
                   <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
-                    {i18n.t('dayCount')}
+                    {i18n.t('workedDaysCol')}
                   </Text>
                   <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
-                    {i18n.t('hours')}
+                    {i18n.t('workedHoursCol')}
                   </Text>
                   {!isFlexible && (
                     <>
@@ -1158,7 +1127,7 @@ export default function RecordsScreen() {
                         {i18n.t('target')}
                       </Text>
                       <Text style={styles.detailsTableHeaderText} numberOfLines={2}>
-                        {`± ${i18n.t('minuteShort')}`}
+                        {i18n.t('balanceCol')}
                       </Text>
                     </>
                   )}
@@ -1178,14 +1147,10 @@ export default function RecordsScreen() {
                       {!isFlexible && (
                         <>
                           {renderDetailsHours(m.targetMinutes)}
-                          {renderDetailsBalance(
-                            m.balanceText,
-                            m.balance,
-                            [
+                          {renderDetailsBalance(m.balanceText, [
                               styles.detailsTableCellBold,
                               m.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
-                            ]
-                          )}
+                          ])}
                         </>
                       )}
                     </View>
@@ -1218,14 +1183,10 @@ export default function RecordsScreen() {
                     {!isFlexible && cumulativeBalance && (
                       <>
                         {renderDetailsHours(cumulativeBalance.targetMinutes, styles.detailsTableTotalText)}
-                        {renderDetailsBalance(
-                          cumulativeBalance.balanceText,
-                          cumulativeBalance.balance,
-                          [
+                        {renderDetailsBalance(cumulativeBalance.balanceText, [
                             styles.detailsTableTotalText,
                             cumulativeBalance.balance >= 0 ? styles.totalBalancePositive : styles.totalBalanceNegative,
-                          ]
-                        )}
+                        ])}
                       </>
                     )}
                   </View>
@@ -1642,12 +1603,12 @@ const createStyles = (isDark: boolean) =>
       color: isDark ? '#aaa' : '#666',
     },
     monthSummaryLeaveValue: {
-      fontSize: 18,
+      fontSize: 16,
       fontWeight: '700',
       color: '#f59e0b',
     },
-    monthSummaryLeaveQuota: {
-      fontSize: 14,
+    monthSummaryLeaveSlash: {
+      fontSize: 16,
       fontWeight: '500',
       color: isDark ? '#888' : '#999',
     },

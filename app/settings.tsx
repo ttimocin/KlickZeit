@@ -242,6 +242,71 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
       >
+        {/* Hesap */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{i18n.t('account')}</Text>
+
+          {user && !user.isAnonymous ? (
+            <>
+              <View style={styles.userInfo}>
+                <Ionicons name="finger-print-outline" size={32} color="#4CAF50" />
+                <View>
+                  <Text style={styles.userCodeLabel}>{i18n.t('yourCode')}</Text>
+                  <Text style={styles.userCodeValue}>{userCode}</Text>
+                </View>
+              </View>
+
+              <View style={styles.userInfo}>
+                <Ionicons name="person-circle-outline" size={32} color="#4CAF50" />
+                <Text style={styles.userEmail}>{user.email}</Text>
+              </View>
+
+              {/* Sync Butonları */}
+              <TouchableOpacity
+                style={styles.syncButton}
+                onPress={handleSyncToCloud}
+                disabled={isSyncing}
+              >
+                <Ionicons name="cloud-upload-outline" size={20} color="#4CAF50" />
+                <Text style={styles.syncButtonText}>{i18n.t('syncToCloud')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.syncButton}
+                onPress={handleLoadFromCloud}
+                disabled={isSyncing}
+              >
+                <Ionicons name="cloud-download-outline" size={20} color="#2196F3" />
+                <Text style={[styles.syncButtonText, { color: '#2196F3' }]}>{i18n.t('loadFromCloud')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                <Ionicons name="log-out-outline" size={20} color="#FF5252" />
+                <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.deleteAccountButton}
+                onPress={() => router.push('/delete-account')}
+              >
+                <Ionicons name="trash-outline" size={20} color="#FF5252" />
+                <Text style={styles.deleteAccountText}>{i18n.t('deleteAccount')}</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.loginHint}>{i18n.t('loginHint')}</Text>
+              <TouchableOpacity
+                style={styles.loginButton}
+                onPress={() => router.push('/login')}
+              >
+                <Ionicons name="log-in-outline" size={20} color="#fff" />
+                <Text style={styles.loginButtonText}>{i18n.t('login')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+
         {/* Dil Seçimi */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{i18n.t('language')}</Text>
@@ -671,71 +736,6 @@ export default function SettingsScreen() {
             <Ionicons name="document-text-outline" size={20} color={isDark ? '#fff' : '#333'} />
             <Text style={styles.linkText}>{i18n.t('termsOfService')}</Text>
           </TouchableOpacity>
-        </View>
-
-        {/* Hesap */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{i18n.t('account')}</Text>
-
-          {user && !user.isAnonymous ? (
-            <>
-              <View style={styles.userInfo}>
-                <Ionicons name="finger-print-outline" size={32} color="#4CAF50" />
-                <View>
-                  <Text style={styles.userCodeLabel}>{i18n.t('yourCode')}</Text>
-                  <Text style={styles.userCodeValue}>{userCode}</Text>
-                </View>
-              </View>
-
-              <View style={styles.userInfo}>
-                <Ionicons name="person-circle-outline" size={32} color="#4CAF50" />
-                <Text style={styles.userEmail}>{user.email}</Text>
-              </View>
-
-              {/* Sync Butonları */}
-              <TouchableOpacity
-                style={styles.syncButton}
-                onPress={handleSyncToCloud}
-                disabled={isSyncing}
-              >
-                <Ionicons name="cloud-upload-outline" size={20} color="#4CAF50" />
-                <Text style={styles.syncButtonText}>{i18n.t('syncToCloud')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.syncButton}
-                onPress={handleLoadFromCloud}
-                disabled={isSyncing}
-              >
-                <Ionicons name="cloud-download-outline" size={20} color="#2196F3" />
-                <Text style={[styles.syncButtonText, { color: '#2196F3' }]}>{i18n.t('loadFromCloud')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Ionicons name="log-out-outline" size={20} color="#FF5252" />
-                <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.deleteAccountButton}
-                onPress={() => router.push('/delete-account')}
-              >
-                <Ionicons name="trash-outline" size={20} color="#FF5252" />
-                <Text style={styles.deleteAccountText}>{i18n.t('deleteAccount')}</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <Text style={styles.loginHint}>{i18n.t('loginHint')}</Text>
-              <TouchableOpacity
-                style={styles.loginButton}
-                onPress={() => router.push('/login')}
-              >
-                <Ionicons name="log-in-outline" size={20} color="#fff" />
-                <Text style={styles.loginButtonText}>{i18n.t('login')}</Text>
-              </TouchableOpacity>
-            </>
-          )}
         </View>
 
         {/* Footer */}

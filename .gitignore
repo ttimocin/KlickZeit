@@ -39,6 +39,7 @@ yarn-error.*
 google-services.json
 android/app/google-services.json
 wear/app/google-services.json
+GoogleService-Info.plist
 firebase-debug.log
 fir*.keystore
 !debug.keystore

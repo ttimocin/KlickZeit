@@ -4,6 +4,7 @@ const path = require('path');
 const appConfig = require('./app.json');
 
 const rootGoogleServices = path.join(__dirname, 'google-services.json');
+const rootGoogleServicesInfo = path.join(__dirname, 'GoogleService-Info.plist');
 const syncTargets = [
   path.join(__dirname, 'android', 'app', 'google-services.json'),
   path.join(__dirname, 'wear', 'app', 'google-services.json'),
@@ -34,13 +35,28 @@ if (process.env.GOOGLE_SERVICES_JSON && process.env.GOOGLE_SERVICES_JSON.trim().
   }
 }
 
-if (!fs.existsSync(rootGoogleServices)) {
-  console.error('❌ google-services.json not found at project root');
-  console.error('   Copy google-services.json.example → google-services.json and fill from Firebase Console.');
-  throw new Error('google-services.json is required for Android build');
+if (process.env.GOOGLE_SERVICES_INFO_PLIST && process.env.GOOGLE_SERVICES_INFO_PLIST.trim().length > 0) {
+  const plistContent = process.env.GOOGLE_SERVICES_INFO_PLIST.trim();
+
+  try {
+    fs.writeFileSync(rootGoogleServicesInfo, plistContent, 'utf8');
+    console.log('✓ GoogleService-Info.plist created at root from GOOGLE_SERVICES_INFO_PLIST');
+  } catch (e) {
+    console.warn('⚠ GOOGLE_SERVICES_INFO_PLIST could not be written:', e.message);
+  }
 }
 
-syncGoogleServicesFrom(rootGoogleServices);
-console.log('✓ google-services.json synced from project root');
+if (!fs.existsSync(rootGoogleServices)) {
+  console.warn('⚠ google-services.json not found — Android builds require this file');
+} else {
+  syncGoogleServicesFrom(rootGoogleServices);
+  console.log('✓ google-services.json synced from project root');
+}
+
+if (!fs.existsSync(rootGoogleServicesInfo)) {
+  console.warn('⚠ GoogleService-Info.plist not found — iOS builds require this file');
+} else {
+  console.log('✓ GoogleService-Info.plist found at project root');
+}
 
 module.exports = appConfig;

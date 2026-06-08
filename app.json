@@ -3,17 +3,28 @@
     "name": "KlickZeit",
     "slug": "klickzeit",
     "version": "1.0.3",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "klickzeit",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.taytek.zeitlog"
+      "bundleIdentifier": "com.taytek.zeitlog",
+      "buildNumber": "1",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationPortrait"
+        ],
+        "CFBundleAllowMixedLocalizations": true
+      }
     },
     "android": {
-      "versionCode": 14,
+      "versionCode": 16,
       "package": "com.taytek.zeitlog",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
@@ -35,6 +46,16 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      "@react-native-firebase/app",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "deploymentTarget": "16.4"
+          }
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
@@ -45,6 +66,12 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#4CAF50"
         }
       ],
       "@react-native-google-signin/google-signin",

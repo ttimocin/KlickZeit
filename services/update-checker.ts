@@ -1,9 +1,15 @@
 import i18n from '@/i18n';
 import remoteConfig from '@react-native-firebase/remote-config';
-import { Alert, BackHandler, Linking } from 'react-native';
+import Constants from 'expo-constants';
+import { Alert, BackHandler, Linking, Platform } from 'react-native';
 
-// Mevcut uygulama versiyonu (app.json'dan alınmalı)
-const CURRENT_VERSION = '1.0.2';
+const CURRENT_VERSION = Constants.expoConfig?.version ?? '1.0.3';
+
+const DEFAULT_UPDATE_URL = Platform.select({
+  ios: 'https://apps.apple.com/app/id0000000000',
+  android: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
+  default: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
+})!;
 
 // Versiyon karşılaştırma (1.0.0 formatı)
 const compareVersions = (v1: string, v2: string): number => {
@@ -32,7 +38,7 @@ export const checkForUpdates = async (): Promise<void> => {
       await remoteConfig().setDefaults({
         force_update_version: '1.0.0',
         latest_version: '1.0.0',
-        update_url: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
+        update_url: DEFAULT_UPDATE_URL,
       });
 
       // Minimum fetch interval (debug için 0, production için 3600)

@@ -15,10 +15,14 @@ import {
   User,
 } from 'firebase/auth';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 // Google Sign-In yapılandırması
 GoogleSignin.configure({
   webClientId: '1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com',
+  ...(process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
+    ? { iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID }
+    : {}),
 });
 
 interface AuthContextType {
@@ -86,8 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signInWithGoogle = async () => {
     try {
-      // Google Play Services kontrolü
-      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+      }
 
       // Google ile giriş yap
       const signInResult = await GoogleSignin.signIn();
