@@ -49,13 +49,13 @@ export default function LoginScreen() {
 
     // Email formatını kontrol et
     if (!isValidEmail(email)) {
-      showWarning(i18n.t('error'), 'Geçersiz e-posta adresi');
+      showWarning(i18n.t('error'), i18n.t('invalidEmailFormat'));
       return;
     }
 
     // Şifre uzunluğunu kontrol et (sadece kayıt için)
     if (!isLogin && !isValidPassword(password)) {
-      showWarning(i18n.t('error'), 'Şifre en az 6 karakter olmalı');
+      showWarning(i18n.t('error'), i18n.t('authWeakPassword'));
       return;
     }
 
@@ -69,7 +69,7 @@ export default function LoginScreen() {
         showError(i18n.t('error'), result.error);
       }
     } catch (error) {
-      showError(i18n.t('error'), 'Beklenmeyen bir hata oluştu');
+      showError(i18n.t('error'), i18n.t('unexpectedError'));
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +83,7 @@ export default function LoginScreen() {
         showError(i18n.t('error'), result.error);
       }
     } catch (error) {
-      showError(i18n.t('error'), 'Beklenmeyen bir hata oluştu');
+      showError(i18n.t('error'), i18n.t('unexpectedError'));
     } finally {
       setIsLoading(false);
     }

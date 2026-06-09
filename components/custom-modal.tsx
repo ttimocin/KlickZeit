@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
+import i18n from '@/i18n';
 import React, { useEffect, useRef } from 'react';
 import {
     Animated,
@@ -33,11 +34,12 @@ export const CustomModal: React.FC<CustomModalProps> = ({
   title,
   message,
   icon,
-  buttons = [{ text: 'Tamam', style: 'default' }],
+  buttons,
   onClose,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
+  const resolvedButtons = buttons ?? [{ text: i18n.t('ok'), style: 'default' as const }];
   
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -122,9 +124,9 @@ export const CustomModal: React.FC<CustomModalProps> = ({
             
             <View style={[
               styles.buttonContainer,
-              buttons.length > 2 && styles.buttonContainerVertical
+              resolvedButtons.length > 2 && styles.buttonContainerVertical
             ]}>
-              {buttons.map((button, index) => {
+              {resolvedButtons.map((button, index) => {
                 const buttonStyle = getButtonStyle(button.style);
                 return (
                   <TouchableOpacity
@@ -132,8 +134,8 @@ export const CustomModal: React.FC<CustomModalProps> = ({
                     style={[
                       styles.button,
                       { backgroundColor: buttonStyle.bg },
-                      buttons.length <= 2 && styles.buttonHorizontal,
-                      buttons.length > 2 && styles.buttonVertical,
+                      resolvedButtons.length <= 2 && styles.buttonHorizontal,
+                      resolvedButtons.length > 2 && styles.buttonVertical,
                     ]}
                     onPress={() => handleButtonPress(button)}
                     activeOpacity={0.7}
@@ -180,7 +182,7 @@ export const useModal = () => {
       title,
       message,
       icon: '✅',
-      buttons: [{ text: 'Tamam', style: 'default', onPress: onOk }],
+      buttons: [{ text: i18n.t('ok'), style: 'default', onPress: onOk }],
     });
   };
 
@@ -189,7 +191,7 @@ export const useModal = () => {
       title,
       message,
       icon: '❌',
-      buttons: [{ text: 'Tamam', style: 'destructive' }],
+      buttons: [{ text: i18n.t('ok'), style: 'destructive' }],
     });
   };
 
@@ -198,7 +200,7 @@ export const useModal = () => {
       title,
       message,
       icon: '⚠️',
-      buttons: [{ text: 'Tamam', style: 'default' }],
+      buttons: [{ text: i18n.t('ok'), style: 'default' }],
     });
   };
 
@@ -207,7 +209,7 @@ export const useModal = () => {
       title,
       message,
       icon: 'ℹ️',
-      buttons: [{ text: 'Tamam', style: 'default' }],
+      buttons: [{ text: i18n.t('ok'), style: 'default' }],
     });
   };
 
@@ -215,8 +217,8 @@ export const useModal = () => {
     title: string,
     message: string,
     onConfirm: () => void,
-    confirmText: string = 'Onayla',
-    cancelText: string = 'İptal',
+    confirmText: string = i18n.t('confirm'),
+    cancelText: string = i18n.t('cancel'),
     isDestructive: boolean = false
   ) => {
     showModal({

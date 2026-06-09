@@ -118,7 +118,7 @@ export default function SettingsScreen() {
           title: i18n.t('info'),
           message: i18n.t('loginToSync'),
           icon: 'ℹ️',
-          buttons: [{ text: 'OK', style: 'default' }],
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
         });
         return;
       }
@@ -127,7 +127,7 @@ export default function SettingsScreen() {
           title: i18n.t('info'),
           message: i18n.t('noInternetConnection'),
           icon: '📡',
-          buttons: [{ text: 'OK', style: 'default' }],
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
         });
         return;
       }
@@ -141,7 +141,7 @@ export default function SettingsScreen() {
         title,
         message,
         icon: isWarning ? '⚠️' : '☁️',
-        buttons: [{ text: 'OK', style: 'default' }],
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
       });
     } finally {
       setSyncProgress((prev) => ({ ...prev, visible: false }));
@@ -173,7 +173,7 @@ export default function SettingsScreen() {
           title: i18n.t('info'),
           message: i18n.t('loginToSync'),
           icon: 'ℹ️',
-          buttons: [{ text: 'OK', style: 'default' }],
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
         });
         return;
       }
@@ -182,7 +182,7 @@ export default function SettingsScreen() {
           title: i18n.t('info'),
           message: i18n.t('noInternetConnection'),
           icon: '📡',
-          buttons: [{ text: 'OK', style: 'default' }],
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
         });
         return;
       }
@@ -201,7 +201,7 @@ export default function SettingsScreen() {
           ? `${result.loaded} ${i18n.t('recordsLoaded')}${standardsLoaded ? ` & ${i18n.t('settingsRestored')}` : ''}`
           : i18n.t('noNewRecords'),
         icon: result.loaded > 0 || standardsLoaded ? '✅' : 'ℹ️',
-        buttons: [{ text: 'OK', style: 'default' }],
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
       });
     } finally {
       setSyncProgress((prev) => ({ ...prev, visible: false }));

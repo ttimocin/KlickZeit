@@ -36,7 +36,7 @@ export default function DeleteAccountScreen() {
         title: i18n.t('error'),
         message: i18n.t('deleteAccountConfirmationError'),
         icon: '⚠️',
-        buttons: [{ text: 'OK', style: 'default' }],
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
       });
       return;
     }
@@ -62,7 +62,7 @@ export default function DeleteAccountScreen() {
                 icon: '✅',
                 buttons: [
                   {
-                    text: 'OK',
+                    text: i18n.t('ok'),
                     style: 'default',
                     onPress: async () => {
                       await logout();
@@ -76,7 +76,7 @@ export default function DeleteAccountScreen() {
                 title: i18n.t('error'),
                 message: result.error || i18n.t('deleteAccountError'),
                 icon: '❌',
-                buttons: [{ text: 'OK', style: 'default' }],
+                buttons: [{ text: i18n.t('ok'), style: 'default' }],
               });
             }
           },

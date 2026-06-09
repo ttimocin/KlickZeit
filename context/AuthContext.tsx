@@ -1,4 +1,5 @@
 import { auth } from '@/config/firebase';
+import i18n from '@/i18n';
 import { Logger } from '@/utils/logger';
 import {
   GoogleSignin,
@@ -119,14 +120,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const googleError = error as { code?: string; message?: string };
 
       if (googleError.code === statusCodes.SIGN_IN_CANCELLED) {
-        return { error: 'Giriş iptal edildi' };
+        return { error: i18n.t('authSignInCancelled') };
       } else if (googleError.code === statusCodes.IN_PROGRESS) {
-        return { error: 'Giriş işlemi devam ediyor' };
+        return { error: i18n.t('authSignInInProgress') };
       } else if (googleError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        return { error: 'Google Play Servisleri kullanılamıyor' };
+        return { error: i18n.t('authPlayServicesNotAvailable') };
       }
 
-      return { error: `Google ile giriş başarısız: ${googleError.message || googleError.code || 'Bilinmeyen hata'}` };
+      const detail = googleError.message || googleError.code || i18n.t('authUnknownError');
+      return { error: i18n.t('authGoogleSignInFailed', { message: detail }) };
     }
   };
 
@@ -160,21 +162,21 @@ export function useAuth() {
 function getErrorMessage(code: string): string {
   switch (code) {
     case 'auth/email-already-in-use':
-      return 'Bu e-posta adresi zaten kullanımda';
+      return i18n.t('authEmailAlreadyInUse');
     case 'auth/invalid-email':
-      return 'Geçersiz e-posta adresi';
+      return i18n.t('invalidEmailFormat');
     case 'auth/weak-password':
-      return 'Şifre en az 6 karakter olmalı';
+      return i18n.t('authWeakPassword');
     case 'auth/user-not-found':
-      return 'Kullanıcı bulunamadı';
+      return i18n.t('authUserNotFound');
     case 'auth/wrong-password':
-      return 'Hatalı şifre';
+      return i18n.t('authWrongPassword');
     case 'auth/invalid-credential':
-      return 'Geçersiz e-posta veya şifre';
+      return i18n.t('authInvalidCredential');
     case 'auth/too-many-requests':
-      return 'Çok fazla deneme. Lütfen bekleyin';
+      return i18n.t('authTooManyRequests');
     default:
-      return 'Bir hata oluştu';
+      return i18n.t('authGenericError');
   }
 }
 

@@ -113,12 +113,24 @@ const shortDayNames: Record<string, string[]> = {
   tr: ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'],
   en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
   de: ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'],
+  fr: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+  pt: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+  ar: ['إث', 'ثل', 'أر', 'خم', 'جم', 'سب', 'أح'],
+  zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+  ru: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+  uk: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'],
 };
 
 const fullDayNames: Record<string, string[]> = {
   tr: ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'],
   en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
   de: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+  fr: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'],
+  pt: ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'],
+  ar: ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'],
+  zh: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日'],
+  ru: ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'],
+  uk: ['Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота', 'Неділя'],
 };
 
 // JS getDay (0=Pazar..6=Cumartesi) -> Pazartesi bazlı indeks (0=Pzt..6=Paz)
@@ -545,7 +557,7 @@ export default function RecordsScreen() {
         title: i18n.t('importSuccess'),
         message,
         icon: '✅',
-        buttons: [{ text: 'Tamam', style: 'default' }],
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
       });
       await loadSummaries();
     } else if (result.success && totalChanges === 0) {
@@ -598,7 +610,7 @@ export default function RecordsScreen() {
           title,
           message,
           icon: isWarning ? '⚠️' : '☁️',
-          buttons: [{ text: 'Tamam', style: 'default' }],
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
         });
       } else {
         showInfo(i18n.t('info'), i18n.t('noRecordsToSync'));

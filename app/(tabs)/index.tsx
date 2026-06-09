@@ -533,15 +533,15 @@ export default function HomeScreen() {
       >
         <View style={styles.gameSelectOverlay}>
           <View style={styles.gameSelectContainer}>
-            <Text style={styles.gameSelectTitle}>🎮 Oyun Takma Adı</Text>
+            <Text style={styles.gameSelectTitle}>{i18n.t('gameNicknameTitle')}</Text>
             <Text style={{ color: isDark ? '#aaa' : '#666', fontSize: 14, textAlign: 'center', marginBottom: 16, lineHeight: 20 }}>
-              {'Puan tablolarinda gorunecek takma adinizi belirleyin.\nBos birakirsan anonim kod kullanilir.'}
+              {i18n.t('gameNicknameHint')}
             </Text>
 
             <View style={{ borderWidth: 1, borderColor: isDark ? '#444' : '#ddd', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 16 }}>
               <TextInput
                 style={{ fontSize: 16, color: isDark ? '#fff' : '#000' }}
-                placeholder="Takma adın (max 24 karakter)"
+                placeholder={i18n.t('gameNicknamePlaceholder')}
                 placeholderTextColor={isDark ? '#555' : '#bbb'}
                 maxLength={24}
                 autoCapitalize="words"
@@ -566,7 +566,9 @@ export default function HomeScreen() {
             >
               <View style={styles.gameSelectInfo}>
                 <Text style={[styles.gameSelectName, { color: '#fff' }]}>
-                  {pendingNickname.trim() ? '✅ Kaydet ve Devam Et' : '👻 Anonim Devam Et'}
+                  {pendingNickname.trim()
+                    ? i18n.t('gameNicknameSaveContinue')
+                    : i18n.t('gameNicknameContinueAnonymous')}
                 </Text>
               </View>
             </TouchableOpacity>
