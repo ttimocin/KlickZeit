@@ -59,4 +59,36 @@ if (!fs.existsSync(rootGoogleServicesInfo)) {
   console.log('✓ GoogleService-Info.plist found at project root');
 }
 
-module.exports = appConfig;
+function getFirebaseExtraFromGoogleServices() {
+  if (!fs.existsSync(rootGoogleServices)) return {};
+  try {
+    const gs = JSON.parse(fs.readFileSync(rootGoogleServices, 'utf8'));
+    const client =
+      gs.client?.find(
+        (c) => c.client_info?.android_client_info?.package_name === 'com.taytek.zeitlog'
+      ) ?? gs.client?.[0];
+    if (!client?.api_key?.[0]?.current_key) return {};
+    return {
+      apiKey: client.api_key[0].current_key,
+      authDomain: `${gs.project_info.project_id}.firebaseapp.com`,
+      projectId: gs.project_info.project_id,
+      storageBucket: gs.project_info.storage_bucket,
+      messagingSenderId: String(gs.project_info.project_number),
+      appId: client.client_info.mobilesdk_app_id,
+    };
+  } catch (e) {
+    console.warn('⚠ Could not read firebase config from google-services.json:', e.message);
+    return {};
+  }
+}
+
+module.exports = {
+  ...appConfig,
+  expo: {
+    ...appConfig.expo,
+    extra: {
+      ...appConfig.expo.extra,
+      firebase: getFirebaseExtraFromGoogleServices(),
+    },
+  },
+};
