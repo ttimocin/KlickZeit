@@ -1,0 +1,33 @@
+diff --git a/node_modules/expo-document-picker/ios/DocumentPickerModule.swift b/node_modules/expo-document-picker/ios/DocumentPickerModule.swift
+index 0000000..1111111 100644
+--- a/node_modules/expo-document-picker/ios/DocumentPickerModule.swift
++++ b/node_modules/expo-document-picker/ios/DocumentPickerModule.swift
+@@ -176,8 +176,15 @@ public class DocumentPickerModule: Module, PickingResultHandler {
+       return UTType.audio
+     case "text/*":
+       return UTType.text
++    case "text/csv", "text/comma-separated-values", "application/csv", "public.comma-separated-values-text":
++      return UTType.commaSeparatedText
++    case "public.plain-text", "public.text":
++      return UTType.plainText
+     default:
+-      return UTType(mimeType: mimeType)
++      if mimeType.contains("/") {
++        return UTType(mimeType: mimeType) ?? UTType.item
++      }
++      return UTType(mimeType) ?? UTType.item
+     }
+   }
+ 
+@@ -211,7 +218,10 @@ public class DocumentPickerModule: Module, PickingResultHandler {
+ 
+   private func createDocumentPicker(with options: DocumentPickerOptions) -> UIDocumentPickerViewController {
+     if #available(iOS 14.0, *) {
+-      let utTypes = options.type.compactMap { toUTType(mimeType: $0) }
++      var utTypes = options.type.compactMap { toUTType(mimeType: $0) }
++      if utTypes.isEmpty {
++        utTypes = [UTType.item]
++      }
+       return UIDocumentPickerViewController(
+         forOpeningContentTypes: utTypes,
+         asCopy: true

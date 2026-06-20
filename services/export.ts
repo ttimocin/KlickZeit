@@ -1,6 +1,7 @@
 import i18n from '@/i18n';
 import { DailySummary, WorkRecord } from '@/types';
 import * as DocumentPicker from 'expo-document-picker';
+import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -180,6 +181,7 @@ export const exportToCSV = async (): Promise<boolean> => {
     if (await Sharing.isAvailableAsync()) {
       await Sharing.shareAsync(filePath, {
         mimeType: 'text/csv',
+        UTI: 'public.comma-separated-values-text',
         dialogTitle: 'İş Takip Kayıtlarını Paylaş',
       });
       return true;
@@ -474,12 +476,26 @@ const parseTime = (timeStr: string): string | null => {
   return null;
 };
 
+// iOS Files app often tags CSV as plain text / comma-separated-values, not text/csv MIME.
+const getCsvDocumentPickerTypes = (): string | string[] => {
+  if (Platform.OS === 'ios') {
+    return [
+      'public.comma-separated-values-text',
+      'public.plain-text',
+      'text/csv',
+      'text/*',
+      '*/*',
+    ];
+  }
+  return ['text/csv', 'text/comma-separated-values', 'application/csv', '*/*'];
+};
+
 // CSV dosyasından içe aktar (mevcut kayıtları günceller veya yeni ekler)
 export const importFromCSV = async (): Promise<{ success: boolean; imported: number; updated: number; error?: string }> => {
   try {
     // Dosya seç
     const result = await DocumentPicker.getDocumentAsync({
-      type: ['text/csv', 'text/comma-separated-values', 'application/csv', '*/*'],
+      type: getCsvDocumentPickerTypes(),
       copyToCacheDirectory: true,
     });
 
