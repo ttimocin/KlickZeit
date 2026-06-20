@@ -9,10 +9,12 @@ import {
 import * as AppleAuthentication from 'expo-apple-authentication';
 import * as Crypto from 'expo-crypto';
 import {
+  ActionCodeSettings,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
   OAuthProvider,
   onAuthStateChanged,
+  sendEmailVerification,
   signInAnonymously,
   signInWithCredential,
   signInWithEmailAndPassword,
@@ -43,14 +45,51 @@ GoogleSignin.configure({
   iosClientId: googleIosClientId,
 });
 
+interface AuthResult {
+  error?: string;
+  needsEmailVerification?: boolean;
+  resentVerification?: boolean;
+}
+
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string) => Promise<{ error?: string }>;
+  signIn: (email: string, password: string) => Promise<AuthResult>;
+  signUp: (email: string, password: string) => Promise<AuthResult>;
+  resendVerificationEmail: (email: string, password: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<{ error?: string }>;
   signInWithApple: () => Promise<{ error?: string }>;
   logout: () => Promise<void>;
+}
+
+function getEmailVerificationActionCodeSettings(): ActionCodeSettings {
+  const projectId =
+    (Constants.expoConfig?.extra?.firebase as { projectId?: string } | undefined)?.projectId ??
+    process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID ??
+    'zeitlog-8aad7';
+
+  // Özel domain gerekmez — Firebase proje domain'i otomatik yetkilidir
+  return {
+    url: `https://${projectId}.firebaseapp.com`,
+    handleCodeInApp: false,
+  };
+}
+
+async function sendVerificationEmail(user: User) {
+  await sendEmailVerification(user, getEmailVerificationActionCodeSettings());
+}
+
+function isEmailPasswordUser(user: User): boolean {
+  return user.providerData.some((provider) => provider.providerId === 'password');
+}
+
+async function ensureEmailVerifiedOrSignOut(user: User): Promise<boolean> {
+  await user.reload();
+  if (isEmailPasswordUser(user) && !user.emailVerified) {
+    await signOut(auth);
+    return false;
+  }
+  return true;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -71,7 +110,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // İnternet yokken anonim giriş uzun sürebilir; en fazla 2.5 sn bekle
     const maxWait = setTimeout(stopLoading, 2500);
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser && !currentUser.isAnonymous && isEmailPasswordUser(currentUser)) {
+        const verified = await ensureEmailVerifiedOrSignOut(currentUser);
+        if (!verified) {
+          stopLoading();
+          return;
+        }
+      }
+
       setUser(currentUser);
       stopLoading();
       if (!currentUser) {
@@ -87,9 +134,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<AuthResult> => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      await credential.user.reload();
+
+      if (!credential.user.emailVerified) {
+        await sendVerificationEmail(credential.user);
+        await signOut(auth);
+        return {
+          error: i18n.t('authEmailNotVerified'),
+          resentVerification: true,
+        };
+      }
+
       return {};
     } catch (error: unknown) {
       const firebaseError = error as { code?: string; message?: string };
@@ -97,10 +155,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string): Promise<AuthResult> => {
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      return {};
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      await sendVerificationEmail(credential.user);
+      await signOut(auth);
+      return { needsEmailVerification: true };
+    } catch (error: unknown) {
+      const firebaseError = error as { code?: string; message?: string };
+      return { error: getErrorMessage(firebaseError.code || 'unknown') };
+    }
+  };
+
+  const resendVerificationEmail = async (email: string, password: string): Promise<AuthResult> => {
+    try {
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      await credential.user.reload();
+
+      if (credential.user.emailVerified) {
+        await signOut(auth);
+        return { error: i18n.t('authEmailAlreadyVerified') };
+      }
+
+      await sendVerificationEmail(credential.user);
+      await signOut(auth);
+      return { needsEmailVerification: true };
     } catch (error: unknown) {
       const firebaseError = error as { code?: string; message?: string };
       return { error: getErrorMessage(firebaseError.code || 'unknown') };
@@ -209,7 +288,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signInWithGoogle, signInWithApple, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        signIn,
+        signUp,
+        resendVerificationEmail,
+        signInWithGoogle,
+        signInWithApple,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

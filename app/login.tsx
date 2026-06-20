@@ -22,8 +22,8 @@ export default function LoginScreen() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const insets = useSafeAreaInsets();
-  const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
-  const { showError, showWarning, ModalComponent } = useModal();
+  const { signIn, signUp, resendVerificationEmail, signInWithGoogle, signInWithApple } = useAuth();
+  const { showError, showWarning, showInfo, ModalComponent } = useModal();
 
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -73,7 +73,43 @@ export default function LoginScreen() {
         ? await signIn(email, password)
         : await signUp(email, password);
 
+      if (result.needsEmailVerification) {
+        showInfo(i18n.t('info'), i18n.t('authEmailVerificationSent'));
+        setIsLogin(true);
+        return;
+      }
+
       if (result.error) {
+        if (result.resentVerification) {
+          showWarning(i18n.t('error'), i18n.t('authEmailNotVerifiedWithResent'));
+        } else {
+          showError(i18n.t('error'), result.error);
+        }
+      }
+    } catch (error) {
+      showError(i18n.t('error'), i18n.t('unexpectedError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!email || !password) {
+      showWarning(i18n.t('error'), i18n.t('fillAllFields'));
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showWarning(i18n.t('error'), i18n.t('invalidEmailFormat'));
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await resendVerificationEmail(email, password);
+      if (result.needsEmailVerification) {
+        showInfo(i18n.t('info'), i18n.t('authEmailVerificationSent'));
+      } else if (result.error) {
         showError(i18n.t('error'), result.error);
       }
     } catch (error) {
@@ -229,6 +265,16 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {isLogin && (
+            <TouchableOpacity
+              style={styles.resendButton}
+              onPress={handleResendVerification}
+              disabled={isLoading}
+            >
+              <Text style={styles.resendButtonText}>{i18n.t('authResendVerification')}</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
 
@@ -366,6 +412,16 @@ const createStyles = (isDark: boolean) =>
       color: '#4CAF50',
       fontSize: 14,
       fontWeight: '600',
+    },
+    resendButton: {
+      marginTop: 16,
+      alignItems: 'center',
+      paddingVertical: 8,
+    },
+    resendButtonText: {
+      color: isDark ? '#aaa' : '#666',
+      fontSize: 13,
+      textDecorationLine: 'underline',
     },
   });
 
