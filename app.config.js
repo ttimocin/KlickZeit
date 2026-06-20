@@ -59,6 +59,13 @@ if (!fs.existsSync(rootGoogleServicesInfo)) {
   console.log('✓ GoogleService-Info.plist found at project root');
 }
 
+function readPlistString(plistContent, key) {
+  const match = plistContent.match(
+    new RegExp(`<key>${key}</key>\\s*<string>([^<]+)</string>`)
+  );
+  return match ? match[1] : undefined;
+}
+
 function getFirebaseExtraFromGoogleServices() {
   if (!fs.existsSync(rootGoogleServices)) return {};
   try {
@@ -82,13 +89,47 @@ function getFirebaseExtraFromGoogleServices() {
   }
 }
 
+function getFirebaseExtraFromGoogleServicesInfo() {
+  if (!fs.existsSync(rootGoogleServicesInfo)) return {};
+  try {
+    const plist = fs.readFileSync(rootGoogleServicesInfo, 'utf8');
+    const apiKey = readPlistString(plist, 'API_KEY');
+    const projectId = readPlistString(plist, 'PROJECT_ID');
+    const storageBucket = readPlistString(plist, 'STORAGE_BUCKET');
+    const messagingSenderId = readPlistString(plist, 'GCM_SENDER_ID');
+    const appId = readPlistString(plist, 'GOOGLE_APP_ID');
+    const iosClientId = readPlistString(plist, 'CLIENT_ID');
+
+    if (!apiKey || !projectId || !appId) return {};
+
+    return {
+      apiKey,
+      authDomain: `${projectId}.firebaseapp.com`,
+      projectId,
+      storageBucket,
+      messagingSenderId,
+      appId,
+      iosClientId,
+    };
+  } catch (e) {
+    console.warn('⚠ Could not read firebase config from GoogleService-Info.plist:', e.message);
+    return {};
+  }
+}
+
+function getFirebaseExtra() {
+  const fromAndroid = getFirebaseExtraFromGoogleServices();
+  if (fromAndroid.apiKey) return fromAndroid;
+  return getFirebaseExtraFromGoogleServicesInfo();
+}
+
 module.exports = {
   ...appConfig,
   expo: {
     ...appConfig.expo,
     extra: {
       ...appConfig.expo.extra,
-      firebase: getFirebaseExtraFromGoogleServices(),
+      firebase: getFirebaseExtra(),
     },
   },
 };

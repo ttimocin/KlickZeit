@@ -1,13 +1,17 @@
 import { auth } from '@/config/firebase';
 import i18n from '@/i18n';
+import Constants from 'expo-constants';
 import { Logger } from '@/utils/logger';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import * as Crypto from 'expo-crypto';
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  OAuthProvider,
   onAuthStateChanged,
   signInAnonymously,
   signInWithCredential,
@@ -18,12 +22,25 @@ import {
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 
+async function createAppleSignInNonce(): Promise<{ rawNonce: string; hashedNonce: string }> {
+  const bytes = await Crypto.getRandomBytesAsync(32);
+  const rawNonce = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+  const hashedNonce = await Crypto.digestStringAsync(
+    Crypto.CryptoDigestAlgorithm.SHA256,
+    rawNonce
+  );
+  return { rawNonce, hashedNonce };
+}
+
+const googleIosClientId =
+  process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID ??
+  (Constants.expoConfig?.extra?.firebase as { iosClientId?: string } | undefined)?.iosClientId ??
+  '1014925050088-kgium6pn4lrfov3jb9usavmkjkm240rr.apps.googleusercontent.com';
+
 // Google Sign-In yapılandırması
 GoogleSignin.configure({
   webClientId: '1014925050088-uagisb6c5lntdbdikkd5f8gbn5tssp73.apps.googleusercontent.com',
-  ...(process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
-    ? { iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID }
-    : {}),
+  iosClientId: googleIosClientId,
 });
 
 interface AuthContextType {
@@ -32,6 +49,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
   signUp: (email: string, password: string) => Promise<{ error?: string }>;
   signInWithGoogle: () => Promise<{ error?: string }>;
+  signInWithApple: () => Promise<{ error?: string }>;
   logout: () => Promise<void>;
 }
 
@@ -86,6 +104,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: unknown) {
       const firebaseError = error as { code?: string; message?: string };
       return { error: getErrorMessage(firebaseError.code || 'unknown') };
+    }
+  };
+
+  const signInWithApple = async () => {
+    try {
+      if (Platform.OS !== 'ios') {
+        return { error: i18n.t('authAppleNotAvailable') };
+      }
+
+      const isAvailable = await AppleAuthentication.isAvailableAsync();
+      if (!isAvailable) {
+        return { error: i18n.t('authAppleNotAvailable') };
+      }
+
+      const { rawNonce, hashedNonce } = await createAppleSignInNonce();
+      const appleCredential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+        nonce: hashedNonce,
+      });
+
+      if (!appleCredential.identityToken) {
+        return {
+          error: i18n.t('authAppleSignInFailed', { message: i18n.t('authUnknownError') }),
+        };
+      }
+
+      const provider = new OAuthProvider('apple.com');
+      const credential = provider.credential({
+        idToken: appleCredential.identityToken,
+        rawNonce,
+      });
+
+      await signInWithCredential(auth, credential);
+      return {};
+    } catch (error: unknown) {
+      Logger.error('❌ Apple Sign-In Error:', error);
+
+      const appleError = error as { code?: string; message?: string };
+      if (appleError.code === 'ERR_REQUEST_CANCELED') {
+        return { error: i18n.t('authSignInCancelled') };
+      }
+
+      const detail = appleError.message || appleError.code || i18n.t('authUnknownError');
+      return { error: i18n.t('authAppleSignInFailed', { message: detail }) };
     }
   };
 
@@ -144,7 +209,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signInWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, signUp, signInWithGoogle, signInWithApple, logout }}>
       {children}
     </AuthContext.Provider>
   );

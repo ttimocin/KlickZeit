@@ -3,7 +3,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,7 +22,7 @@ export default function LoginScreen() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const insets = useSafeAreaInsets();
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, signInWithApple } = useAuth();
   const { showError, showWarning, ModalComponent } = useModal();
 
   const [isLogin, setIsLogin] = useState(true);
@@ -29,6 +30,13 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [appleAuthAvailable, setAppleAuthAvailable] = useState(false);
+
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AppleAuthentication.isAvailableAsync().then(setAppleAuthAvailable);
+    }
+  }, []);
 
   // Email formatını kontrol et
   const isValidEmail = (email: string): boolean => {
@@ -79,6 +87,20 @@ export default function LoginScreen() {
     setIsLoading(true);
     try {
       const result = await signInWithGoogle();
+      if (result.error) {
+        showError(i18n.t('error'), result.error);
+      }
+    } catch (error) {
+      showError(i18n.t('error'), i18n.t('unexpectedError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    setIsLoading(true);
+    try {
+      const result = await signInWithApple();
       if (result.error) {
         showError(i18n.t('error'), result.error);
       }
@@ -171,9 +193,24 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
+          {/* Apple Sign In (iOS — App Store requirement, above Google) */}
+          {Platform.OS === 'ios' && appleAuthAvailable && (
+            <AppleAuthentication.AppleAuthenticationButton
+              buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+              buttonStyle={
+                isDark
+                  ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE
+                  : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
+              cornerRadius={12}
+              style={styles.appleButton}
+              onPress={handleAppleSignIn}
+            />
+          )}
+
           {/* Google Sign In */}
           <TouchableOpacity
-            style={styles.googleButton}
+            style={[styles.googleButton, Platform.OS === 'ios' && appleAuthAvailable && styles.socialButtonSpacing]}
             onPress={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -301,6 +338,14 @@ const createStyles = (isDark: boolean) =>
       borderWidth: 1,
       borderColor: isDark ? '#333' : '#e0e0e0',
       gap: 12,
+    },
+    appleButton: {
+      width: '100%',
+      height: 56,
+      marginBottom: 12,
+    },
+    socialButtonSpacing: {
+      marginTop: 0,
     },
     googleButtonText: {
       color: isDark ? '#fff' : '#333',

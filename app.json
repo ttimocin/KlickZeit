@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.taytek.zeitlog",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
@@ -75,6 +75,7 @@
         }
       ],
       "@react-native-google-signin/google-signin",
+      "expo-apple-authentication",
       "@react-native-community/datetimepicker"
     ],
     "experiments": {
