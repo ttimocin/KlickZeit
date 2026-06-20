@@ -2,12 +2,17 @@ import { HOME_BANNER_AD_UNIT_ID, HOME_BANNER_HEIGHT } from '@/config/ads';
 import React from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import { usePurchases } from '@/context/PurchasesContext';
 
 type Props = {
   isDark: boolean;
 };
 
 export function HomeBannerAd({ isDark }: Props) {
+  const { isPro } = usePurchases();
+
+  if (isPro) return null;
+
   if (Platform.OS === 'web') {
     return <View style={[styles.slot, { height: HOME_BANNER_HEIGHT }]} />;
   }

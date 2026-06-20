@@ -40,7 +40,11 @@ const themes = [
   { code: 'dark', icon: 'moon' as const },
 ];
 
+import RevenueCatUI from 'react-native-purchases-ui';
+import { usePurchases } from '@/context/PurchasesContext';
+
 export default function SettingsScreen() {
+  const { isPro, customerInfo } = usePurchases();
   const { theme, themeMode, setThemeMode } = useTheme();
   const isDark = theme === 'dark';
   const insets = useSafeAreaInsets();
@@ -709,6 +713,41 @@ export default function SettingsScreen() {
                 </TouchableOpacity>
               ) : null}
             </View>
+          </View>
+        </View>
+
+        {/* Pro & Ads */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Premium</Text>
+          <View style={styles.card}>
+            <TouchableOpacity 
+              style={[styles.row, isPro ? styles.rowDisabled : undefined]} 
+              onPress={() => RevenueCatUI.presentPaywall()}
+              disabled={isPro}
+            >
+              <View style={styles.rowIcon}>
+                <Feather name="star" size={20} color={isPro ? "#FFD700" : "#4CAF50"} />
+              </View>
+              <View style={styles.rowContent}>
+                <Text style={styles.rowLabel}>
+                  {isPro ? 'KlickZeit Pro (Aktif)' : 'Reklamları Kaldır (Ömür Boyu)'}
+                </Text>
+              </View>
+              {!isPro && <Feather name="chevron-right" size={20} color={theme === 'dark' ? '#666' : '#999'} />}
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.row} 
+              onPress={() => RevenueCatUI.presentCustomerCenter()}
+            >
+              <View style={styles.rowIcon}>
+                <Feather name="headphones" size={20} color="#4CAF50" />
+              </View>
+              <View style={styles.rowContent}>
+                <Text style={styles.rowLabel}>Satın Almaları Yönet</Text>
+              </View>
+              <Feather name="chevron-right" size={20} color={theme === 'dark' ? '#666' : '#999'} />
+            </TouchableOpacity>
           </View>
         </View>
 

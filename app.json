@@ -42,7 +42,8 @@
       "permissions": [
         "INTERNET",
         "SYSTEM_ALERT_WINDOW",
-        "VIBRATE"
+        "VIBRATE",
+        "com.android.vending.BILLING"
       ]
     },
     "web": {

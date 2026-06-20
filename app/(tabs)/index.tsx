@@ -1,20 +1,20 @@
+import { HomeBannerAd } from '@/components/HomeBannerAd';
 import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
 import TetrisGame from '@/components/TetrisGame';
-import { HomeBannerAd } from '@/components/HomeBannerAd';
+import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
-import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
 import i18n from '@/i18n';
 import { syncToFirebase } from '@/services/firebase-sync';
 import { hasSeenNicknamePrompt, markNicknamePromptSeen, setGameNickname, syncNicknameFromFirestore } from '@/services/game-nickname';
 import {
-  requestNotificationPermissions,
-  rescheduleRemindersAfterBreak,
-  setupNotificationChannel,
-  showCheckInNotification,
-  showCheckOutNotification,
+    requestNotificationPermissions,
+    rescheduleRemindersAfterBreak,
+    setupNotificationChannel,
+    showCheckInNotification,
+    showCheckOutNotification,
 } from '@/services/notifications';
 import { addRecord, getBreakDuration as getBreakDurationFromStorage, getLastBreakRecord, getLastRecord, getTodayBreakRecords, getTodayWorkRecords, setBreakDuration } from '@/services/storage';
 import { sendEntryTimeToWear } from '@/services/wearable-sync';
@@ -27,15 +27,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
-  Dimensions,
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    ActivityIndicator,
+    Dimensions,
+    Modal,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -317,6 +317,7 @@ export default function HomeScreen() {
 
   return (
     <View key={`home-${forceUpdate}`} style={[styles.container, { paddingTop: insets.top }]}>
+      <PremiumPromoModal />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomChromeHeight }}
         showsVerticalScrollIndicator={false}

@@ -2,6 +2,7 @@ import { CloudRestoreOnLoginPrompt } from '@/components/cloud-restore-on-login';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/context/ThemeContext';
+import { PurchasesProvider } from '@/context/PurchasesContext';
 import { checkForUpdates } from '@/services/update-checker';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
@@ -84,9 +85,11 @@ export default function RootLayout() {
   return (
     <AppThemeProvider>
       <AuthProvider>
-        <LanguageProvider>
-          <RootLayoutNav />
-        </LanguageProvider>
+        <PurchasesProvider>
+          <LanguageProvider>
+            <RootLayoutNav />
+          </LanguageProvider>
+        </PurchasesProvider>
       </AuthProvider>
     </AppThemeProvider>
   );
