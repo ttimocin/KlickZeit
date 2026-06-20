@@ -1,5 +1,6 @@
 import { useModal } from '@/components/custom-modal';
 import { HomeBannerAd } from '@/components/HomeBannerAd';
+import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
 import { SyncProgressModal, SyncProgressState } from '@/components/sync-progress-modal';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -28,7 +29,7 @@ import {
   UIManager,
   View
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Android için LayoutAnimation desteği
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -195,6 +196,7 @@ const buildWeekData = (
 };
 
 export default function RecordsScreen() {
+  const insets = useSafeAreaInsets();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { forceUpdate, language } = useLanguage();
@@ -827,6 +829,8 @@ export default function RecordsScreen() {
     return monthlyBalances.reduce((sum, m) => sum + (m.workedDayCount ?? m.dayCount), 0);
   }, [monthlyBalances]);
 
+  const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
+  const bottomChromeHeight = tabBarHeight + HOME_BANNER_HEIGHT;
   const styles = createStyles(isDark);
 
   const renderDetailsDays = (count: number, extraStyle?: object) => (
@@ -1016,35 +1020,6 @@ export default function RecordsScreen() {
       </View>
     </View>
   );
-
-  const renderWeekCardsWithBanner = () => {
-    if (weeklyData.length === 0) {
-      return (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>📅</Text>
-          <Text style={styles.emptyText}>{i18n.t('noRecordsYet')}</Text>
-          <Text style={styles.emptySubtext}>{i18n.t('addFromHome')}</Text>
-        </View>
-      );
-    }
-
-    return weeklyData.flatMap((week, index) => {
-      const nodes: React.ReactNode[] = [renderWeekCard(week)];
-      const shouldInsertBanner =
-        (weeklyData.length === 1 && index === 0) ||
-        (weeklyData.length > 1 && index === 0);
-
-      if (shouldInsertBanner) {
-        nodes.push(
-          <View key="explore-banner-after-latest" style={styles.inlineBannerContainer}>
-            <HomeBannerAd isDark={isDark} />
-          </View>
-        );
-      }
-
-      return nodes;
-    });
-  };
 
   return (
     <SafeAreaView key={`history-${forceUpdate}`} style={styles.container}>
@@ -1324,7 +1299,7 @@ export default function RecordsScreen() {
       {/* Haftalık Görünüm */}
       <ScrollView
         style={styles.weeklyContainer}
-        contentContainerStyle={styles.weeklyContent}
+        contentContainerStyle={[styles.weeklyContent, { paddingBottom: bottomChromeHeight + 16 }]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -1334,8 +1309,20 @@ export default function RecordsScreen() {
           />
         }
       >
-        {renderWeekCardsWithBanner()}
+        {weeklyData.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyIcon}>📅</Text>
+            <Text style={styles.emptyText}>{i18n.t('noRecordsYet')}</Text>
+            <Text style={styles.emptySubtext}>{i18n.t('addFromHome')}</Text>
+          </View>
+        ) : (
+          weeklyData.map(renderWeekCard)
+        )}
       </ScrollView>
+
+      <View style={[styles.bannerDock, { bottom: tabBarHeight }]}>
+        <HomeBannerAd isDark={isDark} />
+      </View>
 
       {/* Custom Modal */}
       <SyncProgressModal
@@ -1934,8 +1921,10 @@ const createStyles = (isDark: boolean) =>
       padding: 20,
       paddingTop: 16,
     },
-    inlineBannerContainer: {
-      marginBottom: 20,
+    bannerDock: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
       alignItems: 'center',
     },
     weekCard: {
