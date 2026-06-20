@@ -6,218 +6,136 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gizlilik Politikası - KlickZeit</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #1a1a2e;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-
-        .last-updated {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .section {
-            margin-bottom: 30px;
-        }
-
-        .section h2 {
-            color: #1a1a2e;
-            font-size: 20px;
-            margin-bottom: 12px;
-            margin-top: 24px;
-        }
-
-        .section p {
-            color: #666;
-            font-size: 15px;
-            line-height: 1.8;
-            white-space: pre-line;
-        }
-
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
-            text-align: center;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .footer a {
-            color: #10b981;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .lang-switcher { text-align: right; margin-bottom: 20px; font-size: 14px; }
+        .lang-switcher a { color: #10b981; text-decoration: none; margin-left: 12px; }
+        .lang-switcher a:hover { text-decoration: underline; }
+        h1 { color: #1a1a2e; margin-bottom: 10px; font-size: 32px; }
+        .last-updated { color: #666; font-size: 14px; margin-bottom: 30px; }
+        .section { margin-bottom: 30px; }
+        .section h2 { color: #1a1a2e; font-size: 20px; margin-bottom: 12px; margin-top: 24px; }
+        .section p { color: #666; font-size: 15px; line-height: 1.8; white-space: pre-line; }
+        .section a { color: #10b981; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; color: #999; font-size: 14px; }
+        .footer a { color: #10b981; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
         @media (prefers-color-scheme: dark) {
-            body {
-                background: #121212;
-                color: #fff;
-            }
-
-            .container {
-                background: #1e1e1e;
-            }
-
-            h1,
-            .section h2 {
-                color: #fff;
-            }
-
-            .section p {
-                color: #ccc;
-            }
-
-            .last-updated {
-                color: #888;
-            }
-
-            .footer {
-                border-top-color: #333;
-                color: #666;
-            }
+            body { background: #121212; color: #fff; }
+            .container { background: #1e1e1e; }
+            h1, .section h2 { color: #fff; }
+            .section p { color: #ccc; }
+            .last-updated { color: #888; }
+            .footer { border-top-color: #333; color: #666; }
         }
-
         @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 24px;
-            }
+            body { padding: 10px; }
+            .container { padding: 20px; }
+            h1 { font-size: 24px; }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="lang-switcher" style="text-align: right; margin-bottom: 20px; font-size: 14px;">
-            <a href="privacy-policy.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇹🇷 TR</a>
-            <a href="privacy-policy-en.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇬🇧
-                EN</a>
-            <a href="privacy-policy-de.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇩🇪
-                DE</a>
-            <a href="privacy-policy-fr.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇫🇷
-                FR</a>
-            <a href="privacy-policy-pt.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇵🇹
-                PT</a>
-            <a href="privacy-policy-ar.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇸🇦
-                AR</a>
-            <a href="privacy-policy-zh.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇨🇳
-                ZH</a>
-            <a href="privacy-policy-ru.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇷🇺
-                RU</a>
-            <a href="privacy-policy-uk.html" style="color: #10b981; text-decoration: none; margin-left: 12px;">🇺🇦
-                UK</a>
+        <div class="lang-switcher">
+            <a href="privacy-policy.html">🇹🇷 TR</a>
+            <a href="privacy-policy-en.html">🇬🇧 EN</a>
+            <a href="privacy-policy-de.html">🇩🇪 DE</a>
+            <a href="privacy-policy-fr.html">🇫🇷 FR</a>
+            <a href="privacy-policy-pt.html">🇵🇹 PT</a>
+            <a href="privacy-policy-ar.html">🇸🇦 AR</a>
+            <a href="privacy-policy-zh.html">🇨🇳 ZH</a>
+            <a href="privacy-policy-ru.html">🇷🇺 RU</a>
+            <a href="privacy-policy-uk.html">🇺🇦 UK</a>
         </div>
 
         <h1>Gizlilik Politikası</h1>
-        <p class="last-updated">Son Güncelleme: 2025</p>
+        <p class="last-updated">Son Güncelleme: 19 Haziran 2026</p>
 
         <div class="section">
-            <h2>1. Veri Toplama</h2>
-            <p>KlickZeit, uygulamanın temel işlevlerini ve oyun özelliklerini sağlamak için aşağıdaki verileri toplar:
-
-                • E-posta adresi (Firebase Authentication için)
-                • Giriş/çıkış saatleri ve çalışma süreleri
-                • Oyun skorları ve en iyi süreler (Liderlik tablosu için)
-                • Her kullanıcıya atanan anonim Kullanıcı Kodu (örn: KZ-ABCD1234)
-                • Cihazınızda yerel olarak saklanan kayıtlar</p>
+            <h2>1. Giriş</h2>
+            <p>KlickZeit, TayTek tarafından geliştirilen ücretsiz bir iş zamanı takip uygulamasıdır. Bu politika, uygulamayı kullanırken hangi verilerin toplandığını ve nasıl işlendiğini açıklar.</p>
         </div>
 
         <div class="section">
-            <h2>2. Veri Kullanımı</h2>
-            <p>Toplanan veriler sadece şu amaçlarla kullanılır:
+            <h2>2. Topladığımız Veriler</h2>
+            <p>Uygulamanın çalışması için aşağıdaki veriler toplanabilir:
 
-                • Uygulamanın temel işlevselliğini sağlamak
-                • Verilerinizi Firebase üzerinden yedeklemek
-                • Farklı cihazlarda verilerinize erişmenizi sağlamak
-
-                Verileriniz hiçbir zaman üçüncü taraflarla paylaşılmaz veya reklam amaçlı kullanılmaz.</p>
+• E-posta adresi (e-posta ile giriş, Google veya Apple ile oturum açma)
+• Anonim misafir oturum kimliği (giriş yapmadan kullanım)
+• Giriş/çıkış saatleri, çalışma süreleri, mola ve izin kayıtları
+• Uygulama ayarları (çalışma standartları, dil ve tema tercihleri)
+• Oyun skorları, en iyi süreler ve isteğe bağlı oyun takma adları
+• Misafir kullanıcılara gösterilen Kullanıcı Kodu (örn. KZ-ABCD1234)
+• Cihazınızda yerel olarak saklanan kayıtlar</p>
         </div>
 
         <div class="section">
-            <h2>3. Veri Saklama</h2>
+            <h2>3. Veri Kullanımı</h2>
+            <p>Toplanan veriler yalnızca şu amaçlarla kullanılır:
+
+• İş zamanı takibi ve uygulama özelliklerini sunmak
+• İsteğe bağlı bulut yedekleme ve cihazlar arası erişim sağlamak
+• Oyun ve liderlik tablosu özelliklerini işletmek
+• Uygulama güncellemelerini kontrol etmek (Firebase Remote Config)
+
+Verileriniz reklam amaçlı kullanılmaz veya üçüncü taraflara satılmaz.</p>
+        </div>
+
+        <div class="section">
+            <h2>4. Veri Saklama ve Görünürlük</h2>
             <p>Verileriniz:
 
-                • Cihazınızda yerel olarak (AsyncStorage) saklanır
-                • İsteğe bağlı olarak Firebase Firestore'da bulut yedekleme olarak saklanır
-                • Liderlik tablolarındaki skorlar ve Kullanıcı Kodunuz tüm kullanıcılara görünebilir
-                • Diğer veriler sadece sizin hesabınıza bağlıdır ve başka kullanıcılar erişemez</p>
+• Cihazınızda yerel olarak (AsyncStorage) saklanır
+• Giriş yaptığınızda isteğe bağlı olarak Firebase Firestore'da yedeklenir
+• Giriş yapmış kullanıcılarda profilde e-posta gösterilir; Kullanıcı Kodu yalnızca misafir kullanıcılara gösterilir
+• Liderlik tablolarında skorlar, takma adlar ve Kullanıcı Kodları diğer kullanıcılara görünebilir
+• Çalışma kayıtlarınız ve ayarlarınız yalnızca hesabınıza bağlıdır</p>
         </div>
 
         <div class="section">
-            <h2>4. Güvenlik</h2>
+            <h2>5. Güvenlik</h2>
             <p>Verilerinizin güvenliği için:
 
-                • Firebase Authentication ile güvenli giriş
-                • Firestore Security Rules ile veri erişim kontrolü
-                • Tüm veriler şifreli bağlantılar üzerinden aktarılır</p>
+• Firebase Authentication ile güvenli oturum açma
+• Firestore güvenlik kuralları ile erişim kontrolü
+• Veriler şifreli bağlantılar (HTTPS/TLS) üzerinden aktarılır</p>
         </div>
 
         <div class="section">
-            <h2>5. Veri Silme</h2>
-            <p>Hesabınızı silmek istediğinizde:
+            <h2>6. Verilerinizi Silme</h2>
+            <p>Hesabınızı ve verilerinizi silmek için:
 
-                • Uygulama içinden çıkış yapabilirsiniz
-                • Firebase Console üzerinden hesabınızı silebilirsiniz
-                • Yerel veriler uygulama silindiğinde otomatik olarak silinir</p>
+• Ayarlar &gt; Hesabı Sil bölümünden hesabınızı kalıcı olarak silebilirsiniz
+• Bu işlem Firebase hesabınızı, bulut kayıtlarınızı ve yerel verilerinizi kaldırır
+• Yalnızca çıkış yapmak istiyorsanız Ayarlar'dan Çıkış Yap'ı kullanabilirsiniz
+• Uygulamayı kaldırmak cihazdaki yerel verileri siler</p>
         </div>
 
         <div class="section">
-            <h2>6. Üçüncü Taraf Servisler</h2>
-            <p>Uygulama aşağıdaki üçüncü taraf servisleri kullanır:
+            <h2>7. Üçüncü Taraf Servisler</h2>
+            <p>Uygulama aşağıdaki servisleri kullanır:
 
-                • Firebase (Google): Authentication ve Firestore veritabanı
-                • Bu servislerin gizlilik politikaları kendi web sitelerinde mevcuttur</p>
+• Firebase (Google): Kimlik doğrulama, Firestore veritabanı ve Remote Config
+• Google Sign-In (Google LLC)
+• Sign in with Apple (Apple Inc.)
+
+Bu servislerin kendi gizlilik politikaları geçerlidir.</p>
         </div>
 
         <div class="section">
-            <h2>7. İletişim</h2>
-            <p>Gizlilik politikası hakkında sorularınız için:
+            <h2>8. İletişim</h2>
+            <p>Gizlilik ile ilgili sorularınız için:
 
-                • GitHub: <a href="https://github.com/ttimocin/KlickZeit"
-                    target="_blank">https://github.com/ttimocin/KlickZeit</a>
-                • Issues sayfasından bize ulaşabilirsiniz</p>
+• GitHub: <a href="https://github.com/ttimocin/KlickZeit" target="_blank">https://github.com/ttimocin/KlickZeit</a>
+• Issues sayfasından bize ulaşabilirsiniz</p>
         </div>
 
         <div class="footer">
-            <p>KlickZeit - Ücretsiz ve Reklamsız İş Takip Uygulaması</p>
-            <p><a href="https://github.com/ttimocin/KlickZeit">GitHub</a> • <a href="terms-of-service.html">Kullanım
-                    Koşulları</a></p>
+            <p>KlickZeit - TayTek</p>
+            <p><a href="https://github.com/ttimocin/KlickZeit">GitHub</a> • <a href="terms-of-service.html">Kullanım Koşulları</a></p>
         </div>
     </div>
 </body>

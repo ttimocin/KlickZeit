@@ -48,6 +48,11 @@ export default function SettingsScreen() {
   const { user, logout } = useAuth();
   const { showModal, ModalComponent } = useModal();
   const userCode = getUserCode();
+  const isLoggedIn = !!(user && !user.isAnonymous);
+  const profileEmail = isLoggedIn
+    ? (user?.email ?? user?.displayName ?? i18n.t('userAccount'))
+    : null;
+  const profileInitial = (user?.email?.[0] ?? user?.displayName?.[0] ?? 'G').toUpperCase();
 
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<SyncProgressState & { title: string }>({
@@ -242,58 +247,39 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: insets.bottom + 20 }}
       >
-        {/* Hesap */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{i18n.t('account')}</Text>
+        {/* Profil */}
+        <View style={styles.profileCard}>
+          <View style={styles.profileHeader}>
+            <View style={[styles.profileAvatar, isLoggedIn && styles.profileAvatarLoggedIn]}>
+              {isLoggedIn ? (
+                <Text style={styles.profileAvatarText}>{profileInitial}</Text>
+              ) : (
+                <Ionicons name="person-outline" size={30} color="#fff" />
+              )}
+            </View>
+            <View style={styles.profileInfo}>
+              {isLoggedIn ? (
+                <>
+                  <Text style={styles.profileEmail} numberOfLines={2}>
+                    {profileEmail}
+                  </Text>
+                  {user?.displayName && user?.email ? (
+                    <Text style={styles.profileSubtitle} numberOfLines={1}>
+                      {user.displayName}
+                    </Text>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <Text style={styles.profileGuestLabel}>{i18n.t('guest')}</Text>
+                  <Text style={styles.profileCodeLabel}>{i18n.t('yourCode')}</Text>
+                  <Text style={styles.profileCodeValue}>{userCode}</Text>
+                </>
+              )}
+            </View>
+          </View>
 
-          {user && !user.isAnonymous ? (
-            <>
-              <View style={styles.userInfo}>
-                <Ionicons name="finger-print-outline" size={32} color="#4CAF50" />
-                <View>
-                  <Text style={styles.userCodeLabel}>{i18n.t('yourCode')}</Text>
-                  <Text style={styles.userCodeValue}>{userCode}</Text>
-                </View>
-              </View>
-
-              <View style={styles.userInfo}>
-                <Ionicons name="person-circle-outline" size={32} color="#4CAF50" />
-                <Text style={styles.userEmail}>{user.email}</Text>
-              </View>
-
-              {/* Sync Butonları */}
-              <TouchableOpacity
-                style={styles.syncButton}
-                onPress={handleSyncToCloud}
-                disabled={isSyncing}
-              >
-                <Ionicons name="cloud-upload-outline" size={20} color="#4CAF50" />
-                <Text style={styles.syncButtonText}>{i18n.t('syncToCloud')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.syncButton}
-                onPress={handleLoadFromCloud}
-                disabled={isSyncing}
-              >
-                <Ionicons name="cloud-download-outline" size={20} color="#2196F3" />
-                <Text style={[styles.syncButtonText, { color: '#2196F3' }]}>{i18n.t('loadFromCloud')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                <Ionicons name="log-out-outline" size={20} color="#FF5252" />
-                <Text style={styles.logoutText}>{i18n.t('logout')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.deleteAccountButton}
-                onPress={() => router.push('/delete-account')}
-              >
-                <Ionicons name="trash-outline" size={20} color="#FF5252" />
-                <Text style={styles.deleteAccountText}>{i18n.t('deleteAccount')}</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
+          {!isLoggedIn && (
             <>
               <Text style={styles.loginHint}>{i18n.t('loginHint')}</Text>
               <TouchableOpacity
@@ -306,6 +292,34 @@ export default function SettingsScreen() {
             </>
           )}
         </View>
+
+        {isLoggedIn && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{i18n.t('account')}</Text>
+            <TouchableOpacity
+              style={styles.actionRow}
+              onPress={handleSyncToCloud}
+              disabled={isSyncing}
+            >
+              <View style={[styles.actionIconWrap, styles.actionIconWrapGreen]}>
+                <Ionicons name="cloud-upload-outline" size={20} color="#4CAF50" />
+              </View>
+              <Text style={styles.actionRowText}>{i18n.t('syncToCloud')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionRow, styles.actionRowLast]}
+              onPress={handleLoadFromCloud}
+              disabled={isSyncing}
+            >
+              <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
+                <Ionicons name="cloud-download-outline" size={20} color="#2196F3" />
+              </View>
+              <Text style={styles.actionRowText}>{i18n.t('loadFromCloud')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Dil Seçimi */}
         <View style={styles.section}>
@@ -738,6 +752,28 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {isLoggedIn && (
+          <View style={styles.section}>
+            <TouchableOpacity style={styles.dangerRow} onPress={handleLogout}>
+              <View style={[styles.actionIconWrap, styles.actionIconWrapDanger]}>
+                <Ionicons name="log-out-outline" size={20} color="#FF5252" />
+              </View>
+              <Text style={styles.dangerRowText}>{i18n.t('logout')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.dangerRow, styles.actionRowLast]}
+              onPress={() => router.push('/delete-account')}
+            >
+              <View style={[styles.actionIconWrap, styles.actionIconWrapDanger]}>
+                <Ionicons name="trash-outline" size={20} color="#FF5252" />
+              </View>
+              <Text style={styles.dangerRowText}>{i18n.t('deleteAccount')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>Made with ❤️ by TayTek</Text>
@@ -910,79 +946,119 @@ const createStyles = (isDark: boolean) =>
       fontSize: 14,
       color: isDark ? '#fff' : '#333',
     },
-    userInfo: {
+    profileCard: {
+      backgroundColor: isDark ? '#1e1e1e' : '#fff',
+      borderRadius: 20,
+      padding: 20,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: isDark ? '#2f2f2f' : '#e8e8e8',
+    },
+    profileHeader: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 12,
-      marginBottom: 16,
+      gap: 16,
     },
-    userEmail: {
-      fontSize: 14,
-      color: isDark ? '#aaa' : '#666',
+    profileAvatar: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: isDark ? '#3a3a3a' : '#9e9e9e',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    profileAvatarLoggedIn: {
+      backgroundColor: '#4CAF50',
+    },
+    profileAvatarText: {
+      fontSize: 26,
+      fontWeight: '700',
+      color: '#fff',
+    },
+    profileInfo: {
       flex: 1,
     },
-    userCodeLabel: {
+    profileEmail: {
+      fontSize: 17,
+      fontWeight: '600',
+      color: isDark ? '#fff' : '#1a1a1a',
+      lineHeight: 24,
+    },
+    profileSubtitle: {
+      fontSize: 14,
+      color: isDark ? '#888' : '#666',
+      marginTop: 4,
+    },
+    profileGuestLabel: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: isDark ? '#fff' : '#1a1a1a',
+      marginBottom: 6,
+    },
+    profileCodeLabel: {
       fontSize: 12,
       color: isDark ? '#888' : '#999',
       textTransform: 'uppercase',
+      letterSpacing: 0.5,
     },
-    userCodeValue: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      color: isDark ? '#fff' : '#1a1a1a',
-      letterSpacing: 1,
-    },
-    syncButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 12,
-      backgroundColor: isDark ? '#1a3a1a' : '#e8f5e9',
-      borderRadius: 12,
-      gap: 8,
-      marginBottom: 8,
-    },
-    syncButtonText: {
-      fontSize: 16,
+    profileCodeValue: {
+      fontSize: 20,
+      fontWeight: '700',
       color: '#4CAF50',
-      fontWeight: '500',
+      letterSpacing: 1.2,
+      marginTop: 2,
     },
-    logoutButton: {
+    actionRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: 12,
-      backgroundColor: isDark ? '#3a2020' : '#ffebee',
-      borderRadius: 12,
-      gap: 8,
-      marginTop: 8,
+      paddingVertical: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      gap: 12,
     },
-    logoutText: {
+    actionRowLast: {
+      borderBottomWidth: 0,
+    },
+    actionIconWrap: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    actionIconWrapGreen: {
+      backgroundColor: isDark ? '#1a3a1a' : '#e8f5e9',
+    },
+    actionIconWrapBlue: {
+      backgroundColor: isDark ? '#1a2a3a' : '#e3f2fd',
+    },
+    actionIconWrapDanger: {
+      backgroundColor: isDark ? '#3a2020' : '#ffebee',
+    },
+    actionRowText: {
+      flex: 1,
+      fontSize: 16,
+      color: isDark ? '#fff' : '#1a1a1a',
+      fontWeight: '500',
+    },
+    dangerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+      gap: 12,
+    },
+    dangerRowText: {
+      flex: 1,
       fontSize: 16,
       color: '#FF5252',
       fontWeight: '500',
-    },
-    deleteAccountButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 12,
-      backgroundColor: isDark ? '#3a2020' : '#ffebee',
-      borderRadius: 12,
-      marginTop: 8,
-      borderWidth: 1,
-      borderColor: '#FF5252',
-    },
-    deleteAccountText: {
-      fontSize: 16,
-      color: '#FF5252',
-      fontWeight: '500',
-      marginLeft: 8,
     },
     loginHint: {
       fontSize: 14,
       color: isDark ? '#888' : '#666',
-      textAlign: 'center',
+      marginTop: 16,
       marginBottom: 16,
       lineHeight: 20,
     },
