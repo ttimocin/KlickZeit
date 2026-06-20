@@ -1,4 +1,8 @@
 {
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-1513134902454765~1337786914",
+    "ios_app_id": "ca-app-pub-1513134902454765~1926200034"
+  },
   "expo": {
     "name": "KlickZeit",
     "slug": "klickzeit",

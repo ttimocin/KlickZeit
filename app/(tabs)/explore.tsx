@@ -1,4 +1,5 @@
 import { useModal } from '@/components/custom-modal';
+import { HomeBannerAd } from '@/components/HomeBannerAd';
 import { SyncProgressModal, SyncProgressState } from '@/components/sync-progress-modal';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
@@ -1016,6 +1017,35 @@ export default function RecordsScreen() {
     </View>
   );
 
+  const renderWeekCardsWithBanner = () => {
+    if (weeklyData.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>📅</Text>
+          <Text style={styles.emptyText}>{i18n.t('noRecordsYet')}</Text>
+          <Text style={styles.emptySubtext}>{i18n.t('addFromHome')}</Text>
+        </View>
+      );
+    }
+
+    return weeklyData.flatMap((week, index) => {
+      const nodes: React.ReactNode[] = [renderWeekCard(week)];
+      const shouldInsertBanner =
+        (weeklyData.length === 1 && index === 0) ||
+        (weeklyData.length > 1 && index === 0);
+
+      if (shouldInsertBanner) {
+        nodes.push(
+          <View key="explore-banner-after-latest" style={styles.inlineBannerContainer}>
+            <HomeBannerAd isDark={isDark} />
+          </View>
+        );
+      }
+
+      return nodes;
+    });
+  };
+
   return (
     <SafeAreaView key={`history-${forceUpdate}`} style={styles.container}>
       {/* Başlık */}
@@ -1304,15 +1334,7 @@ export default function RecordsScreen() {
           />
         }
       >
-        {weeklyData.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>📅</Text>
-            <Text style={styles.emptyText}>{i18n.t('noRecordsYet')}</Text>
-            <Text style={styles.emptySubtext}>{i18n.t('addFromHome')}</Text>
-          </View>
-        ) : (
-          weeklyData.map(renderWeekCard)
-        )}
+        {renderWeekCardsWithBanner()}
       </ScrollView>
 
       {/* Custom Modal */}
@@ -1911,6 +1933,10 @@ const createStyles = (isDark: boolean) =>
     weeklyContent: {
       padding: 20,
       paddingTop: 16,
+    },
+    inlineBannerContainer: {
+      marginBottom: 20,
+      alignItems: 'center',
     },
     weekCard: {
       backgroundColor: isDark ? '#1a1a1a' : '#ffffff',
