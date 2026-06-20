@@ -7,7 +7,8 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { ActivityIndicator, LogBox, View } from 'react-native';
+import { ActivityIndicator, LogBox, Platform, View } from 'react-native';
+import mobileAds from 'react-native-google-mobile-ads';
 import 'react-native-reanimated';
 
 // Expo dev modunda ekranı uyanık tutma bazen Activity hazır olmadan çağrılır; uygulamayı etkilemez.
@@ -33,6 +34,13 @@ function RootLayoutNav() {
     // Güncelleme kontrolü hata verse bile uygulamanın açılmasını engelleme
     checkForUpdates().catch((error) => {
       console.log('Güncelleme kontrolü başarısız oldu, uygulama normal şekilde devam ediyor:', error);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    mobileAds().initialize().catch((error) => {
+      console.log('AdMob başlatılamadı:', error);
     });
   }, []);
 

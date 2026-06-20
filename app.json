@@ -76,7 +76,15 @@
       ],
       "@react-native-google-signin/google-signin",
       "expo-apple-authentication",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-1513134902454765~1337786914",
+          "iosAppId": "ca-app-pub-1513134902454765~1926200034",
+          "userTrackingUsageDescription": "Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

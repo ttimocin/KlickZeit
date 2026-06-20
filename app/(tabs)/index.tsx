@@ -1,9 +1,11 @@
 import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
 import TetrisGame from '@/components/TetrisGame';
+import { HomeBannerAd } from '@/components/HomeBannerAd';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from '@/context/ThemeContext';
+import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
 import i18n from '@/i18n';
 import { syncToFirebase } from '@/services/firebase-sync';
 import { hasSeenNicknamePrompt, markNicknamePromptSeen, setGameNickname, syncNicknameFromFirestore } from '@/services/game-nickname';
@@ -309,11 +311,16 @@ export default function HomeScreen() {
   const screenHeight = Dimensions.get('window').height;
   const screenWidth = Dimensions.get('window').width;
   const isSmallScreen = screenHeight < 700; // Küçük ekran kontrolü
+  const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
+  const bottomChromeHeight = tabBarHeight + HOME_BANNER_HEIGHT;
   const styles = createStyles(isDark, isSmallScreen, screenHeight);
 
   return (
     <View key={`home-${forceUpdate}`} style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomChromeHeight }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerLeft}>
@@ -520,6 +527,10 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
+      <View style={[styles.bannerDock, { bottom: tabBarHeight }]}>
+        <HomeBannerAd isDark={isDark} />
+      </View>
+
       {/* Nickname Prompt Modal - ilk kez oyun alanına girişte */}
       <Modal
         visible={nicknamePromptVisible}
@@ -697,10 +708,10 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     timeCard: {
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: isSmallScreen ? 12 : 16,
+      paddingVertical: isSmallScreen ? 8 : 10,
       paddingHorizontal: 20,
       marginHorizontal: 20,
-      marginBottom: 8,
+      marginBottom: 4,
       borderRadius: 24,
       backgroundColor: isDark ? '#1f1f1f' : '#f5f5f5',
       borderWidth: 1,
@@ -714,7 +725,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       elevation: 3,
     },
     clock: {
-      fontSize: isSmallScreen ? 64 : 88,
+      fontSize: isSmallScreen ? 56 : 72,
       fontWeight: '700',
       color: isDark ? '#fff' : '#1a1a2e',
       letterSpacing: -3,
@@ -725,7 +736,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       alignItems: 'center',
       justifyContent: 'center',
       width: '100%',
-      marginTop: 8,
+      marginTop: 4,
     },
     dayName: {
       fontSize: 15,
@@ -767,8 +778,14 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: isSmallScreen ? 20 : 40,
-      paddingBottom: isSmallScreen ? 20 : 40,
+      paddingBottom: isSmallScreen ? 8 : 16,
       position: 'relative',
+    },
+    bannerDock: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      zIndex: 5,
     },
     timerContainer: {
       position: 'absolute',
@@ -776,7 +793,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       left: 0,
       right: 0,
       alignItems: 'center',
-      paddingTop: 20,
+      paddingTop: 12,
       zIndex: 10,
       pointerEvents: 'none',
     },
@@ -817,7 +834,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     buttonWrapper: {
       alignItems: 'center',
       justifyContent: 'center',
-      marginTop: 30,
+      marginTop: 20,
     },
     mainButtonGradient: {
       width: isSmallScreen ? 120 : 150,
@@ -877,11 +894,11 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     breakContainer: {
       alignItems: 'center',
       paddingHorizontal: 20,
-      marginTop: 30,
+      marginTop: 16,
     },
     breakTimerContainer: {
       alignItems: 'center',
-      marginBottom: 12,
+      marginBottom: 8,
     },
     breakTimerLabel: {
       fontSize: 11,
