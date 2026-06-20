@@ -24,7 +24,7 @@
       }
     },
     "android": {
-      "versionCode": 17,
+      "versionCode": 18,
       "package": "com.taytek.zeitlog",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
