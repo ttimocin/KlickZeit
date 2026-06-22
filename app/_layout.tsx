@@ -2,6 +2,8 @@ import { CloudRestoreOnLoginPrompt } from '@/components/cloud-restore-on-login';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/context/ThemeContext';
+import { AdsFlowProvider } from '@/context/AdsFlowContext';
+import { PremiumPromoProvider } from '@/context/PremiumPromoContext';
 import { PurchasesProvider } from '@/context/PurchasesContext';
 import { checkForUpdates } from '@/services/update-checker';
 import { initializeMobileAds } from '@/utils/mobile-ads';
@@ -84,9 +86,13 @@ export default function RootLayout() {
     <AppThemeProvider>
       <AuthProvider>
         <PurchasesProvider>
-          <LanguageProvider>
-            <RootLayoutNav />
-          </LanguageProvider>
+          <AdsFlowProvider>
+            <LanguageProvider>
+              <PremiumPromoProvider>
+                <RootLayoutNav />
+              </PremiumPromoProvider>
+            </LanguageProvider>
+          </AdsFlowProvider>
         </PurchasesProvider>
       </AuthProvider>
     </AppThemeProvider>

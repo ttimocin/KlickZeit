@@ -1,4 +1,5 @@
 import Constants from 'expo-constants';
+import i18n from '@/i18n';
 import { Alert, NativeModules, Platform } from 'react-native';
 
 type RevenueCatExtra = {
@@ -44,22 +45,22 @@ export function showPurchasesUnavailableAlert(): void {
   const apiKey = getRevenueCatApiKey();
   if (!apiKey) {
     Alert.alert(
-      'Premium yapılandırılmamış',
-      'RevenueCat API anahtarı bulunamadı. .env dosyasını kontrol edin.'
+      i18n.t('purchasesNotConfiguredTitle'),
+      i18n.t('purchasesNotConfiguredMessage')
     );
     return;
   }
 
   if (apiKey.startsWith('test_') && !isNativeDebugBuild()) {
     Alert.alert(
-      'Premium (test modu)',
-      'Test Store anahtarı release APK\'da çalışmaz. Premium testi için debug APK kullanın veya RevenueCat\'ten goog_ production anahtarı ekleyin.'
+      i18n.t('purchasesTestModeTitle'),
+      i18n.t('purchasesTestModeMessage')
     );
     return;
   }
 
   Alert.alert(
-    'Premium kullanılamıyor',
-    'Satın alma ekranı şu an açılamıyor. Lütfen daha sonra tekrar deneyin.'
+    i18n.t('purchasesUnavailableTitle'),
+    i18n.t('purchasesUnavailableMessage')
   );
 }

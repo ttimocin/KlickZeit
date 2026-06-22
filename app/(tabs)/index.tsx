@@ -1,11 +1,13 @@
 import { HomeBannerAd } from '@/components/HomeBannerAd';
-import { PremiumPromoModal } from '@/components/PremiumPromoModal';
+import { ProLottieButton } from '@/components/ProLottieButton';
 import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
 import TetrisGame from '@/components/TetrisGame';
 import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
+import { useAdsFlow } from '@/context/AdsFlowContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { usePurchases } from '@/context/PurchasesContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { syncToFirebase } from '@/services/firebase-sync';
@@ -42,6 +44,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const { user } = useAuth();
+  const { isPro } = usePurchases();
+  const { shouldShowAds } = useAdsFlow();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { forceUpdate } = useLanguage(); // Dil değişince yenile
@@ -313,12 +317,12 @@ export default function HomeScreen() {
   const screenWidth = Dimensions.get('window').width;
   const isSmallScreen = screenHeight < 700; // Küçük ekran kontrolü
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
-  const bottomChromeHeight = tabBarHeight + HOME_BANNER_HEIGHT;
+  const showBannerSlot = shouldShowAds && !isPro;
+  const bottomChromeHeight = tabBarHeight + (showBannerSlot ? HOME_BANNER_HEIGHT : 0);
   const styles = createStyles(isDark, isSmallScreen, screenHeight);
 
   return (
     <View key={`home-${forceUpdate}`} style={[styles.container, { paddingTop: insets.top }]}>
-      <PremiumPromoModal />
       <ScrollView
         contentContainerStyle={{ flexGrow: 1, paddingBottom: bottomChromeHeight }}
         showsVerticalScrollIndicator={false}
@@ -328,12 +332,15 @@ export default function HomeScreen() {
           <View style={styles.headerLeft}>
             <Text style={styles.greeting}>{getGreeting()}</Text>
           </View>
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={() => router.push('/settings')}
-          >
-            <Ionicons name="settings-outline" size={24} color={isDark ? '#888' : '#666'} />
-          </TouchableOpacity>
+          <View style={styles.headerActions}>
+            <ProLottieButton />
+            <TouchableOpacity
+              style={styles.settingsButton}
+              onPress={() => router.push('/settings')}
+            >
+              <Ionicons name="settings-outline" size={24} color={isDark ? '#888' : '#666'} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* User Email Badge - Giriş yapıldıysa göster */}
@@ -343,6 +350,11 @@ export default function HomeScreen() {
             <Text style={styles.userEmail} numberOfLines={1}>
               {user.email}
             </Text>
+            {isPro && (
+              <View style={styles.userProBadge}>
+                <Text style={styles.userProBadgeText}>PRO</Text>
+              </View>
+            )}
           </View>
         )}
 
@@ -682,7 +694,7 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     },
     header: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       justifyContent: 'space-between',
       paddingTop: isSmallScreen ? 8 : 12,
       paddingBottom: isSmallScreen ? 4 : 8,
@@ -691,10 +703,13 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     headerLeft: {
       flex: 1,
     },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     greeting: {
       fontSize: isSmallScreen ? 13 : 15,
       color: isDark ? '#999' : '#888',
-      marginBottom: isSmallScreen ? 2 : 4,
       fontWeight: '400',
     },
     title: {
@@ -705,7 +720,6 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
     },
     settingsButton: {
       padding: 8,
-      marginTop: 4,
     },
     timeCard: {
       alignItems: 'center',
@@ -774,6 +788,21 @@ const createStyles = (isDark: boolean, isSmallScreen: boolean, screenHeight: num
       fontSize: 13,
       color: '#4CAF50',
       fontWeight: '500',
+      flexShrink: 1,
+    },
+    userProBadge: {
+      backgroundColor: '#FFD700',
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 6,
+      borderWidth: 1,
+      borderColor: 'rgba(27, 94, 32, 0.25)',
+    },
+    userProBadgeText: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: '#1B5E20',
+      letterSpacing: 0.8,
     },
     buttonContainer: {
       flex: 1,

@@ -1,4 +1,5 @@
 import { HOME_BANNER_AD_UNIT_ID, HOME_BANNER_HEIGHT } from '@/config/ads';
+import { useAdsFlow } from '@/context/AdsFlowContext';
 import { usePurchases } from '@/context/PurchasesContext';
 import { isMobileAdsNativeModuleAvailable } from '@/utils/mobile-ads';
 import React from 'react';
@@ -10,8 +11,9 @@ type Props = {
 
 export function HomeBannerAd({ isDark }: Props) {
   const { isPro } = usePurchases();
+  const { isReady, shouldShowAds, notifyBannerAdLoaded, notifyBannerAdFailed } = useAdsFlow();
 
-  if (isPro) return null;
+  if (!isReady || !shouldShowAds || isPro) return null;
 
   if (Platform.OS === 'web' || !isMobileAdsNativeModuleAvailable()) {
     return <View style={[styles.slot, { height: HOME_BANNER_HEIGHT }]} />;
@@ -30,7 +32,12 @@ export function HomeBannerAd({ isDark }: Props) {
         },
       ]}
     >
-      <BannerAd unitId={HOME_BANNER_AD_UNIT_ID} size={BannerAdSize.BANNER} />
+      <BannerAd
+        unitId={HOME_BANNER_AD_UNIT_ID}
+        size={BannerAdSize.BANNER}
+        onAdLoaded={() => notifyBannerAdLoaded()}
+        onAdFailedToLoad={() => notifyBannerAdFailed()}
+      />
     </View>
   );
 }

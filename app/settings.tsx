@@ -13,7 +13,6 @@ import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/dat
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -740,7 +739,7 @@ export default function SettingsScreen() {
 
         {/* Pro & Ads */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Premium</Text>
+          <Text style={styles.sectionTitle}>{i18n.t('premiumSectionTitle')}</Text>
           <TouchableOpacity
             style={styles.actionRow}
             onPress={handlePresentPaywall}
@@ -750,7 +749,7 @@ export default function SettingsScreen() {
               <Feather name="star" size={20} color={isPro ? '#FFD700' : '#4CAF50'} />
             </View>
             <Text style={[styles.actionRowText, isPro && { opacity: 0.7 }]}>
-              {isPro ? 'KlickZeit Pro (Aktif)' : 'Reklamları Kaldır (Ömür Boyu)'}
+              {isPro ? i18n.t('premiumProActive') : i18n.t('premiumRemoveAds')}
             </Text>
             {!isPro && <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />}
           </TouchableOpacity>
@@ -762,7 +761,7 @@ export default function SettingsScreen() {
             <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
               <Feather name="headphones" size={20} color="#2196F3" />
             </View>
-            <Text style={styles.actionRowText}>Satın Almaları Yönet</Text>
+            <Text style={styles.actionRowText}>{i18n.t('premiumManagePurchases')}</Text>
             <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
           </TouchableOpacity>
         </View>
@@ -775,20 +774,6 @@ export default function SettingsScreen() {
             <Text style={styles.appVersion}>v1.0.3</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
-
-          <TouchableOpacity
-            style={styles.linkButton}
-            onPress={async () => {
-              try {
-                await Linking.openURL('https://github.com/ttimocin/KlickZeit');
-              } catch (error) {
-                console.error('GitHub linki açılırken hata:', error);
-              }
-            }}
-          >
-            <Ionicons name="logo-github" size={20} color={isDark ? '#fff' : '#333'} />
-            <Text style={styles.linkText}>GitHub</Text>
-          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.linkButton}

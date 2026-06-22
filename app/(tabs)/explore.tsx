@@ -1,8 +1,10 @@
 import { useModal } from '@/components/custom-modal';
 import { HomeBannerAd } from '@/components/HomeBannerAd';
 import { HOME_BANNER_HEIGHT, TAB_BAR_BASE_HEIGHT } from '@/config/ads';
+import { useAdsFlow } from '@/context/AdsFlowContext';
 import { SyncProgressModal, SyncProgressState } from '@/components/sync-progress-modal';
 import { useLanguage } from '@/context/LanguageContext';
+import { usePurchases } from '@/context/PurchasesContext';
 import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { exportToCSV, exportToExcel, exportToPDF, getDailySummaries, importFromCSV } from '@/services/export';
@@ -200,6 +202,8 @@ export default function RecordsScreen() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
   const { forceUpdate, language } = useLanguage();
+  const { isPro } = usePurchases();
+  const { shouldShowAds } = useAdsFlow();
   const { showModal, showWarning, showError, showInfo, ModalComponent } = useModal();
 
   const [summaries, setSummaries] = useState<DailySummary[]>([]);
@@ -830,7 +834,8 @@ export default function RecordsScreen() {
   }, [monthlyBalances]);
 
   const tabBarHeight = TAB_BAR_BASE_HEIGHT + insets.bottom;
-  const bottomChromeHeight = tabBarHeight + HOME_BANNER_HEIGHT;
+  const showBannerSlot = shouldShowAds && !isPro;
+  const bottomChromeHeight = tabBarHeight + (showBannerSlot ? HOME_BANNER_HEIGHT : 0);
   const styles = createStyles(isDark);
 
   const renderDetailsDays = (count: number, extraStyle?: object) => (
@@ -1108,7 +1113,7 @@ export default function RecordsScreen() {
         onRequestClose={() => setDetailsModalVisible(false)}
       >
         <View style={styles.detailsModalOverlay}>
-          <View style={styles.detailsModalContainer}>
+          <View style={[styles.detailsModalContainer, { paddingBottom: bottomChromeHeight + 16 }]}>
             {/* Modal Header */}
             <View style={styles.detailsModalHeader}>
               <Text style={styles.detailsModalTitle}>
@@ -1125,6 +1130,7 @@ export default function RecordsScreen() {
             {/* Modal Content — tablo */}
             <ScrollView
               style={styles.detailsModalScroll}
+              contentContainerStyle={styles.detailsModalScrollContent}
               showsVerticalScrollIndicator={false}
             >
               <View style={styles.detailsTable}>
@@ -1709,7 +1715,6 @@ const createStyles = (isDark: boolean) =>
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
       maxHeight: '80%',
-      paddingBottom: 30,
     },
     detailsModalHeader: {
       flexDirection: 'row',
@@ -1731,7 +1736,9 @@ const createStyles = (isDark: boolean) =>
     detailsModalScroll: {
       paddingHorizontal: 16,
       paddingTop: 12,
-      paddingBottom: 24,
+    },
+    detailsModalScrollContent: {
+      paddingBottom: 12,
     },
     detailsTable: {
       borderRadius: 12,

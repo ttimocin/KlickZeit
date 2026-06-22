@@ -21,6 +21,26 @@ export async function initializeMobileAds(): Promise<void> {
   }
 }
 
+/** AdMob UMP — AB / ABD eyaletleri gizlilik onayı (tek form). */
+export async function presentAdsConsentForms(): Promise<void> {
+  if (!isMobileAdsNativeModuleAvailable()) return;
+
+  const { AdsConsent } = require('react-native-google-mobile-ads');
+
+  // gatherConsent = requestInfoUpdate + loadAndShowConsentFormIfRequired
+  // showPrivacyOptionsForm ayrıca çağrılmaz — aynı onay ekranını ikinci kez açar.
+  // Gizlilik seçenekleri ayarlardan erişilebilir olmalı (privacyOptionsRequirementStatus).
+  await AdsConsent.gatherConsent();
+}
+
+/** Ayarlardan "Gizlilik seçenekleri" için — otomatik gösterilmez. */
+export async function presentAdsPrivacyOptionsForm(): Promise<void> {
+  if (!isMobileAdsNativeModuleAvailable()) return;
+
+  const { AdsConsent } = require('react-native-google-mobile-ads');
+  await AdsConsent.showPrivacyOptionsForm();
+}
+
 export function getBannerAdUnitId(productionId: string): string {
   if (__DEV__) return GOOGLE_TEST_BANNER_ID;
   return productionId;
