@@ -11,9 +11,9 @@ type Props = {
 
 export function HomeBannerAd({ isDark }: Props) {
   const { isPro } = usePurchases();
-  const { isReady, shouldShowAds, notifyBannerAdLoaded, notifyBannerAdFailed } = useAdsFlow();
+  const { isReady, shouldShowAds, consentFlowCompleted } = useAdsFlow();
 
-  if (!isReady || !shouldShowAds || isPro) return null;
+  if (!isReady || !shouldShowAds || !consentFlowCompleted || isPro) return null;
 
   if (Platform.OS === 'web' || !isMobileAdsNativeModuleAvailable()) {
     return <View style={[styles.slot, { height: HOME_BANNER_HEIGHT }]} />;
@@ -32,12 +32,7 @@ export function HomeBannerAd({ isDark }: Props) {
         },
       ]}
     >
-      <BannerAd
-        unitId={HOME_BANNER_AD_UNIT_ID}
-        size={BannerAdSize.BANNER}
-        onAdLoaded={() => notifyBannerAdLoaded()}
-        onAdFailedToLoad={() => notifyBannerAdFailed()}
-      />
+      <BannerAd unitId={HOME_BANNER_AD_UNIT_ID} size={BannerAdSize.BANNER} />
     </View>
   );
 }

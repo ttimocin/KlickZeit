@@ -1,11 +1,11 @@
+import { usePurchases } from '@/context/PurchasesContext';
 import {
   incrementAndGetLaunchCount,
   shouldShowAdsForSession,
 } from '@/services/ad-session';
-import { presentAdsConsentForms } from '@/utils/mobile-ads';
+import { presentAdsConsentForms, requestAppTrackingIfNeeded } from '@/utils/mobile-ads';
 import React, {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useRef,
@@ -17,13 +17,12 @@ type AdsFlowContextValue = {
   isReady: boolean;
   shouldShowAds: boolean;
   consentFlowCompleted: boolean;
-  notifyBannerAdLoaded: () => void;
-  notifyBannerAdFailed: () => void;
 };
 
 const AdsFlowContext = createContext<AdsFlowContextValue | null>(null);
 
 export function AdsFlowProvider({ children }: { children: React.ReactNode }) {
+  const { isPro, isLoading: purchasesLoading } = usePurchases();
   const [isReady, setIsReady] = useState(false);
   const [shouldShowAds, setShouldShowAds] = useState(false);
   const [consentFlowCompleted, setConsentFlowCompleted] = useState(false);
@@ -50,33 +49,39 @@ export function AdsFlowProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  const runConsentFlow = useCallback(async () => {
-    if (consentStartedRef.current) return;
-    consentStartedRef.current = true;
+  useEffect(() => {
+    if (!isReady || purchasesLoading) return;
 
-    if (Platform.OS === 'web') {
+    if (!shouldShowAds || isPro) {
       setConsentFlowCompleted(true);
       return;
     }
 
-    try {
-      await presentAdsConsentForms();
-    } catch (error) {
-      console.warn('Gizlilik onay formu gösterilemedi:', error);
-    } finally {
-      setConsentFlowCompleted(true);
-    }
-  }, []);
+    if (consentStartedRef.current) return;
+    consentStartedRef.current = true;
 
-  const notifyBannerAdLoaded = useCallback(() => {
-    if (!shouldShowAds || consentStartedRef.current) return;
-    void runConsentFlow();
-  }, [runConsentFlow, shouldShowAds]);
+    let cancelled = false;
 
-  const notifyBannerAdFailed = useCallback(() => {
-    if (!shouldShowAds || consentStartedRef.current) return;
-    void runConsentFlow();
-  }, [runConsentFlow, shouldShowAds]);
+    (async () => {
+      if (Platform.OS === 'web') {
+        if (!cancelled) setConsentFlowCompleted(true);
+        return;
+      }
+
+      try {
+        await presentAdsConsentForms();
+        await requestAppTrackingIfNeeded();
+      } catch (error) {
+        console.warn('Reklam gizlilik akışı tamamlanamadı:', error);
+      } finally {
+        if (!cancelled) setConsentFlowCompleted(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isReady, purchasesLoading, shouldShowAds, isPro]);
 
   return (
     <AdsFlowContext.Provider
@@ -84,8 +89,6 @@ export function AdsFlowProvider({ children }: { children: React.ReactNode }) {
         isReady,
         shouldShowAds,
         consentFlowCompleted,
-        notifyBannerAdLoaded,
-        notifyBannerAdFailed,
       }}
     >
       {children}

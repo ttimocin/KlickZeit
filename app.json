@@ -89,6 +89,12 @@
           "iosAppId": "ca-app-pub-1513134902454765~1926200034",
           "userTrackingUsageDescription": "Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır."
         }
+      ],
+      [
+        "expo-tracking-transparency",
+        {
+          "userTrackingPermission": "Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır."
+        }
       ]
     ],
     "experiments": {

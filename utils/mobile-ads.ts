@@ -58,6 +58,18 @@ export async function presentAdsPrivacyOptionsForm(): Promise<void> {
   await AdsConsent.showPrivacyOptionsForm();
 }
 
+/** iOS ATT — UMP gatherConsent sonrası, yalnızca reklam gösterilecek kullanıcılar için. */
+export async function requestAppTrackingIfNeeded(): Promise<void> {
+  if (Platform.OS !== 'ios') return;
+
+  try {
+    const { requestTrackingPermissionsAsync } = await import('expo-tracking-transparency');
+    await requestTrackingPermissionsAsync();
+  } catch (error) {
+    console.warn('ATT izni istenemedi:', error);
+  }
+}
+
 export function getBannerAdUnitId(productionId: string): string {
   if (__DEV__) return GOOGLE_TEST_BANNER_ID;
   return productionId;
