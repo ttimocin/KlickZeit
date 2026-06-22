@@ -43,6 +43,12 @@ const themes = [
 import RevenueCatUI from 'react-native-purchases-ui';
 import { usePurchases } from '@/context/PurchasesContext';
 import { showPurchasesUnavailableAlert, shouldEnablePurchases } from '@/utils/revenuecat';
+import { presentKlickZeitPaywall } from '@/utils/present-paywall';
+import {
+  isAdsPrivacyOptionsRequired,
+  isMobileAdsNativeModuleAvailable,
+  presentAdsPrivacyOptionsForm,
+} from '@/utils/mobile-ads';
 
 export default function SettingsScreen() {
   const { isPro } = usePurchases();
@@ -69,12 +75,26 @@ export default function SettingsScreen() {
 
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showAdsPrivacyOptions, setShowAdsPrivacyOptions] = useState(false);
 
   // Standartlar
   const [standards, setStandards] = useState<AppStandards>(DEFAULT_STANDARDS);
 
   useEffect(() => {
     getAppStandards().then(setStandards);
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    let cancelled = false;
+    void isAdsPrivacyOptionsRequired().then((required) => {
+      if (!cancelled) setShowAdsPrivacyOptions(required);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const updateStandard = async (key: keyof AppStandards, value: number | string | undefined) => {
@@ -109,7 +129,7 @@ export default function SettingsScreen() {
       showPurchasesUnavailableAlert();
       return;
     }
-    RevenueCatUI.presentPaywall().catch((error) => {
+    presentKlickZeitPaywall().catch((error) => {
       console.error('Paywall açılamadı:', error);
     });
   };
@@ -121,6 +141,28 @@ export default function SettingsScreen() {
     }
     RevenueCatUI.presentCustomerCenter().catch((error) => {
       console.error('Customer Center açılamadı:', error);
+    });
+  };
+
+  const handleAdsPrivacyOptions = () => {
+    if (!isMobileAdsNativeModuleAvailable()) {
+      showModal({
+        title: i18n.t('adsPrivacyOptions'),
+        message: i18n.t('adsPrivacyOptionsUnavailable'),
+        icon: '🔒',
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
+      });
+      return;
+    }
+
+    presentAdsPrivacyOptionsForm().catch((error) => {
+      console.error('Reklam gizlilik ayarları açılamadı:', error);
+      showModal({
+        title: i18n.t('adsPrivacyOptions'),
+        message: i18n.t('adsPrivacyOptionsUnavailable'),
+        icon: '🔒',
+        buttons: [{ text: i18n.t('ok'), style: 'default' }],
+      });
     });
   };
 
@@ -755,7 +797,10 @@ export default function SettingsScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.actionRow, styles.actionRowLast]}
+            style={[
+              styles.actionRow,
+              !showAdsPrivacyOptions && styles.actionRowLast,
+            ]}
             onPress={handlePresentCustomerCenter}
           >
             <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
@@ -764,6 +809,19 @@ export default function SettingsScreen() {
             <Text style={styles.actionRowText}>{i18n.t('premiumManagePurchases')}</Text>
             <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
           </TouchableOpacity>
+
+          {showAdsPrivacyOptions ? (
+            <TouchableOpacity
+              style={[styles.actionRow, styles.actionRowLast]}
+              onPress={handleAdsPrivacyOptions}
+            >
+              <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
+                <Feather name="shield" size={20} color="#2196F3" />
+              </View>
+              <Text style={styles.actionRowText}>{i18n.t('adsPrivacyOptions')}</Text>
+              <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+            </TouchableOpacity>
+          ) : null}
         </View>
 
         {/* Hakkında */}

@@ -58,7 +58,9 @@ export const PurchasesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       try {
-        Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+        Purchases.setLogLevel(
+          __DEV__ || isNativeDebugBuild() ? LOG_LEVEL.DEBUG : LOG_LEVEL.WARN
+        );
         Purchases.configure({ apiKey });
 
         const info = await Purchases.getCustomerInfo();

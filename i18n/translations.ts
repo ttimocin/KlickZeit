@@ -282,6 +282,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (Aktif)',
     premiumRemoveAds: 'Reklamları Kaldır (Ömür Boyu)',
     premiumManagePurchases: 'Satın Almaları Yönet',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Reklamsız Deneyim!',
     premiumPromoDescription: 'KlickZeit\'i reklamlar olmadan, tamamen kesintisiz ve odaklanmış bir şekilde kullanmak ister misiniz?',
     premiumPromoFeature1: 'Ömür boyu tek seferlik ödeme',
@@ -295,6 +296,8 @@ export const translations = {
     purchasesTestModeMessage: 'Test Store anahtarı release APK\'da çalışmaz. Premium testi için debug APK kullanın veya RevenueCat\'ten goog_ production anahtarı ekleyin.',
     purchasesUnavailableTitle: 'Premium kullanılamıyor',
     purchasesUnavailableMessage: 'Satın alma ekranı şu an açılamıyor. Lütfen daha sonra tekrar deneyin.',
+    adsPrivacyOptions: 'Reklam gizlilik ayarları',
+    adsPrivacyOptionsUnavailable: 'Reklam gizlilik ayarları şu an kullanılamıyor.',
 
     // Legal
     privacyPolicy: 'Gizlilik Politikası',
@@ -588,6 +591,7 @@ export const translations = {
     playGame: '🎮 Play Game',
     score: 'Score',
     best: 'Best',
+    youWon: 'You won! 🎉',
     gameOver: 'Game Over!',
     newGame: 'New Game',
     restart: 'Restart',
@@ -629,6 +633,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (Active)',
     premiumRemoveAds: 'Remove Ads (Lifetime)',
     premiumManagePurchases: 'Manage Purchases',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Ad-Free Experience!',
     premiumPromoDescription: 'Would you like to use KlickZeit without ads — uninterrupted and focused?',
     premiumPromoFeature1: 'One-time lifetime payment',
@@ -642,6 +647,8 @@ export const translations = {
     purchasesTestModeMessage: 'Test Store keys do not work in release APKs. Use a debug APK for testing or add a goog_ production key from RevenueCat.',
     purchasesUnavailableTitle: 'Premium unavailable',
     purchasesUnavailableMessage: 'The purchase screen cannot be opened right now. Please try again later.',
+    adsPrivacyOptions: 'Ad privacy settings',
+    adsPrivacyOptionsUnavailable: 'Ad privacy settings are not available right now.',
 
     // Legal
     privacyPolicy: 'Privacy Policy',
@@ -935,6 +942,7 @@ export const translations = {
     playGame: '🎮 Spiel spielen',
     score: 'Punkte',
     best: 'Beste',
+    youWon: 'Gewonnen! 🎉',
     gameOver: 'Spiel vorbei!',
     newGame: 'Neues Spiel',
     restart: 'Neu starten',
@@ -976,6 +984,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (Aktiv)',
     premiumRemoveAds: 'Werbung entfernen (Lebenslang)',
     premiumManagePurchases: 'Käufe verwalten',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Werbefreies Erlebnis!',
     premiumPromoDescription: 'Möchten Sie KlickZeit ohne Werbung — unterbrechungsfrei und konzentriert — nutzen?',
     premiumPromoFeature1: 'Einmalige Zahlung fürs Leben',
@@ -989,6 +998,8 @@ export const translations = {
     purchasesTestModeMessage: 'Test Store-Schlüssel funktionieren nicht in Release-APKs. Verwenden Sie eine Debug-APK oder einen goog_-Produktionsschlüssel von RevenueCat.',
     purchasesUnavailableTitle: 'Premium nicht verfügbar',
     purchasesUnavailableMessage: 'Der Kaufbildschirm kann derzeit nicht geöffnet werden. Bitte versuchen Sie es später erneut.',
+    adsPrivacyOptions: 'Werbe-Datenschutzeinstellungen',
+    adsPrivacyOptionsUnavailable: 'Werbe-Datenschutzeinstellungen sind derzeit nicht verfügbar.',
 
     // Legal
     privacyPolicy: 'Datenschutzerklärung',
@@ -1324,6 +1335,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (Actif)',
     premiumRemoveAds: 'Supprimer les pubs (À vie)',
     premiumManagePurchases: 'Gérer les achats',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Expérience sans publicité !',
     premiumPromoDescription: 'Souhaitez-vous utiliser KlickZeit sans publicités — de façon fluide et concentrée ?',
     premiumPromoFeature1: 'Paiement unique à vie',
@@ -1337,6 +1349,8 @@ export const translations = {
     purchasesTestModeMessage: 'Les clés Test Store ne fonctionnent pas dans les APK release. Utilisez un APK debug ou une clé goog_ de production RevenueCat.',
     purchasesUnavailableTitle: 'Premium indisponible',
     purchasesUnavailableMessage: 'L\'écran d\'achat ne peut pas être ouvert pour le moment. Réessayez plus tard.',
+    adsPrivacyOptions: 'Paramètres de confidentialité publicitaire',
+    adsPrivacyOptionsUnavailable: 'Les paramètres de confidentialité publicitaire ne sont pas disponibles pour le moment.',
 
     // Légal
     privacyPolicy: 'Politique de confidentialité',
@@ -1630,6 +1644,7 @@ export const translations = {
     playGame: '🎮 Jogar',
     score: 'Pontuação',
     best: 'Melhor',
+    youWon: 'Você venceu! 🎉',
     gameOver: 'Fim de jogo!',
     newGame: 'Novo jogo',
     restart: 'Reiniciar',
@@ -1671,6 +1686,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (Ativo)',
     premiumRemoveAds: 'Remover anúncios (Vitalício)',
     premiumManagePurchases: 'Gerenciar compras',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Experiência sem anúncios!',
     premiumPromoDescription: 'Gostaria de usar o KlickZeit sem anúncios — de forma contínua e focada?',
     premiumPromoFeature1: 'Pagamento único vitalício',
@@ -1684,6 +1700,8 @@ export const translations = {
     purchasesTestModeMessage: 'Chaves Test Store não funcionam em APK release. Use um APK debug ou adicione uma chave goog_ de produção no RevenueCat.',
     purchasesUnavailableTitle: 'Premium indisponível',
     purchasesUnavailableMessage: 'A tela de compra não pode ser aberta agora. Tente novamente mais tarde.',
+    adsPrivacyOptions: 'Configurações de privacidade de anúncios',
+    adsPrivacyOptionsUnavailable: 'As configurações de privacidade de anúncios não estão disponíveis no momento.',
 
     // Legal
     privacyPolicy: 'Política de privacidade',
@@ -2019,6 +2037,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (مفعّل)',
     premiumRemoveAds: 'إزالة الإعلانات (مدى الحياة)',
     premiumManagePurchases: 'إدارة المشتريات',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'تجربة بدون إعلانات!',
     premiumPromoDescription: 'هل تريد استخدام KlickZeit بدون إعلانات — بشكل متواصل ومركّز؟',
     premiumPromoFeature1: 'دفعة واحدة مدى الحياة',
@@ -2032,6 +2051,8 @@ export const translations = {
     purchasesTestModeMessage: 'مفاتيح Test Store لا تعمل في APK الإصدار. استخدم APK تصحيح أو أضف مفتاح goog_ للإنتاج من RevenueCat.',
     purchasesUnavailableTitle: 'بريميوم غير متاح',
     purchasesUnavailableMessage: 'لا يمكن فتح شاشة الشراء الآن. يرجى المحاولة لاحقاً.',
+    adsPrivacyOptions: 'إعدادات خصوصية الإعلانات',
+    adsPrivacyOptionsUnavailable: 'إعدادات خصوصية الإعلانات غير متاحة حالياً.',
 
     // القانونية
     privacyPolicy: 'سياسة الخصوصية',
@@ -2367,6 +2388,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro（已激活）',
     premiumRemoveAds: '移除广告（终身）',
     premiumManagePurchases: '管理购买',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: '无广告体验！',
     premiumPromoDescription: '您是否希望在没有广告的情况下使用 KlickZeit——流畅且专注？',
     premiumPromoFeature1: '一次性终身付款',
@@ -2380,6 +2402,8 @@ export const translations = {
     purchasesTestModeMessage: 'Test Store 密钥在 release APK 中无效。请使用 debug APK 或在 RevenueCat 中添加 goog_ 生产密钥。',
     purchasesUnavailableTitle: '高级版不可用',
     purchasesUnavailableMessage: '目前无法打开购买界面。请稍后再试。',
+    adsPrivacyOptions: '广告隐私设置',
+    adsPrivacyOptionsUnavailable: '广告隐私设置目前不可用。',
 
     // 法律
     privacyPolicy: '隐私政策',
@@ -2715,6 +2739,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (активен)',
     premiumRemoveAds: 'Убрать рекламу (навсегда)',
     premiumManagePurchases: 'Управление покупками',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Без рекламы!',
     premiumPromoDescription: 'Хотите пользоваться KlickZeit без рекламы — без отвлечений и с полной концентрацией?',
     premiumPromoFeature1: 'Разовый платёж на всю жизнь',
@@ -2728,6 +2753,8 @@ export const translations = {
     purchasesTestModeMessage: 'Ключи Test Store не работают в release APK. Используйте debug APK или добавьте production-ключ goog_ из RevenueCat.',
     purchasesUnavailableTitle: 'Премиум недоступен',
     purchasesUnavailableMessage: 'Экран покупки сейчас не открывается. Попробуйте позже.',
+    adsPrivacyOptions: 'Настройки конфиденциальности рекламы',
+    adsPrivacyOptionsUnavailable: 'Настройки конфиденциальности рекламы сейчас недоступны.',
 
     // Юридическая информация
     privacyPolicy: 'Политика конфиденциальности',
@@ -3063,6 +3090,7 @@ export const translations = {
     premiumProActive: 'KlickZeit Pro (активний)',
     premiumRemoveAds: 'Прибрати рекламу (назавжди)',
     premiumManagePurchases: 'Керування покупками',
+    proButtonA11yLabel: 'KlickZeit Pro',
     premiumPromoTitle: 'Без реклами!',
     premiumPromoDescription: 'Бажаєте користуватися KlickZeit без реклами — без перерв і з повною концентрацією?',
     premiumPromoFeature1: 'Одноразовий платіж назавжди',
@@ -3076,6 +3104,8 @@ export const translations = {
     purchasesTestModeMessage: 'Ключі Test Store не працюють у release APK. Використовуйте debug APK або додайте production-ключ goog_ з RevenueCat.',
     purchasesUnavailableTitle: 'Преміум недоступний',
     purchasesUnavailableMessage: 'Екран покупки зараз не відкривається. Спробуйте пізніше.',
+    adsPrivacyOptions: 'Налаштування конфіденційності реклами',
+    adsPrivacyOptionsUnavailable: 'Налаштування конфіденційності реклами зараз недоступні.',
 
     // Юридична інформація
     privacyPolicy: 'Політика конфіденційності',

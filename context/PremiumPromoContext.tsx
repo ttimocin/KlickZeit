@@ -15,8 +15,8 @@ import React, {
   useState,
 } from 'react';
 import { Animated, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import RevenueCatUI from 'react-native-purchases-ui';
 import { showPurchasesUnavailableAlert, shouldEnablePurchases } from '@/utils/revenuecat';
+import { presentKlickZeitPaywall } from '@/utils/present-paywall';
 
 const LAST_PROMO_DATE_KEY = '@last_promo_date';
 
@@ -128,7 +128,7 @@ export function PremiumPromoProvider({ children }: { children: React.ReactNode }
         showPurchasesUnavailableAlert();
         return;
       }
-      RevenueCatUI.presentPaywall().catch((error) => {
+      presentKlickZeitPaywall().catch((error) => {
         console.error('Paywall açılamadı:', error);
       });
     }, 300);

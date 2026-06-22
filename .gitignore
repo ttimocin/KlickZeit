@@ -2,6 +2,8 @@
 
 # dependencies
 node_modules/
+.tools/
+.tools/node/
 
 # Expo
 .expo/
@@ -78,4 +80,3 @@ logs
 
 expo-env.d.ts
 # @end expo-cli
-.tools/

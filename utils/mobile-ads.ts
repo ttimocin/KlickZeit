@@ -33,6 +33,23 @@ export async function presentAdsConsentForms(): Promise<void> {
   await AdsConsent.gatherConsent();
 }
 
+/** UMP: ayarlarda gizlilik seçenekleri girişi gerekli mi? */
+export async function isAdsPrivacyOptionsRequired(): Promise<boolean> {
+  if (!isMobileAdsNativeModuleAvailable()) return false;
+
+  try {
+    const {
+      AdsConsent,
+      AdsConsentPrivacyOptionsRequirementStatus,
+    } = require('react-native-google-mobile-ads');
+    const status = await AdsConsent.getPrivacyOptionsRequirementStatus();
+    return status === AdsConsentPrivacyOptionsRequirementStatus.REQUIRED;
+  } catch (error) {
+    console.warn('AdMob gizlilik seçenekleri durumu okunamadı:', error);
+    return false;
+  }
+}
+
 /** Ayarlardan "Gizlilik seçenekleri" için — otomatik gösterilmez. */
 export async function presentAdsPrivacyOptionsForm(): Promise<void> {
   if (!isMobileAdsNativeModuleAvailable()) return;
