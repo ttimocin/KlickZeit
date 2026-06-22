@@ -13,9 +13,9 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.taytek.zeitlog",
-      "buildNumber": "2",
+      "buildNumber": "5",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
@@ -28,7 +28,7 @@
       }
     },
     "android": {
-      "versionCode": 18,
+      "versionCode": 20,
       "package": "com.taytek.zeitlog",
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {

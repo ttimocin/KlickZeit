@@ -1,4 +1,5 @@
 import { HomeBannerAd } from '@/components/HomeBannerAd';
+import { PremiumPromoModal } from '@/components/PremiumPromoModal';
 import SnakeGame from '@/components/SnakeGame';
 import SudokuGame from '@/components/SudokuGame';
 import TetrisGame from '@/components/TetrisGame';

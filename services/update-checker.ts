@@ -6,7 +6,7 @@ import { Alert, BackHandler, Linking, Platform } from 'react-native';
 const CURRENT_VERSION = Constants.expoConfig?.version ?? '1.0.3';
 
 const DEFAULT_UPDATE_URL = Platform.select({
-  ios: 'https://apps.apple.com/app/id0000000000',
+  ios: 'https://apps.apple.com/app/id6777813623',
   android: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
   default: 'https://play.google.com/store/apps/details?id=com.taytek.zeitlog',
 })!;

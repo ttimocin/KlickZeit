@@ -6,8 +6,9 @@ import { useTheme } from '@/context/ThemeContext';
 import i18n from '@/i18n';
 import { AppStandards, DEFAULT_STANDARDS, getAppStandards, setAppStandards } from '@/services/storage';
 import { formatBackupCompleteMessage } from '@/utils/backup-message';
+import { openLegalPage } from '@/utils/open-legal-page';
 import { getUserCode } from '@/services/user-code';
-import { Ionicons } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -42,9 +43,10 @@ const themes = [
 
 import RevenueCatUI from 'react-native-purchases-ui';
 import { usePurchases } from '@/context/PurchasesContext';
+import { showPurchasesUnavailableAlert, shouldEnablePurchases } from '@/utils/revenuecat';
 
 export default function SettingsScreen() {
-  const { isPro, customerInfo } = usePurchases();
+  const { isPro } = usePurchases();
   const { theme, themeMode, setThemeMode } = useTheme();
   const isDark = theme === 'dark';
   const insets = useSafeAreaInsets();
@@ -100,6 +102,26 @@ export default function SettingsScreen() {
         { text: i18n.t('cancel'), style: 'cancel' },
         { text: i18n.t('logout'), style: 'destructive', onPress: () => logout() },
       ],
+    });
+  };
+
+  const handlePresentPaywall = () => {
+    if (!shouldEnablePurchases()) {
+      showPurchasesUnavailableAlert();
+      return;
+    }
+    RevenueCatUI.presentPaywall().catch((error) => {
+      console.error('Paywall açılamadı:', error);
+    });
+  };
+
+  const handlePresentCustomerCenter = () => {
+    if (!shouldEnablePurchases()) {
+      showPurchasesUnavailableAlert();
+      return;
+    }
+    RevenueCatUI.presentCustomerCenter().catch((error) => {
+      console.error('Customer Center açılamadı:', error);
     });
   };
 
@@ -719,36 +741,30 @@ export default function SettingsScreen() {
         {/* Pro & Ads */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Premium</Text>
-          <View style={styles.card}>
-            <TouchableOpacity 
-              style={[styles.row, isPro ? styles.rowDisabled : undefined]} 
-              onPress={() => RevenueCatUI.presentPaywall()}
-              disabled={isPro}
-            >
-              <View style={styles.rowIcon}>
-                <Feather name="star" size={20} color={isPro ? "#FFD700" : "#4CAF50"} />
-              </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>
-                  {isPro ? 'KlickZeit Pro (Aktif)' : 'Reklamları Kaldır (Ömür Boyu)'}
-                </Text>
-              </View>
-              {!isPro && <Feather name="chevron-right" size={20} color={theme === 'dark' ? '#666' : '#999'} />}
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionRow}
+            onPress={handlePresentPaywall}
+            disabled={isPro}
+          >
+            <View style={[styles.actionIconWrap, styles.actionIconWrapGreen]}>
+              <Feather name="star" size={20} color={isPro ? '#FFD700' : '#4CAF50'} />
+            </View>
+            <Text style={[styles.actionRowText, isPro && { opacity: 0.7 }]}>
+              {isPro ? 'KlickZeit Pro (Aktif)' : 'Reklamları Kaldır (Ömür Boyu)'}
+            </Text>
+            {!isPro && <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />}
+          </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.row} 
-              onPress={() => RevenueCatUI.presentCustomerCenter()}
-            >
-              <View style={styles.rowIcon}>
-                <Feather name="headphones" size={20} color="#4CAF50" />
-              </View>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>Satın Almaları Yönet</Text>
-              </View>
-              <Feather name="chevron-right" size={20} color={theme === 'dark' ? '#666' : '#999'} />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={[styles.actionRow, styles.actionRowLast]}
+            onPress={handlePresentCustomerCenter}
+          >
+            <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
+              <Feather name="headphones" size={20} color="#2196F3" />
+            </View>
+            <Text style={styles.actionRowText}>Satın Almaları Yönet</Text>
+            <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
+          </TouchableOpacity>
         </View>
 
         {/* Hakkında */}
@@ -756,7 +772,7 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('about')}</Text>
           <View style={styles.aboutCard}>
             <Text style={styles.appName}>KlickZeit</Text>
-            <Text style={styles.appVersion}>v1.0.2</Text>
+            <Text style={styles.appVersion}>v1.0.3</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
 
@@ -776,18 +792,29 @@ export default function SettingsScreen() {
 
           <TouchableOpacity
             style={styles.linkButton}
-            onPress={() => router.push('/privacy-policy')}
+            onPress={() => openLegalPage('privacy', language)}
           >
             <Ionicons name="shield-checkmark-outline" size={20} color={isDark ? '#fff' : '#333'} />
             <Text style={styles.linkText}>{i18n.t('privacyPolicy')}</Text>
+            <Ionicons name="open-outline" size={16} color={isDark ? '#666' : '#999'} />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.linkButton}
-            onPress={() => router.push('/terms-of-service')}
+            onPress={() => openLegalPage('terms', language)}
           >
             <Ionicons name="document-text-outline" size={20} color={isDark ? '#fff' : '#333'} />
             <Text style={styles.linkText}>{i18n.t('termsOfService')}</Text>
+            <Ionicons name="open-outline" size={16} color={isDark ? '#666' : '#999'} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.linkButton}
+            onPress={() => openLegalPage('impressum', language)}
+          >
+            <Ionicons name="information-circle-outline" size={20} color={isDark ? '#fff' : '#333'} />
+            <Text style={styles.linkText}>{i18n.t('impressum')}</Text>
+            <Ionicons name="open-outline" size={16} color={isDark ? '#666' : '#999'} />
           </TouchableOpacity>
         </View>
 

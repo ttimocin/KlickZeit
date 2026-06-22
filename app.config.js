@@ -118,9 +118,9 @@ function getFirebaseExtraFromGoogleServicesInfo() {
 }
 
 function getFirebaseExtra() {
-  const fromAndroid = getFirebaseExtraFromGoogleServices();
-  if (fromAndroid.apiKey) return fromAndroid;
-  return getFirebaseExtraFromGoogleServicesInfo();
+  const fromPlist = getFirebaseExtraFromGoogleServicesInfo();
+  if (fromPlist.apiKey && fromPlist.appId) return fromPlist;
+  return getFirebaseExtraFromGoogleServices();
 }
 
 module.exports = {
@@ -130,6 +130,10 @@ module.exports = {
     extra: {
       ...appConfig.expo.extra,
       firebase: getFirebaseExtra(),
+      revenueCat: {
+        appleApiKey: process.env.EXPO_PUBLIC_REVENUECAT_APPLE_API_KEY,
+        googleApiKey: process.env.EXPO_PUBLIC_REVENUECAT_GOOGLE_API_KEY,
+      },
     },
   },
 };

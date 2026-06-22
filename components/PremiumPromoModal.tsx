@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useState } from 'react';
 import { Animated, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import RevenueCatUI from 'react-native-purchases-ui';
+import { showPurchasesUnavailableAlert, shouldEnablePurchases } from '@/utils/revenuecat';
 
 const LAST_PROMO_DATE_KEY = '@last_promo_date';
 
@@ -81,9 +82,14 @@ export function PremiumPromoModal() {
 
   const handleAccept = () => {
     handleClose();
-    // Modal kapandıktan hemen sonra Paywall'u aç
     setTimeout(() => {
-      RevenueCatUI.presentPaywall();
+      if (!shouldEnablePurchases()) {
+        showPurchasesUnavailableAlert();
+        return;
+      }
+      RevenueCatUI.presentPaywall().catch((error) => {
+        console.error('Paywall açılamadı:', error);
+      });
     }, 300);
   };
 

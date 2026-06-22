@@ -280,6 +280,7 @@ export const translations = {
     // Legal
     privacyPolicy: 'Gizlilik Politikası',
     termsOfService: 'Kullanım Koşulları',
+    impressum: 'Impressum',
     lastUpdated: 'Son Güncelleme',
 
     // Account Deletion
@@ -607,6 +608,7 @@ export const translations = {
     // Legal
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
+    impressum: 'Impressum',
     lastUpdated: 'Last Updated',
 
     // Account Deletion
@@ -934,6 +936,7 @@ export const translations = {
     // Legal
     privacyPolicy: 'Datenschutzerklärung',
     termsOfService: 'Nutzungsbedingungen',
+    impressum: 'Impressum',
     lastUpdated: 'Zuletzt aktualisiert',
 
     // Account Deletion
@@ -1262,6 +1265,7 @@ export const translations = {
     // Légal
     privacyPolicy: 'Politique de confidentialité',
     termsOfService: "Conditions d'utilisation",
+    impressum: 'Impressum',
     lastUpdated: 'Dernière mise à jour',
 
     // Suppression de compte
@@ -1589,6 +1593,7 @@ export const translations = {
     // Legal
     privacyPolicy: 'Política de privacidade',
     termsOfService: 'Termos de serviço',
+    impressum: 'Impressum',
     lastUpdated: 'Última atualização',
 
     // Exclusão de conta
@@ -1917,6 +1922,7 @@ export const translations = {
     // القانونية
     privacyPolicy: 'سياسة الخصوصية',
     termsOfService: 'شروط الخدمة',
+    impressum: 'Impressum',
     lastUpdated: 'آخر تحديث',
 
     // حذف الحساب
@@ -2245,6 +2251,7 @@ export const translations = {
     // 法律
     privacyPolicy: '隐私政策',
     termsOfService: '服务条款',
+    impressum: 'Impressum',
     lastUpdated: '最后更新',
 
     // 账户删除
@@ -2573,6 +2580,7 @@ export const translations = {
     // Юридическая информация
     privacyPolicy: 'Политика конфиденциальности',
     termsOfService: 'Условия использования',
+    impressum: 'Impressum',
     lastUpdated: 'Последнее обновление',
 
     // Удаление аккаунта
@@ -2901,6 +2909,7 @@ export const translations = {
     // Юридична інформація
     privacyPolicy: 'Політика конфіденційності',
     termsOfService: 'Умови використання',
+    impressum: 'Impressum',
     lastUpdated: 'Останнє оновлення',
 
     // Видалення облікового запису

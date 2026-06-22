@@ -4,12 +4,12 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import { ThemeProvider as AppThemeProvider, useTheme } from '@/context/ThemeContext';
 import { PurchasesProvider } from '@/context/PurchasesContext';
 import { checkForUpdates } from '@/services/update-checker';
+import { initializeMobileAds } from '@/utils/mobile-ads';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, LogBox, Platform, View } from 'react-native';
-import mobileAds from 'react-native-google-mobile-ads';
 import 'react-native-reanimated';
 
 // Expo dev modunda ekranı uyanık tutma bazen Activity hazır olmadan çağrılır; uygulamayı etkilemez.
@@ -40,9 +40,7 @@ function RootLayoutNav() {
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    mobileAds().initialize().catch((error) => {
-      console.log('AdMob başlatılamadı:', error);
-    });
+    initializeMobileAds();
   }, []);
 
   // Giriş yapıldıysa ve login sayfasındaysa ana sayfaya yönlendir

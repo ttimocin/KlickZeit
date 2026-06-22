@@ -140,11 +140,14 @@ PODS:
     - "GoogleUtilities/NSData+zlib (~> 8.1)"
   - FirebaseRemoteConfigInterop (12.6.0)
   - FirebaseSharedSwift (12.6.0)
+  - Google-Mobile-Ads-SDK (13.1.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
   - GoogleSignIn (9.1.0):
     - AppAuth (~> 2.0)
     - AppCheckCore (~> 11.0)
     - GTMAppAuth (~> 5.0)
     - GTMSessionFetcher/Core (~> 3.3)
+  - GoogleUserMessagingPlatform (3.1.0)
   - GoogleUtilities (8.1.0):
     - GoogleUtilities/AppDelegateSwizzler (= 8.1.0)
     - GoogleUtilities/Environment (= 8.1.0)
@@ -210,6 +213,11 @@ PODS:
   - libwebp/webp (1.5.0):
     - libwebp/sharpyuv
   - PromisesObjC (2.4.0)
+  - PurchasesHybridCommon (18.15.1):
+    - RevenueCat (= 5.78.0)
+  - PurchasesHybridCommonUI (18.15.1):
+    - PurchasesHybridCommon (= 18.15.1)
+    - RevenueCatUI (= 5.78.0)
   - RCTDeprecation (0.81.5)
   - RCTRequired (0.81.5)
   - RCTTypeSafety (0.81.5):
@@ -1908,6 +1916,9 @@ PODS:
     - React-utils (= 0.81.5)
     - ReactNativeDependencies
   - ReactNativeDependencies (0.81.5)
+  - RevenueCat (5.78.0)
+  - RevenueCatUI (5.78.0):
+    - RevenueCat (= 5.78.0)
   - RNCAsyncStorage (2.2.0):
     - hermes-engine
     - RCTRequired
@@ -1982,6 +1993,30 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - RNGoogleMobileAds (16.3.4):
+    - Google-Mobile-Ads-SDK (= 13.1.0)
+    - GoogleUserMessagingPlatform (= 3.1.0)
+    - hermes-engine
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-Core-prebuilt
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - ReactNativeDependencies
+    - Yoga
   - RNGoogleSignin (16.0.0):
     - GoogleSignIn (~> 9.0)
     - hermes-engine
@@ -2005,6 +2040,12 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - RNPaywalls (10.4.0):
+    - PurchasesHybridCommonUI (= 18.15.1)
+    - React-Core
+  - RNPurchases (10.4.0):
+    - PurchasesHybridCommon (= 18.15.1)
+    - React-Core
   - RNReanimated (4.1.6):
     - hermes-engine
     - RCTRequired
@@ -2313,7 +2354,10 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBRemoteConfig (from `../node_modules/@react-native-firebase/remote-config`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
+  - RNGoogleMobileAds (from `../node_modules/react-native-google-mobile-ads`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
+  - RNPaywalls (from `../node_modules/react-native-purchases-ui`)
+  - RNPurchases (from `../node_modules/react-native-purchases`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNWorklets (from `../node_modules/react-native-worklets`)
@@ -2331,7 +2375,9 @@ SPEC REPOS:
     - FirebaseRemoteConfig
     - FirebaseRemoteConfigInterop
     - FirebaseSharedSwift
+    - Google-Mobile-Ads-SDK
     - GoogleSignIn
+    - GoogleUserMessagingPlatform
     - GoogleUtilities
     - GTMAppAuth
     - GTMSessionFetcher
@@ -2339,6 +2385,10 @@ SPEC REPOS:
     - libdav1d
     - libwebp
     - PromisesObjC
+    - PurchasesHybridCommon
+    - PurchasesHybridCommonUI
+    - RevenueCat
+    - RevenueCatUI
     - SDWebImage
     - SDWebImageAVIFCoder
     - SDWebImageSVGCoder
@@ -2540,8 +2590,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/remote-config"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
+  RNGoogleMobileAds:
+    :path: "../node_modules/react-native-google-mobile-ads"
   RNGoogleSignin:
     :path: "../node_modules/@react-native-google-signin/google-signin"
+  RNPaywalls:
+    :path: "../node_modules/react-native-purchases-ui"
+  RNPurchases:
+    :path: "../node_modules/react-native-purchases"
   RNReanimated:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
@@ -2588,7 +2644,9 @@ SPEC CHECKSUMS:
   FirebaseRemoteConfig: c5dfe22828a7ae7673d16224ea92743687e993df
   FirebaseRemoteConfigInterop: 3443b8cb8fffd76bb3e03b2a84bfd3db952fcda4
   FirebaseSharedSwift: 79f27fff0addd15c3de19b87fba426f3cc2c964f
+  Google-Mobile-Ads-SDK: 8429bef6ee1a4e322b0a5571b64217ed8317a3d5
   GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
@@ -2597,6 +2655,8 @@ SPEC CHECKSUMS:
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f
   libwebp: 02b23773aedb6ff1fd38cec7a77b81414c6842a8
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  PurchasesHybridCommon: eed735a411c1aee8c05d62933fa7c4a40ede4009
+  PurchasesHybridCommonUI: 4f0efc542177185a0d38080bbc42210d4ac15f4a
   RCTDeprecation: 943572d4be82d480a48f4884f670135ae30bf990
   RCTRequired: 8f3cfc90cc25cf6e420ddb3e7caaaabc57df6043
   RCTTypeSafety: 16a4144ca3f959583ab019b57d5633df10b5e97c
@@ -2662,12 +2722,17 @@ SPEC CHECKSUMS:
   ReactCodegen: 8cdd5dde550463bc215652a888a61c8ca8f1e787
   ReactCommon: e6e232202a447d353e5531f2be82f50f47cbaa9a
   ReactNativeDependencies: 71ce9c28beb282aa720ea7b46980fff9669f428a
+  RevenueCat: f3641992451c1426da8d8d1466cec3bbdb765962
+  RevenueCatUI: 32998f100fe73f1d0172df7eef4f0dd1bc781a05
   RNCAsyncStorage: 0574155b95b96b89a51717c4dd42fb6057926bbc
   RNDateTimePicker: a51010cc065ad853823d40163ff27f37a2c5f841
   RNFBApp: 29f12d21b6166565e03b4ae36bc070498d6e159d
   RNFBRemoteConfig: 55e48323889654a49dc58d8de2a9f0cf3a777b08
   RNGestureHandler: c971f0a10fdffe00dfb4c142e87f34cdcd704376
+  RNGoogleMobileAds: 9dbc107ccf99d0c469e3da6851b6d2984cdc05eb
   RNGoogleSignin: 239acfc15869d61e410c32f122eadcac9dc90791
+  RNPaywalls: 88ffef8878c59a60549643f085adb2c30f6e993f
+  RNPurchases: e42a93515b5d8994b2c4954da925470b0f5a92df
   RNReanimated: f6923d4159aab5c12a6fa54e468aee947c70750d
   RNScreens: a1f4b39614ebfdd522e6286053912b9a675b352a
   RNWorklets: 28ee7370ca8da356fcc914e3e68b97e9752196d2
