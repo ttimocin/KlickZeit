@@ -50,6 +50,35 @@ export async function isAdsPrivacyOptionsRequired(): Promise<boolean> {
   }
 }
 
+/** Ayarlardan reklam onayı / gizlilik tercihlerini yeniden aç. */
+export async function presentAdsConsentFromSettings(): Promise<boolean> {
+  if (!isMobileAdsNativeModuleAvailable()) return false;
+
+  const {
+    AdsConsent,
+    AdsConsentPrivacyOptionsRequirementStatus,
+  } = require('react-native-google-mobile-ads');
+
+  const info = await AdsConsent.requestInfoUpdate();
+
+  if (
+    info.privacyOptionsRequirementStatus ===
+    AdsConsentPrivacyOptionsRequirementStatus.REQUIRED
+  ) {
+    await AdsConsent.showPrivacyOptionsForm();
+    return true;
+  }
+
+  if (info.isConsentFormAvailable) {
+    await AdsConsent.showForm();
+    return true;
+  }
+
+  await AdsConsent.loadAndShowConsentFormIfRequired();
+  const after = await AdsConsent.getConsentInfo();
+  return after.isConsentFormAvailable || after.status !== 'UNKNOWN';
+}
+
 /** Ayarlardan "Gizlilik seçenekleri" için — otomatik gösterilmez. */
 export async function presentAdsPrivacyOptionsForm(): Promise<void> {
   if (!isMobileAdsNativeModuleAvailable()) return;

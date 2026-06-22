@@ -45,9 +45,8 @@ import { usePurchases } from '@/context/PurchasesContext';
 import { showPurchasesUnavailableAlert, shouldEnablePurchases } from '@/utils/revenuecat';
 import { presentKlickZeitPaywall } from '@/utils/present-paywall';
 import {
-  isAdsPrivacyOptionsRequired,
   isMobileAdsNativeModuleAvailable,
-  presentAdsPrivacyOptionsForm,
+  presentAdsConsentFromSettings,
 } from '@/utils/mobile-ads';
 
 export default function SettingsScreen() {
@@ -75,26 +74,15 @@ export default function SettingsScreen() {
 
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showAdsPrivacyOptions, setShowAdsPrivacyOptions] = useState(false);
+
+  const showAdsConsentSettings =
+    Platform.OS !== 'web' && isMobileAdsNativeModuleAvailable() && !isPro;
 
   // Standartlar
   const [standards, setStandards] = useState<AppStandards>(DEFAULT_STANDARDS);
 
   useEffect(() => {
     getAppStandards().then(setStandards);
-  }, []);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-
-    let cancelled = false;
-    void isAdsPrivacyOptionsRequired().then((required) => {
-      if (!cancelled) setShowAdsPrivacyOptions(required);
-    });
-
-    return () => {
-      cancelled = true;
-    };
   }, []);
 
   const updateStandard = async (key: keyof AppStandards, value: number | string | undefined) => {
@@ -144,7 +132,7 @@ export default function SettingsScreen() {
     });
   };
 
-  const handleAdsPrivacyOptions = () => {
+  const handleAdsConsentSettings = () => {
     if (!isMobileAdsNativeModuleAvailable()) {
       showModal({
         title: i18n.t('adsPrivacyOptions'),
@@ -155,15 +143,26 @@ export default function SettingsScreen() {
       return;
     }
 
-    presentAdsPrivacyOptionsForm().catch((error) => {
-      console.error('Reklam gizlilik ayarları açılamadı:', error);
-      showModal({
-        title: i18n.t('adsPrivacyOptions'),
-        message: i18n.t('adsPrivacyOptionsUnavailable'),
-        icon: '🔒',
-        buttons: [{ text: i18n.t('ok'), style: 'default' }],
+    presentAdsConsentFromSettings()
+      .then((opened) => {
+        if (!opened) {
+          showModal({
+            title: i18n.t('adsPrivacyOptions'),
+            message: i18n.t('adsPrivacyOptionsUnavailable'),
+            icon: '🔒',
+            buttons: [{ text: i18n.t('ok'), style: 'default' }],
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Reklam onay ekranı açılamadı:', error);
+        showModal({
+          title: i18n.t('adsPrivacyOptions'),
+          message: i18n.t('adsPrivacyOptionsUnavailable'),
+          icon: '🔒',
+          buttons: [{ text: i18n.t('ok'), style: 'default' }],
+        });
       });
-    });
   };
 
   const handleSyncToCloud = async () => {
@@ -799,7 +798,7 @@ export default function SettingsScreen() {
           <TouchableOpacity
             style={[
               styles.actionRow,
-              !showAdsPrivacyOptions && styles.actionRowLast,
+              !showAdsConsentSettings && styles.actionRowLast,
             ]}
             onPress={handlePresentCustomerCenter}
           >
@@ -810,10 +809,10 @@ export default function SettingsScreen() {
             <Ionicons name="chevron-forward" size={18} color={isDark ? '#666' : '#bbb'} />
           </TouchableOpacity>
 
-          {showAdsPrivacyOptions ? (
+          {showAdsConsentSettings ? (
             <TouchableOpacity
               style={[styles.actionRow, styles.actionRowLast]}
-              onPress={handleAdsPrivacyOptions}
+              onPress={handleAdsConsentSettings}
             >
               <View style={[styles.actionIconWrap, styles.actionIconWrapBlue]}>
                 <Feather name="shield" size={20} color="#2196F3" />
