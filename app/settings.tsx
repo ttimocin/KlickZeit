@@ -48,7 +48,6 @@ import {
   isMobileAdsNativeModuleAvailable,
   presentAdsConsentFromSettings,
 } from '@/utils/mobile-ads';
-import crashlytics from '@react-native-firebase/crashlytics';
 
 export default function SettingsScreen() {
   const { isPro } = usePurchases();
@@ -75,42 +74,9 @@ export default function SettingsScreen() {
 
   const [isLanguageExpanded, setIsLanguageExpanded] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [aboutTapCount, setAboutTapCount] = useState(0);
-  const [showDeveloperOptions, setShowDeveloperOptions] = useState(false);
 
   const showAdsConsentSettings =
     Platform.OS !== 'web' && isMobileAdsNativeModuleAvailable() && !isPro;
-
-  const handleAboutTap = () => {
-    if (!__DEV__) return;
-    if (Platform.OS === 'web') return;
-    setAboutTapCount((c) => {
-      const next = c + 1;
-      if (next >= 7) {
-        setShowDeveloperOptions(true);
-        return 0;
-      }
-      return next;
-    });
-  };
-
-  const handleCrashlyticsNonFatal = () => {
-    if (Platform.OS === 'web') return;
-    crashlytics().log('Manual Crashlytics non-fatal test');
-    crashlytics().recordError(new Error('Manual Crashlytics non-fatal test'));
-    showModal({
-      title: 'Crashlytics',
-      message: 'Non-fatal hata gönderildi. Firebase Crashlytics panelinde birkaç dakika içinde görünür.',
-      icon: '✅',
-      buttons: [{ text: i18n.t('ok'), style: 'default' }],
-    });
-  };
-
-  const handleCrashlyticsCrash = () => {
-    if (Platform.OS === 'web') return;
-    crashlytics().log('Manual Crashlytics crash test');
-    crashlytics().crash();
-  };
 
   // Standartlar
   const [standards, setStandards] = useState<AppStandards>(DEFAULT_STANDARDS);
@@ -862,25 +828,9 @@ export default function SettingsScreen() {
           <Text style={styles.sectionTitle}>{i18n.t('about')}</Text>
           <View style={styles.aboutCard}>
             <Text style={styles.appName}>KlickZeit</Text>
-            <TouchableOpacity activeOpacity={0.8} onPress={handleAboutTap}>
-              <Text style={styles.appVersion}>v1.0.3</Text>
-            </TouchableOpacity>
+            <Text style={styles.appVersion}>v1.0.3</Text>
             <Text style={styles.appDescription}>{i18n.t('appDescription')}</Text>
           </View>
-
-          {__DEV__ && showDeveloperOptions ? (
-            <View style={styles.devCard}>
-              <Text style={styles.devTitle}>Geliştirici</Text>
-              <TouchableOpacity style={styles.devRow} onPress={handleCrashlyticsNonFatal}>
-                <Ionicons name="bug-outline" size={18} color={isDark ? '#fff' : '#333'} />
-                <Text style={styles.devText}>Crashlytics: Non-fatal gönder</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.devRow} onPress={handleCrashlyticsCrash}>
-                <Ionicons name="warning-outline" size={18} color="#FF5252" />
-                <Text style={styles.devText}>Crashlytics: Test crash</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
 
           <TouchableOpacity
             style={styles.linkButton}
@@ -1073,34 +1023,6 @@ const createStyles = (isDark: boolean) =>
       backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8',
       borderRadius: 12,
       marginBottom: 12,
-    },
-    devCard: {
-      backgroundColor: isDark ? '#2a2a2a' : '#f8f8f8',
-      borderRadius: 12,
-      padding: 12,
-      marginBottom: 12,
-    },
-    devTitle: {
-      fontSize: 13,
-      fontWeight: '700',
-      color: isDark ? '#bbb' : '#666',
-      marginBottom: 8,
-    },
-    devRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-      paddingVertical: 10,
-      paddingHorizontal: 10,
-      borderRadius: 10,
-      backgroundColor: isDark ? '#1f1f1f' : '#ffffff',
-      marginBottom: 8,
-    },
-    devText: {
-      flex: 1,
-      fontSize: 14,
-      color: isDark ? '#fff' : '#333',
-      fontWeight: '600',
     },
     appName: {
       fontSize: 24,

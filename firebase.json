@@ -1,10 +1,4 @@
 {
-  "react-native": {
-    "crashlytics_disable_auto_disabler": true,
-    "crashlytics_auto_collection_enabled": true
-  }
-}
-{
     "firestore": {
         "rules": "firestore.rules",
         "indexes": "firestore.indexes.json"
