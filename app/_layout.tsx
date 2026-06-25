@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ActivityIndicator, LogBox, Platform, View } from 'react-native';
 import 'react-native-reanimated';
+import crashlytics from '@react-native-firebase/crashlytics';
 
 // Expo dev modunda ekranı uyanık tutma bazen Activity hazır olmadan çağrılır; uygulamayı etkilemez.
 if (__DEV__) {
@@ -43,6 +44,11 @@ function RootLayoutNav() {
   useEffect(() => {
     if (Platform.OS === 'web') return;
     initializeMobileAds();
+  }, []);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    crashlytics().setCrashlyticsCollectionEnabled(true);
   }, []);
 
   // Giriş yapıldıysa ve login sayfasındaysa ana sayfaya yönlendir
