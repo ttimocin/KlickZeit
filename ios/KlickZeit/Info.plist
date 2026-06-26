@@ -38,7 +38,7 @@
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-1513134902454765~1926200034</string>
     <key>NSUserTrackingUsageDescription</key>
-    <string>Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır.</string>
+    <string>This identifier is used to deliver personalized ads to you.</string>
     <key>LSMinimumSystemVersion</key>
     <string>12.0</string>
     <key>LSRequiresIPhoneOS</key>

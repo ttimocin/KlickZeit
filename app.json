@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.taytek.zeitlog",
-      "buildNumber": "6",
+      "buildNumber": "7",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false
@@ -87,16 +87,27 @@
         {
           "androidAppId": "ca-app-pub-1513134902454765~1337786914",
           "iosAppId": "ca-app-pub-1513134902454765~1926200034",
-          "userTrackingUsageDescription": "Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır."
+          "userTrackingUsageDescription": "This identifier is used to deliver personalized ads to you."
         }
       ],
       [
         "expo-tracking-transparency",
         {
-          "userTrackingPermission": "Bu tanımlayıcı size kişiselleştirilmiş reklamlar sunmak için kullanılır."
+          "userTrackingPermission": "This identifier is used to deliver personalized ads to you."
         }
       ]
     ],
+    "locales": {
+      "tr": "./locales/tr.json",
+      "en": "./locales/en.json",
+      "de": "./locales/de.json",
+      "fr": "./locales/fr.json",
+      "pt": "./locales/pt.json",
+      "ar": "./locales/ar.json",
+      "zh": "./locales/zh.json",
+      "ru": "./locales/ru.json",
+      "uk": "./locales/uk.json"
+    },
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

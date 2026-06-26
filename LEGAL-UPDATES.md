@@ -183,6 +183,7 @@ Uygulama kodu UMP ve ayarlardan gizlilik seçeneklerini sunar; aşağıdakiler *
 ### Google AdMob
 
 - [ ] **Privacy & messaging** → GDPR consent message oluşturuldu ve **Published**
+- [ ] **Privacy & messaging → Languages** → Uygulamanın 9 dili eklendi ve her biri çevrildi: **Turkish, English, German, French, Portuguese, Arabic, Chinese, Russian, Ukrainian**
 - [ ] **US state regulations** → California, Virginia, Colorado vb. eyalet mesajları yapılandırıldı
 - [ ] **Funding Choices** → Kullanıcı opt-out linkleri aktif
 - [ ] Test cihazları AB/ABD senaryoları için tanımlı (QA)
@@ -197,6 +198,9 @@ Uygulama kodu UMP ve ayarlardan gizlilik seçeneklerini sunar; aşağıdakiler *
 
 - [ ] **App Privacy** nutrition labels: Advertising Data, Identifiers, Purchase History güncel
 - [ ] ATT açıklaması App Review notlarında belirtilebilir (uygulama UMP sonrası ATT istiyor)
+- [ ] **App Review Information → Notes** (İngilizce örnek):
+
+> Permission strings (ATT) are localized via InfoPlist.strings for all 9 supported app languages (tr, en, de, fr, pt, ar, zh, ru, uk). The ATT prompt follows the device language. Ad consent (Google UMP) is configured in AdMob Privacy & Messaging for the same languages. To test: set device language to English, open the app twice (ads appear from the 2nd launch), then complete UMP and ATT when prompted.
 
 ### RevenueCat Dashboard
 
@@ -213,6 +217,7 @@ Bu yasal metinlerden bağımsız olarak uygulamada:
 2. iOS'ta UMP sonrası **ATT** istenir (`expo-tracking-transparency`)
 3. **Ayarlar → Reklam gizlilik ayarları** (UMP privacy options, gerektiğinde)
 4. **Ayarlar → Satın Almaları Yönet** (RevenueCat Customer Center, restore dahil)
+5. **ATT yerelleştirme:** `locales/*.json` + `ios/KlickZeit/*.lproj/InfoPlist.strings` (9 dil, `NSUserTrackingUsageDescription`)
 
 Yeni native build (iOS `pod install`, release APK/IPA) gereklidir.
 

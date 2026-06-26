@@ -15,6 +15,7 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		E48229285C4E8A88DDDDAA1C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8121DD018491635B06CABBFE /* PrivacyInfo.xcprivacy */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		LOCSTR01A1B2C3D4E5F6789012 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = LOCSTR00A1B2C3D4E5F6789012 /* InfoPlist.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,31 @@
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = KlickZeit/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* KlickZeit-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "KlickZeit-Bridging-Header.h"; path = "KlickZeit/KlickZeit-Bridging-Header.h"; sourceTree = "<group>"; };
+		LOCSTR00A1B2C3D4E5F6789012 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				LOCSTREN1A2B3C4D5E6F789012 /* en */,
+				LOCSTRTR1A2B3C4D5E6F789012 /* tr */,
+				LOCSTRDE1A2B3C4D5E6F789012 /* de */,
+				LOCSTRFR1A2B3C4D5E6F789012 /* fr */,
+				LOCSTRPT1A2B3C4D5E6F789012 /* pt */,
+				LOCSTRAR1A2B3C4D5E6F789012 /* ar */,
+				LOCSTRZH1A2B3C4D5E6F789012 /* zh */,
+				LOCSTRRU1A2B3C4D5E6F789012 /* ru */,
+				LOCSTRUK1A2B3C4D5E6F789012 /* uk */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		LOCSTREN1A2B3C4D5E6F789012 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = KlickZeit/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRTR1A2B3C4D5E6F789012 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = KlickZeit/tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRDE1A2B3C4D5E6F789012 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = KlickZeit/de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRFR1A2B3C4D5E6F789012 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = KlickZeit/fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRPT1A2B3C4D5E6F789012 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = KlickZeit/pt.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRAR1A2B3C4D5E6F789012 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = KlickZeit/ar.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRZH1A2B3C4D5E6F789012 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = KlickZeit/zh.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRRU1A2B3C4D5E6F789012 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = KlickZeit/ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		LOCSTRUK1A2B3C4D5E6F789012 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = KlickZeit/uk.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,6 +91,7 @@
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
 				8121DD018491635B06CABBFE /* PrivacyInfo.xcprivacy */,
 				A1B2C3D31E5F678901234567 /* GoogleService-Info.plist */,
+				LOCSTR00A1B2C3D4E5F6789012 /* InfoPlist.strings */,
 			);
 			name = KlickZeit;
 			sourceTree = "<group>";
@@ -180,8 +207,16 @@
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				ar,
 				Base,
+				de,
+				en,
+				fr,
+				pt,
+				ru,
+				tr,
+				uk,
+				zh,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -203,6 +238,7 @@
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
 				E48229285C4E8A88DDDDAA1C /* PrivacyInfo.xcprivacy in Resources */,
 				A1B2C3D41E5F678901234567 /* GoogleService-Info.plist in Resources */,
+				LOCSTR01A1B2C3D4E5F6789012 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

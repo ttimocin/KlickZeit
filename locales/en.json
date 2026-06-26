@@ -1,0 +1,5 @@
+{
+  "ios": {
+    "NSUserTrackingUsageDescription": "This identifier is used to deliver personalized ads to you."
+  }
+}
