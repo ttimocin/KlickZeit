@@ -1,7 +1,7 @@
+import { getRevenueCatApiKey, isNativeDebugBuild, shouldEnablePurchases } from '@/utils/revenuecat';
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import Purchases, { CustomerInfo, LOG_LEVEL } from 'react-native-purchases';
 import { useAuth } from './AuthContext';
-import { getRevenueCatApiKey, isNativeDebugBuild, shouldEnablePurchases } from '@/utils/revenuecat';
 
 // Entitlement Name
 export const ENTITLEMENT_ID = 'KlickZeit Pro';
