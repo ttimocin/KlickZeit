@@ -54,6 +54,8 @@ export async function isAdsPrivacyOptionsRequired(): Promise<boolean> {
 export async function presentAdsConsentFromSettings(): Promise<boolean> {
   if (!isMobileAdsNativeModuleAvailable()) return false;
 
+  await initializeMobileAds();
+
   const {
     AdsConsent,
     AdsConsentPrivacyOptionsRequirementStatus,
@@ -99,6 +101,7 @@ export async function requestAppTrackingIfNeeded(): Promise<void> {
   }
 }
 
+/** Release/TestFlight: gerçek AdMob birim ID. Debug: Google test banner. */
 export function getBannerAdUnitId(productionId: string): string {
   if (__DEV__) return GOOGLE_TEST_BANNER_ID;
   return productionId;

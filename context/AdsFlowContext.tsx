@@ -3,7 +3,11 @@ import {
   incrementAndGetLaunchCount,
   shouldShowAdsForSession,
 } from '@/services/ad-session';
-import { presentAdsConsentForms, requestAppTrackingIfNeeded } from '@/utils/mobile-ads';
+import {
+  initializeMobileAds,
+  presentAdsConsentForms,
+  requestAppTrackingIfNeeded,
+} from '@/utils/mobile-ads';
 import React, {
   createContext,
   useContext,
@@ -52,6 +56,7 @@ export function AdsFlowProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isReady || purchasesLoading) return;
 
+    // İlk oturum: reklam yok, UMP ve iOS ATT istenmez.
     if (!shouldShowAds || isPro) {
       setConsentFlowCompleted(true);
       return;
@@ -69,6 +74,8 @@ export function AdsFlowProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
+        // 2+ oturum: AdMob → Google UMP onayı → iOS ATT → bannerlar
+        await initializeMobileAds();
         await presentAdsConsentForms();
         await requestAppTrackingIfNeeded();
       } catch (error) {

@@ -3,7 +3,7 @@ import remoteConfig from '@react-native-firebase/remote-config';
 import Constants from 'expo-constants';
 import { Alert, BackHandler, Linking, Platform } from 'react-native';
 
-const CURRENT_VERSION = Constants.expoConfig?.version ?? '1.0.3';
+const CURRENT_VERSION = Constants.expoConfig?.version ?? '1.0.4';
 
 const DEFAULT_UPDATE_URL = Platform.select({
   ios: 'https://apps.apple.com/app/id6777813623',

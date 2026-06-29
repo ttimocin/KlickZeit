@@ -6,7 +6,7 @@
   "expo": {
     "name": "KlickZeit",
     "slug": "klickzeit",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "klickzeit",
@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.taytek.zeitlog",
-      "buildNumber": "8",
+      "buildNumber": "9",
       "googleServicesFile": "./GoogleService-Info.plist",
       "config": {
         "usesNonExemptEncryption": false

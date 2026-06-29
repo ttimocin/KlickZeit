@@ -1,0 +1,35 @@
+diff --git a/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m b/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
+index ada982b..bab8789 100644
+--- a/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
++++ b/node_modules/@react-native-firebase/crashlytics/ios/RNFBCrashlytics/RNFBCrashlyticsModule.m
+@@ -18,6 +18,7 @@
+ #include <Foundation/Foundation.h>
+ #include <sys/sysctl.h>
+ 
++#import <React/RCTBridgeModule.h>
+ #import <React/RCTConvert.h>
+ #import <React/RCTLog.h>
+ #import <React/RCTUtils.h>
+@@ -113,12 +114,17 @@ + (BOOL)requiresMainQueueSetup {
+   resolve([NSNumber numberWithBool:didCrash]);
+ }
+ 
+-RCT_EXPORT_METHOD(log : (NSString *)message) { [[FIRCrashlytics crashlytics] log:message]; }
++RCT_REMAP_METHOD(log,
++                 logMessage:(NSString *)message)
++{
++  [[FIRCrashlytics crashlytics] log:message];
++}
+ 
+-RCT_EXPORT_METHOD(logPromise
+-                  : (NSString *)message resolver
+-                  : (RCTPromiseResolveBlock)resolve rejecter
+-                  : (RCTPromiseRejectBlock)reject) {
++RCT_REMAP_METHOD(logPromise,
++                 logMessagePromise:(NSString *)message
++                 resolver:(RCTPromiseResolveBlock)resolve
++                 rejecter:(RCTPromiseRejectBlock)reject)
++{
+   [[FIRCrashlytics crashlytics] log:message];
+   resolve([NSNull null]);
+ }

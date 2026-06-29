@@ -6,7 +6,6 @@ import { AdsFlowProvider } from '@/context/AdsFlowContext';
 import { PremiumPromoProvider } from '@/context/PremiumPromoContext';
 import { PurchasesProvider } from '@/context/PurchasesContext';
 import { checkForUpdates } from '@/services/update-checker';
-import { initializeMobileAds } from '@/utils/mobile-ads';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -39,11 +38,6 @@ function RootLayoutNav() {
     checkForUpdates().catch((error) => {
       console.log('Güncelleme kontrolü başarısız oldu, uygulama normal şekilde devam ediyor:', error);
     });
-  }, []);
-
-  useEffect(() => {
-    if (Platform.OS === 'web') return;
-    initializeMobileAds();
   }, []);
 
   useEffect(() => {
